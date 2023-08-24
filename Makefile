@@ -10,7 +10,7 @@ filenames = \
 	software.html
 targets = $(addprefix $(OUTPUT_DIR)/, $(filenames))
 
-all: $(targets) css
+all: $(targets) css images
 
 publish: all
 	ghp-import -m "Generate site" -b $(GITHUB_PAGES_BRANCH) "$(OUTPUT_DIR)"
@@ -21,6 +21,9 @@ output_dir:
 
 $(OUTPUT_DIR)/%.html: $(SOURCE_DIR)/%.md output_dir
 	$(TOOLS_DIR)/markdown2html.py $< > $@
+
+images: output_dir
+	cp -r images $(OUTPUT_DIR)/
 
 css: output_dir
 	cp -r css $(OUTPUT_DIR)/
