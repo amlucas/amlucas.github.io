@@ -5,6 +5,7 @@ GITHUB_PAGES_BRANCH=main
 
 filenames = \
 	about.html \
+	contact.html \
 	index.html \
 	publications.html \
 	software.html

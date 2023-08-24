@@ -34,6 +34,7 @@ def main(argv):
     <li> <a href="./about.html"> About </a> </li>
     <li> <a href="./publications.html"> Publications </a> </li>
     <li> <a href="./software.html"> Software </a> </li>
+    <li> <a href="./contact.html"> Contact </a> </li>
   </ul>
 </nav>
 </header>
