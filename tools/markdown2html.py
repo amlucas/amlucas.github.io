@@ -25,8 +25,19 @@ def main(argv):
     <link href="css/white.css" type="text/css" rel="stylesheet" />
     <title>%(title)s</title>
   </head>
-
 <body>
+
+<header>
+<nav>
+  <ul>
+    <li> <a href="./index.html"> Home </a> </li>
+    <li> <a href="./about.html"> About </a> </li>
+    <li> <a href="./publications.html"> Publications </a> </li>
+    <li> <a href="./software.html"> Software </a> </li>
+  </ul>
+</nav>
+</header>
+
 """ % { 'title' : title }
     ]
 
