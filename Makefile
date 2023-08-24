@@ -3,6 +3,8 @@ OUTPUT_DIR=output
 TOOLS_DIR=tools
 GITHUB_PAGES_BRANCH=main
 
+HEADER_PATH = source/header.html
+
 filenames = \
 	about.html \
 	contact.html \
@@ -21,7 +23,7 @@ output_dir:
 	mkdir -p $(OUTPUT_DIR)
 
 $(OUTPUT_DIR)/%.html: $(SOURCE_DIR)/%.md output_dir
-	$(TOOLS_DIR)/markdown2html.py $< > $@
+	$(TOOLS_DIR)/markdown2html.py $< --header $(HEADER_PATH) > $@
 
 images: output_dir
 	cp -r images $(OUTPUT_DIR)/

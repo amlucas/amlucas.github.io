@@ -4,18 +4,21 @@ import argparse
 import markdown
 import sys
 
+def get_file_str(path):
+    with open(path, "r") as f:
+        text = " ".join(line.rstrip() for line in f)
+    return text
+
 def main(argv):
     parser = argparse.ArgumentParser()
-    parser.add_argument('md_file', type=str, help="The file to convert.")
+    parser.add_argument('md_path', type=str, help="The file to convert.")
+    parser.add_argument('--header', type=str, default=None, help="html header.")
     parser.add_argument('--title', type=str, default="Lucas Amoudruz")
     args = parser.parse_args(argv)
 
-    md_file = args.md_file
-    title = args.title
-
-    with open(md_file, "r") as f:
-        md_text = f.read()
-        html = markdown.markdown(md_text)
+    md_path     = args.md_path
+    header_path = args.header
+    title       = args.title
 
     output = [ """<!DOCTYPE html>
 <html>
@@ -27,22 +30,17 @@ def main(argv):
   </head>
 <body>
 
-<header>
-<nav>
-  <ul>
-    <li> <a href="./index.html"> Home </a> </li>
-    <li> <a href="./about.html"> About </a> </li>
-    <li> <a href="./publications.html"> Publications </a> </li>
-    <li> <a href="./software.html"> Software </a> </li>
-    <li> <a href="./contact.html"> Contact </a> </li>
-  </ul>
-</nav>
-</header>
 
 """ % { 'title' : title }
     ]
 
-    output.append( html )
+    if header_path is not None:
+        output.append(get_file_str(header_path))
+
+    with open(md_path, "r") as f:
+        md_text = f.read()
+        html = markdown.markdown(md_text)
+        output.append( html )
 
     output.append( """
 
