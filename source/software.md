@@ -2,7 +2,7 @@
 
 ## Mirheo
 
-Mirheo is a high performance computing software primarily designed to simulate blood flow, microfluidics and microswimmers.
+Mirheo is a high performance computing software primarily designed to simulate blood flow, microfluidics and the evolution of rigid microswimmers.
 The code is written in c++/CUDA/MPI and targets GPU clusters.  
 
 **Github:** [https://github.com/cselab/Mirheo](https://github.com/cselab/Mirheo)  
