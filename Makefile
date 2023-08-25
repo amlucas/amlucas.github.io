@@ -6,7 +6,6 @@ GITHUB_PAGES_BRANCH=main
 HEADER_PATH = source/header.html
 
 filenames = \
-	about.html \
 	contact.html \
 	gallery.html \
 	index.html \
