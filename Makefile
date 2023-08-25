@@ -8,6 +8,7 @@ HEADER_PATH = source/header.html
 filenames = \
 	about.html \
 	contact.html \
+	gallery.html \
 	index.html \
 	publications.html \
 	software.html
