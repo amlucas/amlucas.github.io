@@ -23,3 +23,10 @@ The tool composes simple shapes to generate complex geometries.
 
 **Documentation:** [https://sdftools.readthedocs.io/en/latest/](https://sdftools.readthedocs.io/en/latest/)  
 
+
+
+## stochsim
+
+Stochastic simulation processes with python and json interface.  
+
+**Github:** [https://github.com/amlucas/stochsim](https://github.com/amlucas/stochsim)  
