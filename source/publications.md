@@ -4,7 +4,7 @@
 
 * Amoudruz, L., Litvinov, S. and Koumoutsakos, P., 2024. Path planning of magnetic microswimmers in high-fidelity simulations of capillaries with deep reinforcement learning. arXiv preprint arXiv:2404.02171. [DOI](https://doi.org/10.48550/arXiv.2404.02171)
 
-* Amoudruz, L., Economides, A. and Koumoutsakos, P., 2024. The Volume of Healthy Red Blood Cells is Optimal for Advective Oxygen Transport in Arterioles. Biophysical Journal. [DOI](https://doi.org/10.1016/j.bpj.2024.04.015)
+* Amoudruz, L., Economides, A. and Koumoutsakos, P., 2024. The Volume of Healthy Red Blood Cells is Optimal for Advective Oxygen Transport in Arterioles. Biophysical Journal, 123(10), pp.1289-1296. [DOI](https://doi.org/10.1016/j.bpj.2024.04.015)
 
 ## 2023
 
