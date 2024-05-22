@@ -30,6 +30,7 @@ images: output_dir
 
 css: output_dir
 	cp -r css $(OUTPUT_DIR)/
+	pygmentize -S default -f html -a .codehilite > $(OUTPUT_DIR)/css/codehilite.css
 
 clean:
 	rm -f $(targets)

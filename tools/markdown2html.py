@@ -26,6 +26,7 @@ def main(argv):
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link href="css/white.css" type="text/css" rel="stylesheet" />
+    <link href="css/codehilite.css" rel="stylesheet" />
     <title>%(title)s</title>
   </head>
 <body>
@@ -39,7 +40,8 @@ def main(argv):
 
     with open(md_path, "r") as f:
         md_text = f.read()
-        html = markdown.markdown(md_text)
+        html = markdown.markdown(md_text,
+                                 extensions=['fenced_code', 'codehilite'])
         output.append( html )
 
     output.append( """
