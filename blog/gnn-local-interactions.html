@@ -32,7 +32,7 @@ E_i = \sum\limits_{j \neq i, r_{ij} < r_c} m_i m_j w(r_{ij}),
 </script>
 where <script type="math/tex">r_c = 1</script> is the cutoff radius, <script type="math/tex">r_{ij}</script> the distance separating particles <script type="math/tex">i</script> and <script type="math/tex">j</script> and <script type="math/tex">w(r)=\max\left(0, 1 - \frac{r}{r_c}\right)</script>.</p>
 <p>We show below the training data, 500 particles placed randomly in a square box. The color shows the energy.
-<img alt="" src="../images/blog/gnn-local-interactions/dataset.png" /></p>
+<img alt="" src="../images/blog/gnn-local-interactions/dataset.svg" /></p>
 <p>Let's suppose that we have data about the energy of particles in a given configuration, can we predict the energy of particles in a new situation, without knowing the form of the energy?</p>
 <p>The GNN architecture is set as follows:
 <script type="math/tex; mode=display">
@@ -69,8 +69,8 @@ class GCN(torch.nn.Module):
 
 <p>We train for 20000 epochs using the Adam optimizer with a learning rate of 0.001.
 Here are the results, the model tested on a new random configuration:</p>
-<p><img alt="" src="../images/blog/gnn-local-interactions/comp_xyE.png" />
-<img alt="" src="../images/blog/gnn-local-interactions/comp_E.png" /></p>
+<p><img alt="" src="../images/blog/gnn-local-interactions/comp_xyE.svg" />
+<img alt="" src="../images/blog/gnn-local-interactions/comp_E.svg" /></p>
 <p>The prediction of the energy is very close to the ground truth on the test data.</p>
 
 </body>
