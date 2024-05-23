@@ -9,6 +9,9 @@ I have recorded my time every week to keep track of my progress:
 
 ![](../images/blog/stadium/raw_times.svg)
 
-It looks like I have reached some kind of a plateau, but the initial learning curve was steep!
-I believe that it was about learning how to pace myself. 
-Probably a bit of improved fitness helped too.
+The dashed line shows the window average over 6 consecutive times (red markers).
+We can observe a few trends:
+
+* the time improves when I went consistently (high density of points along the time axis)  
+* not going for a few weeks resulted in higher times  
+* there is some plateau time that I will never reach, at least not with my current technique  

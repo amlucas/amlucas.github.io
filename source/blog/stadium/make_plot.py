@@ -20,10 +20,14 @@ def convert_duration_to_minutes(duration):
 
 def plot_duration_vs_date(dates, durations, out):
     dates = [datetime.strptime(date, '%Y-%m-%d') for date in dates]
-    durations = [convert_duration_to_minutes(duration) for duration in durations]
+    durations = np.array([convert_duration_to_minutes(duration) for duration in durations])
+
+    W = 6
+    mean = np.convolve(durations, np.ones(W), mode='same') / np.convolve(np.ones_like(durations), np.ones(W), mode='same')
 
     fig, ax = plt.subplots()
     ax.plot(dates, durations, 'o', clip_on=False)
+    ax.plot(dates, mean, '--k', clip_on=False)
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
     ax.xaxis.set_major_locator(mdates.AutoDateLocator())
     plt.xticks(rotation=45)
