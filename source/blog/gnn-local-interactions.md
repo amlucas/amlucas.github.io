@@ -19,6 +19,51 @@ $$
 E_i = \sum\limits_{j \neq i, r_{ij} < r_c} m_i m_j w(r_{ij}),
 $$
 where \(r_c = 1\) is the cutoff radius, \(r_{ij}\) the distance separating particles \(i\) and \(j\) and \(w(r)=\max\left(0, 1 - \frac{r}{r_c}\right)\).
+
+We show below the training data, 500 particles placed randomly in a square box. The color shows the energy.
+![](../images/blog/gnn-local-interactions/dataset.png)
+
 Let's suppose that we have data about the energy of particles in a given configuration, can we predict the energy of particles in a new situation, without knowing the form of the energy?
 
+The GNN architecture is set as follows:
+$$
+y_i = \sum\limits_{j: (i,j) \in E} \phi(m_i, m_j, \mathbf{e}_{ij}),
+$$
+where \(y_i\) is the output at node \(i\) and the edge features are the direction between particles and their distance, \(\mathbf{e}_{ij} = \left(\mathbf{r}_{ij} / r_{ij}, r_{ij}\right)\).
+The function \(\phi\) is a multi layer perceptron.
+Note that in this case the direction between particles is not useful, but we assume that we don't know this information.
 
+This is easily implemented using [pytorch-geometric](https://pytorch-geometric.readthedocs.io/en/latest/index.html):
+~~~python
+class EdgeConv(MessagePassing):
+    def __init__(self, x_channels, e_channels, out_channels):
+        super().__init__(aggr='add')
+        self.mlp = nn.Sequential(nn.Linear(2 * x_channels + e_channels, 16),
+                              nn.ReLU(),
+                              nn.Linear(16, out_channels))
+
+    def forward(self, x, edge_index, edge_attr):
+        return self.propagate(edge_index, x=x, edge_attr=edge_attr)
+
+    def message(self, x_i, x_j, edge_attr):
+        z = torch.cat([x_i, x_j, edge_attr], dim=1)
+        return self.mlp(z)
+
+
+class GCN(torch.nn.Module):
+    def __init__(self, x_channels, e_channels, out_channels):
+        super().__init__()
+        self.conv = EdgeConv(x_channels, e_channels, out_channels)
+
+    def forward(self, data):
+        x, edge_index, edge_attr = data.x, data.edge_index, data.edge_attr
+        return self.conv(x, edge_index, edge_attr)
+~~~
+
+We train for 20000 epochs using the Adam optimizer with a learning rate of 0.001.
+Here are the results, the model tested on a new random configuration:
+
+![](../images/blog/gnn-local-interactions/comp_xyE.png)
+![](../images/blog/gnn-local-interactions/comp_E.png)
+
+The prediction of the energy is very close to the gound truth on the test data.
