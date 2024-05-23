@@ -7,7 +7,7 @@ In computational science we can often represent a physical system by a graph:
 
 * A computational grid is a set of nodes connected with each other.
 * Molecular dynamics is essentially a list of particles (nodes) interacting with pairwise forces (edges).
-* Unstructure grids to represent PDEs.
+* Unstructured grids to represent PDEs.
 * Triangle mesh surfaces to represent membranes.
 
 To test this method I generated \( N \) particles in a square 2D domain, with random positions \(\mathbf{r}_i \sim \mathcal{U}\left([0, L] \times [0, L]\right)\), \(i = 1, 2, \dots, N\).
@@ -66,4 +66,4 @@ Here are the results, the model tested on a new random configuration:
 ![](../images/blog/gnn-local-interactions/comp_xyE.png)
 ![](../images/blog/gnn-local-interactions/comp_E.png)
 
-The prediction of the energy is very close to the gound truth on the test data.
+The prediction of the energy is very close to the ground truth on the test data.
