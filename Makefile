@@ -14,7 +14,8 @@ filenames = \
 	software.html
 
 blog_filenames = \
-	blog/gnn-local-interactions.html
+	blog/gnn-local-interactions.html \
+	blog/stadium.html
 
 targets = $(addprefix $(OUTPUT_DIR)/, $(filenames))
 blog_targets = $(addprefix $(OUTPUT_DIR)/, $(blog_filenames))
