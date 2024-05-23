@@ -4,6 +4,7 @@ TOOLS_DIR=tools
 GITHUB_PAGES_BRANCH=main
 
 HEADER_PATH = source/header.html
+BLOG_HEADER_PATH = source/blog_header.html
 
 filenames = \
 	contact.html \
@@ -11,11 +12,15 @@ filenames = \
 	index.html \
 	publications.html \
 	software.html \
-	blog/particles_tracking.html
+	blog.html
+
+blog_filenames = \
+	blog/gnn-local-interactions.html
 
 targets = $(addprefix $(OUTPUT_DIR)/, $(filenames))
+blog_targets = $(addprefix $(OUTPUT_DIR)/, $(blog_filenames))
 
-all: $(targets) css images
+all: $(targets) $(blog_targets) css images
 
 publish: all
 	ghp-import -m "Generate site" -b $(GITHUB_PAGES_BRANCH) "$(OUTPUT_DIR)"
@@ -24,6 +29,9 @@ publish: all
 output_dir:
 	mkdir -p $(OUTPUT_DIR)
 	mkdir -p $(OUTPUT_DIR)/blog
+
+$(OUTPUT_DIR)/blog/%.html: $(SOURCE_DIR)/blog/%.md output_dir
+	$(TOOLS_DIR)/markdown2html.py $< --header $(BLOG_HEADER_PATH) > $@
 
 $(OUTPUT_DIR)/%.html: $(SOURCE_DIR)/%.md output_dir
 	$(TOOLS_DIR)/markdown2html.py $< --header $(HEADER_PATH) > $@
@@ -40,6 +48,7 @@ css: output_dir css/codehilite.css
 
 clean:
 	rm -f $(targets)
+	rm -f $(blog_targets)
 	rm -r $(OUTPUT_DIR)
 
 .PHONY: all clean css output_dir publish
