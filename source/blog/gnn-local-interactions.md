@@ -1,6 +1,6 @@
 # Graph Neural Networks to learn an energy potential
 
-May 23, 2024
+May 20, 2024
 
 Graph neural networks (GNNs) are an increasingly popular approach to learn from complex data structures that can be represented as graphs.
 In computational science we can often represent a physical system by a graph:
