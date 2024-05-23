@@ -7,12 +7,11 @@ HEADER_PATH = source/header.html
 BLOG_HEADER_PATH = source/blog_header.html
 
 filenames = \
-	contact.html \
+	blog.html \
 	gallery.html \
 	index.html \
 	publications.html \
-	software.html \
-	blog.html
+	software.html
 
 blog_filenames = \
 	blog/gnn-local-interactions.html
