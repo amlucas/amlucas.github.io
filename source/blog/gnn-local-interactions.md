@@ -21,7 +21,7 @@ $$
 where \(r_c = 1\) is the cutoff radius, \(r_{ij}\) the distance separating particles \(i\) and \(j\) and \(w(r)=\max\left(0, 1 - \frac{r}{r_c}\right)\).
 
 We show below the training data, 500 particles placed randomly in a square box. The color shows the energy.
-![](../images/blog/gnn-local-interactions/dataset.png)
+![](../images/blog/gnn-local-interactions/dataset.svg)
 
 Let's suppose that we have data about the energy of particles in a given configuration, can we predict the energy of particles in a new situation, without knowing the form of the energy?
 
@@ -63,7 +63,7 @@ class GCN(torch.nn.Module):
 We train for 20000 epochs using the Adam optimizer with a learning rate of 0.001.
 Here are the results, the model tested on a new random configuration:
 
-![](../images/blog/gnn-local-interactions/comp_xyE.png)
-![](../images/blog/gnn-local-interactions/comp_E.png)
+![](../images/blog/gnn-local-interactions/comp_xyE.svg)
+![](../images/blog/gnn-local-interactions/comp_E.svg)
 
 The prediction of the energy is very close to the ground truth on the test data.
