@@ -10,7 +10,9 @@ filenames = \
 	gallery.html \
 	index.html \
 	publications.html \
-	software.html
+	software.html \
+	blog/particles_tracking.html
+
 targets = $(addprefix $(OUTPUT_DIR)/, $(filenames))
 
 all: $(targets) css images
@@ -21,6 +23,7 @@ publish: all
 
 output_dir:
 	mkdir -p $(OUTPUT_DIR)
+	mkdir -p $(OUTPUT_DIR)/blog
 
 $(OUTPUT_DIR)/%.html: $(SOURCE_DIR)/%.md output_dir
 	$(TOOLS_DIR)/markdown2html.py $< --header $(HEADER_PATH) > $@
@@ -28,9 +31,12 @@ $(OUTPUT_DIR)/%.html: $(SOURCE_DIR)/%.md output_dir
 images: output_dir
 	cp -r images $(OUTPUT_DIR)/
 
-css: output_dir
+css/codehilite.css:
+	pygmentize -S default -f html -a .codehilite > css/codehilite.css
+
+css: output_dir css/codehilite.css
 	cp -r css $(OUTPUT_DIR)/
-	pygmentize -S default -f html -a .codehilite > $(OUTPUT_DIR)/css/codehilite.css
+	cp -r css $(OUTPUT_DIR)/blog/
 
 clean:
 	rm -f $(targets)

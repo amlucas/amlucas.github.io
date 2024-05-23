@@ -28,6 +28,9 @@ def main(argv):
     <link href="css/white.css" type="text/css" rel="stylesheet" />
     <link href="css/codehilite.css" rel="stylesheet" />
     <title>%(title)s</title>
+    <script type="text/javascript" async
+        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
   </head>
 <body>
 
@@ -41,7 +44,9 @@ def main(argv):
     with open(md_path, "r") as f:
         md_text = f.read()
         html = markdown.markdown(md_text,
-                                 extensions=['fenced_code', 'codehilite'])
+                                 extensions=['mdx_math',
+                                             'fenced_code',
+                                             'codehilite'])
         output.append( html )
 
     output.append( """
