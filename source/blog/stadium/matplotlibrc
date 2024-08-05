@@ -6,7 +6,7 @@ axes.spines.top: False
 axes.unicode_minus: False
 axes.xmargin: 0
 axes.ymargin: 0
-figure.dpi: 300
+# figure.dpi: 300
 figure.figsize: 8.00, 6.00
 font.family: Myriad Pro,sans-serif
 font.size: 14
