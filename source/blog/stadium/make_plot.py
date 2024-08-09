@@ -8,9 +8,6 @@ import numpy as np
 import pandas as pd
 
 def extract_date_time_from_csv(csv_file_path):
-    df = pd.read_csv(csv_file_path)
-    dates = df['date'].to_numpy()
-    times = df['time'].to_numpy()
     return dates, times
 
 def convert_duration_to_minutes(duration):
@@ -18,21 +15,41 @@ def convert_duration_to_minutes(duration):
     total_minutes = float(minutes) + float(seconds)/60
     return total_minutes
 
-def plot_duration_vs_date(dates, durations, out):
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('csv_file_path', type=str)
+    parser.add_argument('--out', type=str, default=None)
+    args = parser.parse_args()
+
+    out = args.out
+
+    df = pd.read_csv(args.csv_file_path)
+    dates = df['date'].to_numpy()
+    durations = df['time'].to_numpy()
+    temperature = df['temperature'].to_numpy()
+
     dates = [datetime.strptime(date, '%Y-%m-%d') for date in dates]
     durations = np.array([convert_duration_to_minutes(duration) for duration in durations])
 
-    W = 6
-    mean = np.convolve(durations, np.ones(W), mode='same') / np.convolve(np.ones_like(durations), np.ones(W), mode='same')
+    #W = 6
+    #mean = np.convolve(durations, np.ones(W), mode='same') / np.convolve(np.ones_like(durations), np.ones(W), mode='same')
 
     fig, ax = plt.subplots()
-    ax.plot(dates, durations, 'o', clip_on=False)
-    ax.plot(dates, mean, '--k', clip_on=False)
+    color = 'C0'
+    ax.plot(dates, durations, 'o', clip_on=False, color=color)
+    #ax.plot(dates, mean, '--k', clip_on=False)
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
     ax.xaxis.set_major_locator(mdates.AutoDateLocator())
-    plt.xticks(rotation=45)
-    #plt.xlabel('Date')
-    plt.ylabel('Duration (minutes)')
+    ax.tick_params(axis='x', labelrotation=45)
+    ax.tick_params(axis='y', color=color, labelcolor=color)
+    ax.set_ylabel('Duration (minutes)', color=color)
+
+    color = 'C1'
+    axT = ax.twinx()
+    axT.plot(dates, temperature, 'o', clip_on=False, color=color)
+    axT.set_ylabel('Temperature (Fahrenheit)', color=color)
+    axT.tick_params(axis='y', color=color, labelcolor=color)
+
     plt.tight_layout()
     if out is None:
         plt.show()
@@ -40,10 +57,4 @@ def plot_duration_vs_date(dates, durations, out):
         plt.savefig(out)
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('csv_file_path', type=str)
-    parser.add_argument('--out', type=str, default=None)
-    args = parser.parse_args()
-
-    dates, times = extract_date_time_from_csv(args.csv_file_path)
-    plot_duration_vs_date(dates, times, args.out)
+    main()
