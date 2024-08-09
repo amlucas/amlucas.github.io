@@ -11,6 +11,15 @@ def convert_duration_to_minutes(duration):
     total_minutes = float(minutes) + float(seconds)/60
     return total_minutes
 
+def fitness(dates, day, window=60):
+    f = 0
+    for d in dates:
+        delta = (day - d).days
+        if delta > 0 and delta < window:
+            f += 1
+    return f
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('csv_file_path', type=str)
@@ -23,9 +32,9 @@ def main():
     dates = [datetime.strptime(date, '%Y-%m-%d') for date in data['date']]
     durations = np.array([convert_duration_to_minutes(duration) for duration in data['time']])
 
-    tsince_last = [(dates[i] - dates[i-1]).days for i in range(1,len(dates))]
-
     fig, axes = plt.subplots(ncols=2,nrows=2)
+
+    fitn = [fitness(dates, d) for d in dates]
 
     ax = axes[0,0]
     ax.plot(data['temperature'], durations, '+')
@@ -43,9 +52,10 @@ def main():
     ax.set_ylabel('time [min]')
 
     ax = axes[1,1]
-    ax.plot(tsince_last, durations[1:], '+')
-    ax.set_xlabel('time since last [days]')
+    ax.plot(fitn, durations, '+')
+    ax.set_xlabel('fitness')
     ax.set_ylabel('time [min]')
+    ax.set_xlim(-1, max(fitn) + 1)
 
 
     plt.tight_layout()
