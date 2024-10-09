@@ -14,7 +14,7 @@
 
 
 <header> <nav>   <ul>     <li> <a href="../index.html"> About </a> </li>     <li> <a href="../publications.html"> Publications </a> </li>     <li> <a href="../software.html"> Software </a> </li>     <li> <a href="../gallery.html"> Gallery </a> </li>     <li> <a href="../blog.html"> Blog </a> </li>   </ul> </nav> </header><h1>Graph Neural Networks to learn an energy potential</h1>
-<p>May 23, 2024</p>
+<p>May 20, 2024</p>
 <p>Graph neural networks (GNNs) are an increasingly popular approach to learn from complex data structures that can be represented as graphs.
 In computational science we can often represent a physical system by a graph:</p>
 <ul>
@@ -42,30 +42,30 @@ where <script type="math/tex">y_i</script> is the output at node <script type="m
 The function <script type="math/tex">\phi</script> is a multi layer perceptron.
 Note that in this case the direction between particles is not useful, but we assume that we don't know this information.</p>
 <p>This is easily implemented using <a href="https://pytorch-geometric.readthedocs.io/en/latest/index.html">pytorch-geometric</a>:</p>
-<pre class="codehilite"><code class="language-python">class EdgeConv(MessagePassing):
-    def __init__(self, x_channels, e_channels, out_channels):
-        super().__init__(aggr='add')
-        self.mlp = nn.Sequential(nn.Linear(2 * x_channels + e_channels, 16),
-                              nn.ReLU(),
-                              nn.Linear(16, out_channels))
+<div class="codehilite"><pre><span></span><code><span class="k">class</span> <span class="nc">EdgeConv</span><span class="p">(</span><span class="n">MessagePassing</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_channels</span><span class="p">,</span> <span class="n">e_channels</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">aggr</span><span class="o">=</span><span class="s1">&#39;add&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mlp</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">x_channels</span> <span class="o">+</span> <span class="n">e_channels</span><span class="p">,</span> <span class="mi">16</span><span class="p">),</span>
+                              <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+                              <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">))</span>
 
-    def forward(self, x, edge_index, edge_attr):
-        return self.propagate(edge_index, x=x, edge_attr=edge_attr)
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">edge_attr</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">propagate</span><span class="p">(</span><span class="n">edge_index</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">edge_attr</span><span class="o">=</span><span class="n">edge_attr</span><span class="p">)</span>
 
-    def message(self, x_i, x_j, edge_attr):
-        z = torch.cat([x_i, x_j, edge_attr], dim=1)
-        return self.mlp(z)
+    <span class="k">def</span> <span class="nf">message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_i</span><span class="p">,</span> <span class="n">x_j</span><span class="p">,</span> <span class="n">edge_attr</span><span class="p">):</span>
+        <span class="n">z</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">x_i</span><span class="p">,</span> <span class="n">x_j</span><span class="p">,</span> <span class="n">edge_attr</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlp</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
 
 
-class GCN(torch.nn.Module):
-    def __init__(self, x_channels, e_channels, out_channels):
-        super().__init__()
-        self.conv = EdgeConv(x_channels, e_channels, out_channels)
+<span class="k">class</span> <span class="nc">GCN</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x_channels</span><span class="p">,</span> <span class="n">e_channels</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conv</span> <span class="o">=</span> <span class="n">EdgeConv</span><span class="p">(</span><span class="n">x_channels</span><span class="p">,</span> <span class="n">e_channels</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">)</span>
 
-    def forward(self, data):
-        x, edge_index, edge_attr = data.x, data.edge_index, data.edge_attr
-        return self.conv(x, edge_index, edge_attr)
-</code></pre>
+    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">edge_attr</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">edge_index</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">edge_attr</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">conv</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">edge_index</span><span class="p">,</span> <span class="n">edge_attr</span><span class="p">)</span>
+</code></pre></div>
 
 <p>We train for 20000 epochs using the Adam optimizer with a learning rate of 0.001.
 Here are the results, the model tested on a new random configuration:</p>
