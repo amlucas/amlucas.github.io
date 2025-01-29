@@ -1,5 +1,9 @@
 # List of publications
 
+## 2025
+
+* Karnakov, P., **Amoudruz, L.** and Koumoutsakos, P, 2025. Contactless Precision Steering of Particles in a Fluid inside a Cube with Rotating Walls. Physical Review Letters, 134(4), p.044001. [DOI](https://doi.org/10.1103/PhysRevLett.134.044001)
+
 ## 2024
 
 * Alexeev, D., Litvinov, S., Economides, A., **Amoudruz, L.**, Toner, M. and Koumoutsakos, P., 2024. Inertial Focusing of Spherical Particles: The Effects of Rotational Motion. arXiv preprint arXiv:2408.09552. [DOI](https://doi.org/10.48550/arXiv.2408.09552)
