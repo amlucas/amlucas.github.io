@@ -2,7 +2,7 @@
 
 ## 2025
 
-* Karnakov, P., **Amoudruz, L.** and Koumoutsakos, P, 2025. Contactless Precision Steering of Particles in a Fluid inside a Cube with Rotating Walls. Physical Review Letters, 134(4), p.044001. [DOI](https://doi.org/10.1103/PhysRevLett.134.044001)
+* Karnakov, P., **Amoudruz, L.** and Koumoutsakos, P, 2025. Optimal Navigation in Microfluidics via the Optimization of a Discrete Loss. Physical Review Letters, 134(4), p.044001. [DOI](https://doi.org/10.1103/PhysRevLett.134.044001)
 
 ## 2024
 
