@@ -19,6 +19,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('csv_file_path', type=str)
     parser.add_argument('--out', type=str, default=None)
+    parser.add_argument('--show-temp', action='store_true', default=False)
     args = parser.parse_args()
 
     out = args.out
@@ -26,7 +27,6 @@ def main():
     df = pd.read_csv(args.csv_file_path)
     dates = df['date'].to_numpy()
     durations = df['time'].to_numpy()
-    temperature = df['temperature'].to_numpy()
 
     dates = [datetime.strptime(date, '%Y-%m-%d') for date in dates]
     durations = np.array([convert_duration_to_minutes(duration) for duration in durations])
@@ -41,14 +41,19 @@ def main():
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
     ax.xaxis.set_major_locator(mdates.AutoDateLocator())
     ax.tick_params(axis='x', labelrotation=45)
-    ax.tick_params(axis='y', color=color, labelcolor=color)
-    ax.set_ylabel('Duration (minutes)', color=color)
+    if args.show_temp:
+        ax.tick_params(axis='y', color=color, labelcolor=color)
+        ax.set_ylabel('Duration (minutes)', color=color)
+    else:
+        ax.set_ylabel('Duration (minutes)')
 
-    color = 'C1'
-    axT = ax.twinx()
-    axT.plot(dates, temperature, 'o', clip_on=False, color=color)
-    axT.set_ylabel('Temperature (Fahrenheit)', color=color)
-    axT.tick_params(axis='y', color=color, labelcolor=color)
+    if args.show_temp:
+        temperature = df['temperature'].to_numpy()
+        color = 'C1'
+        axT = ax.twinx()
+        axT.plot(dates, temperature, 'o', clip_on=False, color=color)
+        axT.set_ylabel('Temperature (Fahrenheit)', color=color)
+        axT.tick_params(axis='y', color=color, labelcolor=color)
 
     plt.tight_layout()
     if out is None:
