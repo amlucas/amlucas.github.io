@@ -33,11 +33,7 @@ def main():
     dates = df['date'].tolist()
     times = ['18:00'] * len(dates)
     data = retrieve_weather_data(dates, times)
-
-    data['date'] = dates
-    data['times'] = times
-
-    data.to_csv(args.out, index=False)
+    data.to_csv(args.out)
 
 
 
