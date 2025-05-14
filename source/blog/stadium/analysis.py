@@ -27,9 +27,10 @@ def main():
     args = parser.parse_args()
 
     data = pd.read_csv(args.csv_file_path)
+    data.drop(index=list(range(10)), inplace=True)
     out = args.out
 
-    dates = [datetime.strptime(date, '%Y-%m-%d') for date in data['date']]
+    dates = [datetime.strptime(date.split()[0], '%Y-%m-%d') for date in data['datetime']]
     durations = np.array([convert_duration_to_minutes(duration) for duration in data['time']])
 
     fig, axes = plt.subplots(ncols=2,nrows=2)
@@ -37,25 +38,25 @@ def main():
     fitn = [fitness(dates, d) for d in dates]
 
     ax = axes[0,0]
-    ax.plot(data['temperature'], durations, '+')
-    ax.set_xlabel('T [F]')
+    ax.plot(data['temp'], durations, 'o', clip_on=False)
+    ax.set_xlabel('T [C]')
     ax.set_ylabel('time [min]')
 
     ax = axes[0,1]
-    ax.plot(data['humidity'], durations, '+')
+    ax.plot(data['rhum'], durations, 'o', clip_on=False)
     ax.set_xlabel(r'humidity (percent)')
     ax.set_ylabel('time [min]')
 
     ax = axes[1,0]
-    ax.plot(data['wind'], durations, '+')
-    ax.set_xlabel('wind speed [mph]')
+    ax.plot(data['wspd'], durations, 'o', clip_on=False)
+    ax.set_xlabel('wind speed [km/h]')
     ax.set_ylabel('time [min]')
 
     ax = axes[1,1]
-    ax.plot(fitn, durations, '+')
-    ax.set_xlabel('fitness')
+    ax.plot(fitn, durations, 'o', clip_on=False)
+    ax.set_xlabel('number of stadiums in the past 2 months')
     ax.set_ylabel('time [min]')
-    ax.set_xlim(-1, max(fitn) + 1)
+    ax.set_xlim(0, max(fitn))
 
 
     plt.tight_layout()

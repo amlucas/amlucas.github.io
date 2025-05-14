@@ -11,12 +11,12 @@ def main():
     parser.add_argument('--data', type=str, default='data.csv')
     args = parser.parse_args()
 
-    df = pd.read_csv(args.data, index_col=0)
+    df = pd.read_csv(args.data)
 
     def make_datetime(datetime):
         d, t = datetime.split()
         return np.datetime64(f"{d}T{t}")
-    datetime = np.array([make_datetime(dt) for dt in df.index.to_numpy()])
+    datetime = np.array([make_datetime(dt) for dt in df['datetime'].to_numpy()])
     T = df['temp']
 
     fig, ax = plt.subplots()
