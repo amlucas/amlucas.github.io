@@ -2,13 +2,15 @@
 
 ## 2025
 
-* Alexeev, D., Litvinov, S., Economides, A., **Amoudruz, L.**, Toner, M. and Koumoutsakos, P., 2024. Inertial Focusing of Spherical Particles: The Effects of Rotational Motion. Phys. Rev. Fluids, 10(5), p.054202. [DOI](https://doi.org/10.1103/PhysRevFluids.10.054202) [arxiv](https://doi.org/10.48550/arXiv.2408.09552)
+* **Amoudruz, L.**, Litvinov, S. and Koumoutsakos, P., 2025. Path planning of magnetic microswimmers in high-fidelity simulations of capillaries with deep reinforcement learning. Physics of Fluids, 37, 071703. [DOI](https://doi.org/10.1063/5.0274623) [arxiv](https://doi.org/10.48550/arXiv.2404.02171)
+
+* **Amoudruz, L**, Karnakov, P., and Koumoutsakos, P., 2025. Contactless precision steering of particles in a fluid inside a cube with rotating walls. Journal of Fluid Mechanics, 1014:A15. [DOI](https://doi.org/10.1017/jfm.2025.10174) [arxiv](https://doi.org/10.48550/arXiv.2506.15958)
+
+* Alexeev, D., Litvinov, S., Economides, A., **Amoudruz, L.**, Toner, M. and Koumoutsakos, P., 2025. Inertial Focusing of Spherical Particles: The Effects of Rotational Motion. Phys. Rev. Fluids, 10(5), p.054202. [DOI](https://doi.org/10.1103/PhysRevFluids.10.054202) [arxiv](https://doi.org/10.48550/arXiv.2408.09552)
 
 * Karnakov, P., **Amoudruz, L.** and Koumoutsakos, P, 2025. Optimal Navigation in Microfluidics via the Optimization of a Discrete Loss. Physical Review Letters, 134(4), p.044001. [DOI](https://doi.org/10.1103/PhysRevLett.134.044001)
 
 ## 2024
-
-* **Amoudruz, L.**, Litvinov, S. and Koumoutsakos, P., 2024. Path planning of magnetic microswimmers in high-fidelity simulations of capillaries with deep reinforcement learning. arXiv preprint arXiv:2404.02171. [DOI](https://doi.org/10.48550/arXiv.2404.02171)
 
 * **Amoudruz, L.**, Economides, A. and Koumoutsakos, P., 2024. The Volume of Healthy Red Blood Cells is Optimal for Advective Oxygen Transport in Arterioles. Biophysical Journal, 123(10), pp.1289-1296. [DOI](https://doi.org/10.1016/j.bpj.2024.04.015)
 
