@@ -43,8 +43,8 @@ def main():
     ax.set_ylabel('time [min]')
 
     ax = axes[1,0]
-    ax.plot(df['wspd'], durations, 'o', clip_on=False)
-    ax.set_xlabel('wind speed [km/h]')
+    ax.plot(df['sleep_score'], durations, 'o', clip_on=False)
+    ax.set_xlabel('sleep score')
     ax.set_ylabel('time [min]')
 
     ax = axes[1,1]

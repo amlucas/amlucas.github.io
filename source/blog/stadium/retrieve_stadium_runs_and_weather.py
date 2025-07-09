@@ -38,6 +38,14 @@ def retrieve_stadium_dates_and_durations(garmin):
 
     return start_times, durations
 
+def retrieve_sleep_scores(garmin, start_times):
+    scores = []
+    for t in start_times:
+        cdate = t.split(' ')[0]
+        data = garmin.get_sleep_data(cdate)
+        scores.append(data['dailySleepDTO']['sleepScores']['overall']['value'])
+    return scores
+
 def retrieve_weather_data(start_times):
     location = Point(LAT_STADIUM, LON_STADIUM)
     date_times = pd.to_datetime(start_times)
@@ -69,9 +77,11 @@ def main():
         print(f"Login tokens not found in {tokenstore}.")
 
     start_times, durations = retrieve_stadium_dates_and_durations(garmin)
+    sleep_scores = retrieve_sleep_scores(garmin, start_times)
 
     df = retrieve_weather_data(start_times)
     df['duration'] = durations
+    df['sleep_score'] = sleep_scores
 
     df.sort_values(by='datetime', inplace=True)
     df.to_csv(args.out, index=False)
