@@ -7,14 +7,6 @@ import matplotlib.dates as mdates
 import numpy as np
 import pandas as pd
 
-def extract_date_time_from_csv(csv_file_path):
-    return dates, times
-
-def convert_duration_to_minutes(duration):
-    minutes, seconds = duration.split(':')
-    total_minutes = float(minutes) + float(seconds)/60
-    return total_minutes
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('csv_file_path', type=str)
@@ -25,11 +17,9 @@ def main():
     out = args.out
 
     df = pd.read_csv(args.csv_file_path)
-    dates = df['date'].to_numpy()
-    durations = df['time'].to_numpy()
-
-    dates = [datetime.strptime(date, '%Y-%m-%d') for date in dates]
-    durations = np.array([convert_duration_to_minutes(duration) for duration in durations])
+    dates = df['datetime'].to_numpy()
+    durations = df['duration'].to_numpy() / 60 # minutes
+    dates = [datetime.strptime(date, '%Y-%m-%d %H:%M:%S') for date in dates]
 
     #W = 6
     #mean = np.convolve(durations, np.ones(W), mode='same') / np.convolve(np.ones_like(durations), np.ones(W), mode='same')
@@ -48,11 +38,11 @@ def main():
         ax.set_ylabel('Duration (minutes)')
 
     if args.show_temp:
-        temperature = df['temperature'].to_numpy()
+        temperature = df['temp'].to_numpy()
         color = 'C1'
         axT = ax.twinx()
         axT.plot(dates, temperature, 'o', clip_on=False, color=color)
-        axT.set_ylabel('Temperature (Fahrenheit)', color=color)
+        axT.set_ylabel('Temperature (Celsius)', color=color)
         axT.tick_params(axis='y', color=color, labelcolor=color)
 
     plt.tight_layout()

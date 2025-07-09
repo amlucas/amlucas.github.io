@@ -8,3 +8,13 @@
 ```
 go install github.com/gohugoio/hugo@latest
 ```
+
+## Environment
+
+Python environment to run blog scripts
+
+```
+conda create -n amlucas python=3.12
+conda activate amlucas
+pip install numpy matplotlib pandas scipy garminconnect meteostat readchar
+```
