@@ -7,6 +7,6 @@ dst_dir:
 	mkdir -p $(DST_DIR)
 
 $(DST_DIR)/raw_times.svg: dst_dir
-	./make_plot.py times.csv --out $@
+	./make_plot.py data.csv --out $@
 
 .PHONY: dst_dir all
