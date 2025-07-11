@@ -52,7 +52,7 @@ Additional details can be found in our [2022 article in _Advanced Intelligence S
 
 {{ image("images/hydrocube_picture.png", "", "right", 33) }}
 
-Reinforcement learning is a great tools for control, but does not always converge in the settings I am interesting in.
+Reinforcement learning is a great tool for control, but does not always converge in the settings I am interesting in.
 Furthermore, I typically have a model of the systems I want to control. 
 This lead us to developping a novel method that learns policies from a path planning objective and from the dynamics of the system in the form of an ODE or a PDE.
 

@@ -10,10 +10,12 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('md_path', type=str, help="Directory containing md files.")
     parser.add_argument('--out-html', type=str, help="Path to output html file.")
+    parser.add_argument('--blog', action='store_true', default=False, help="Enable link to blog.")
     args = parser.parse_args()
 
     md_path  = args.md_path
     out_html = args.out_html
+    blog     = args.blog
 
     sections = {
         "about": "about.md",
@@ -39,6 +41,9 @@ def main():
         name = key.title()
         nav_bar += f'  <a href="#{key}">{name}</a>\n'
 
+    if blog:
+        nav_bar += '  <a href="./blog.html">Blog</a>\n'
+
 
     with open(out_html, "w") as f:
         f.write(f"""
@@ -54,7 +59,6 @@ def main():
 
 <nav class="top-nav">
 {nav_bar}
-  <a href="./blog.html">Blog</a>
 </nav>
 
 {html_sections}
