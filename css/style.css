@@ -9,16 +9,19 @@ html {
 }
 
 .top-nav {
-  position: fixed;
+  position: sticky;
   top: 0;
   width: 100%;
+  height: 20px;
   background: white;
   border-bottom: 1px solid #ddd;
   padding: 1rem;
   display: flex;
+  align-items: center;
   justify-content: center;
-  gap: 2rem;
+  gap: 1.5rem;
   z-index: 1000;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
 }
 
 .top-nav a {
@@ -28,12 +31,14 @@ html {
 }
 
 section {
-  padding: 100px 20px;
-  margin-top: 60px; /* offset for fixed nav */
+  padding-top: 20px;
+  padding-bottom: 40px;
+  scroll-margin-top: 80px;
   max-width: 800px;
   margin-left: auto;
   margin-right: auto;
 }
+
 
 .markdown-body img {
   max-width: 100%;
