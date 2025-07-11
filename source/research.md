@@ -17,6 +17,11 @@ Mirheo is implemented in C++/CUDA/MPI and achieves above 98% weak scaling effici
 Check out our [2020 paper in _Computer Physics Communications_](https://doi.org/10.1016/j.cpc.2020.107298) for benchmarks and implementation details.
 Recently we have been tested the performance of Mirheo on the public cloud (article currently under review).
 
+Mirheo has been used in a number of applications, and I am excited to make new predictions of blood flow, design novel microfluidics devices, and understand the biomechanics of RBCs.
+For example, we have used Mirheo to answer the question: _Are RBCs optimal for transporting oxygen?_ 
+Numerical simulations suggest that their shape, and in particular their area-to-volume ratio, maximizes oxygen transport in geometries similar to arterioles (more details in our [2024 publication in _Biophysical Journal_](https://doi.org/10.1016/j.bpj.2024.04.015).
+Similarly, in our [2025 publication in _Physical Review Fluids_](https://doi.org/10.1103/PhysRevFluids.10.054202), Mirheo was used to study the effect of rotation of objects in inertial focusing microfluidics. 
+
 
 ## ...and artificial microswimmers
 
