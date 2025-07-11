@@ -1,0 +1,54 @@
+#!/usr/bin/env python
+
+import argparse
+import markdown
+import os
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('md_path', type=str, help="path to blog.md")
+    parser.add_argument('--out-html', type=str, help="Path to output html file.")
+    args = parser.parse_args()
+
+    md_path  = args.md_path
+    out_html = args.out_html
+
+    with open(md_path) as f:
+        raw_md = f.read()
+    processed_md = raw_md
+
+    html_content = markdown.markdown(processed_md)
+
+    html_section = f"""
+<section class="markdown-body">
+  {html_content}
+</section>
+"""
+
+
+    with open(out_html, "w") as f:
+        f.write(f"""
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blog – Lucas Amoudruz</title>
+  <link rel="stylesheet" href="css/main.css" />
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="./index.html">Home</a>
+  <a href="./blog.html">Blog</a>
+</nav>
+
+{html_section}
+
+</body>
+</html>
+""")
+
+
+if __name__ == '__main__':
+    main()

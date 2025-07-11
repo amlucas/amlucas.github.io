@@ -5,7 +5,18 @@ GITHUB_PAGES_BRANCH=main
 
 targets = $(addprefix $(OUTPUT_DIR)/, $(filenames))
 
-all: $(OUTPUT_DIR)/index.html css images data
+blog_filenames = \
+	blog/gnn-local-interactions.html \
+	blog/stadium.html
+
+blog_targets = $(addprefix $(OUTPUT_DIR)/, $(blog_filenames))
+
+
+all: \
+	$(OUTPUT_DIR)/index.html \
+	$(OUTPUT_DIR)/blog.html \
+	$(blog_targets) \
+	css images data
 
 publish: all
 	ghp-import -m "Generate site" -b $(GITHUB_PAGES_BRANCH) "$(OUTPUT_DIR)"
@@ -13,12 +24,24 @@ publish: all
 
 output_dir:
 	mkdir -p $(OUTPUT_DIR)
+	mkdir -p $(OUTPUT_DIR)/blog
 
-$(OUTPUT_DIR)/index.html: $(SOURCE_DIR)/about.md \
+$(OUTPUT_DIR)/index.html: $(TOOLS_DIR)/mainpage.py \
+		$(SOURCE_DIR)/about.md \
 		$(SOURCE_DIR)/research.md \
 		$(SOURCE_DIR)/publications.md \
 		output_dir
 	$(TOOLS_DIR)/mainpage.py $(SOURCE_DIR) --out-html $@
+
+$(OUTPUT_DIR)/blog.html: $(TOOLS_DIR)/blogmainpage.py \
+		$(SOURCE_DIR)/blog.md \
+		output_dir
+	$(TOOLS_DIR)/blogmainpage.py $(SOURCE_DIR)/blog.md --out-html $@
+
+$(OUTPUT_DIR)/blog/%.html: $(SOURCE_DIR)/blog/%.md \
+		$(TOOLS_DIR)/blogpage.py \
+		output_dir
+	$(TOOLS_DIR)/blogpage.py $< --out-html $@
 
 images: output_dir
 	cp -r images $(OUTPUT_DIR)/

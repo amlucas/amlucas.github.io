@@ -48,12 +48,13 @@ def main():
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lucas Amoudruz</title>
-g  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="css/main.css" />
 </head>
 <body>
 
 <nav class="top-nav">
 {nav_bar}
+  <a href="./blog.html">Blog</a>
 </nav>
 
 {html_sections}
