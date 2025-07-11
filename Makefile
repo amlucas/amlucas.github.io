@@ -15,10 +15,8 @@ output_dir:
 	mkdir -p $(OUTPUT_DIR)
 
 $(OUTPUT_DIR)/index.html: $(SOURCE_DIR)/about.md \
-		$(SOURCE_DIR)/contact.md \
-		$(SOURCE_DIR)/gallery.md \
+		$(SOURCE_DIR)/research.md \
 		$(SOURCE_DIR)/publications.md \
-		$(SOURCE_DIR)/software.md \
 		output_dir
 	$(TOOLS_DIR)/mainpage.py $(SOURCE_DIR) --out-html $@
 
