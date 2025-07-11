@@ -4,6 +4,8 @@ import argparse
 import markdown
 import os
 
+from utils import embed_custom_images
+
 def md_path_to_title(md_path):
     return "blog - " + md_path.split("/")[-1].split(".md")[0]
 
@@ -18,7 +20,7 @@ def main():
 
     with open(md_path) as f:
         raw_md = f.read()
-    processed_md = raw_md
+    processed_md = embed_custom_images(raw_md)
 
     html_content = markdown.markdown(processed_md,
                                      extensions=['mdx_math',

@@ -10,6 +10,8 @@ In computational science we can often represent a physical system by a graph:
 * Unstructured grids to represent PDEs.
 * Triangle mesh surfaces to represent membranes.
 
+{{ image("../images/blog/gnn-local-interactions/dataset.svg", "The training data, 500 particles uniformly placed in a square box.", "right", 50) }}
+
 To test this method I generated \( N \) particles in a square 2D domain, with random positions \(\mathbf{r}_i \sim \mathcal{U}\left([0, L] \times [0, L]\right)\), \(i = 1, 2, \dots, N\).
 Each particle has an associated feature \(m_i \sim \mathcal{U}(0.1, 1)\).
 These are the state of the system.
@@ -20,8 +22,8 @@ E_i = \sum\limits_{j \neq i, r_{ij} < r_c} m_i m_j w(r_{ij}),
 $$
 where \(r_c = 1\) is the cutoff radius, \(r_{ij}\) the distance separating particles \(i\) and \(j\) and \(w(r)=\max\left(0, 1 - \frac{r}{r_c}\right)\).
 
-We show below the training data, 500 particles placed randomly in a square box. The color shows the energy.
-![](../images/blog/gnn-local-interactions/dataset.svg)
+The training data, 500 particles placed randomly in a square box, is illustrated on the right image.
+The color shows the energy.
 
 Let's suppose that we have data about the energy of particles in a given configuration, can we predict the energy of particles in a new situation, without knowing the form of the energy?
 
@@ -63,7 +65,7 @@ class GCN(torch.nn.Module):
 We train for 20000 epochs using the Adam optimizer with a learning rate of 0.001.
 Here are the results, the model tested on a new random configuration:
 
-![](../images/blog/gnn-local-interactions/comp_xyE.svg)
-![](../images/blog/gnn-local-interactions/comp_E.svg)
+{{ image("../images/blog/gnn-local-interactions/comp_xyE.svg", "", "center", 75) }}
+{{ image("../images/blog/gnn-local-interactions/comp_E.svg", "", "center", 65) }}
 
 The prediction of the energy is very close to the ground truth on the test data.

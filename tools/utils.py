@@ -8,7 +8,7 @@ def embed_custom_images(md_text):
         caption = match.group(2).strip()
         float_dir = match.group(3)
         width = match.group(4)
-        float_class = f"float-img-{float_dir}" if float_dir in ["left", "right"] else ""
+        float_class = f"float-img-{float_dir}" if float_dir in ["left", "center", "right"] else ""
         style = f'style="width: {width}%;"'
 
         caption_html = f'<p class="image-caption">{caption}</p>' if caption else ''

@@ -120,3 +120,12 @@ section {
   width: 40%;
   margin: 0 1em 1em 0;
 }
+
+.image-caption {
+  font-style: italic;
+  font-size: 0.9rem;
+  color: #555;
+  margin-top: 0.25rem;
+  text-align: center;
+  line-height: 1.3;
+}
