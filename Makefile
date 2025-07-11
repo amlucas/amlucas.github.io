@@ -3,10 +3,6 @@ OUTPUT_DIR=output
 TOOLS_DIR=tools
 GITHUB_PAGES_BRANCH=main
 
-blog_filenames = \
-	blog/gnn-local-interactions.html \
-	blog/stadium.html
-
 targets = $(addprefix $(OUTPUT_DIR)/, $(filenames))
 
 all: $(OUTPUT_DIR)/index.html css images
@@ -34,9 +30,8 @@ css/codehilite.css:
 
 css: output_dir css/codehilite.css
 	cp -r css $(OUTPUT_DIR)/
-	cp -r css $(OUTPUT_DIR)/blog/
 
 clean:
 	rm -r $(OUTPUT_DIR)
 
-.PHONY: all clean css output_dir publish
+.PHONY: all clean css output_dir publish images
