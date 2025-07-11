@@ -5,7 +5,7 @@ GITHUB_PAGES_BRANCH=main
 
 targets = $(addprefix $(OUTPUT_DIR)/, $(filenames))
 
-all: $(OUTPUT_DIR)/index.html css images
+all: $(OUTPUT_DIR)/index.html css images data
 
 publish: all
 	ghp-import -m "Generate site" -b $(GITHUB_PAGES_BRANCH) "$(OUTPUT_DIR)"
@@ -22,6 +22,9 @@ $(OUTPUT_DIR)/index.html: $(SOURCE_DIR)/about.md \
 
 images: output_dir
 	cp -r images $(OUTPUT_DIR)/
+
+data: output_dir
+	cp -r data $(OUTPUT_DIR)/
 
 css/codehilite.css:
 	pygmentize -S default -f html -a .codehilite > css/codehilite.css

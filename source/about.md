@@ -11,4 +11,4 @@ The most fun part for me is to combine multiple aspects of the above!
 **Email:** [amlucas@seas.harvard.edu](mailto:amlucas@seas.harvard.edu)  
 **Scholar:** [Lucas Amoudruz](https://scholar.google.ch/citations?user=eGRWGKYAAAAJ&hl=en&oi=ao)  
 **Github:** [amlucas](https://github.com/amlucas)  
-**Address:** 29 Oxford St, Cambridge, MA 02138  
+**Full CV (PDF):** [Last updated in July 2025](./data/Lucas_Amoudruz_CV.pdf)  
