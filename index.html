@@ -19,6 +19,11 @@
 <section id="about">
   <div class="markdown-body">
     <h1>About</h1>
+<div class="image-wrap float-img-right" style="width: 20%;">
+  <img src="images/portrait.png" alt="">
+
+</div>
+
 <p>Welcome to my personal website!</p>
 <p>My name is Lucas Amoudruz, I'm currently a research associate at Harvard University in the <a href="https://cse-lab.seas.harvard.edu/">computational science and engineering laboratory</a>.<br />
 My research interests include numerical simulations of microfluidics, red blood cells modeling, blood flow simulations, artificial microswimmers, reinforcement learning, high performance computing, cloud computing and Bayesian inference.<br />
@@ -35,7 +40,11 @@ The most fun part for me is to combine multiple aspects of the above!  </p>
 <p>I develop computational methods and software to simulate and control microscale systems, including blood flow and artificial microswimmers.
 My work combines high-performance computing, fluid dynamics, Bayesian inference, and artificial intelligence to enable biomedical applications such as targeted drug delivery and flow manipulation in microfluidics.</p>
 <h2>High performance computing for simulating blood...</h2>
-<p><img src="./images/rbc_tube.png" class="float-img-right" /></p>
+<div class="image-wrap float-img-right" style="width: 40%;">
+  <img src="images/rbc_tube.png" alt="">
+
+</div>
+
 <p>Simulating blood at the cellular resolution is a complex task, as it involves resolving hydrodynamics between deforming cells.
 Blood is mainly composed of red blood cells (RBCs), and one of the contributions during my PhD was to accurately model these cells and their interactions at large scale.
 We use particles to represent RBCs and all fluids, via the dissipative particle dynamics (DPD) method.
@@ -45,14 +54,22 @@ Mirheo is implemented in C++/CUDA/MPI and achieves above 98% weak scaling effici
 Check out our <a href="https://doi.org/10.1016/j.cpc.2020.107298">2020 paper in <em>Computer Physics Communications</em></a> for benchmarks and implementation details.
 Recently we have been tested the performance of Mirheo on the public cloud (article currently under review).</p>
 <h2>...and artificial microswimmers</h2>
-<p><img src="./images/ABF_single_tube.png" class="float-img-left" /></p>
+<div class="image-wrap float-img-left" style="width: 40%;">
+  <img src="images/ABF_single_tube.png" alt="">
+
+</div>
+
 <p>Artificial bacterial flagella (ABFs) are micron-sized devices equiped with a magnetic head and a corkscrew shaped body, which makes them able to propel when they are immersed in a rotating magnetic field.
 They are great candidates to reach specific regions in the body in a non-invasive way by swimming through the circulatory system of the body.
 Applications are numerous: targeted drug delivery, microsurgery, remote sensing, cells manipulation...
 I have extended our custom software Mirheo to simulate ABFs in blood.
 Here is a video of an <a href="https://www.youtube.com/embed/pwEyiedh-Fg?si=ws153uPWyM9Y4fFl">ABF swimming in blood</a> and another one <a href="https://www.youtube.com/embed/u-5yVLkBUdU?si=lef5Tuvq9pDQxAy7">of many ABFs in a bifurcation</a>.
 One particular focus of my research tries to answer the following question: <em>how to control the external magnetic field to guide ABFs to a target?</em></p>
-<p><img src="./images/ABF_retina_RL.png" class="float-img-right" /></p>
+<div class="image-wrap float-img-right" style="width: 50%;">
+  <img src="images/ABF_retina_RL.png" alt="">
+
+</div>
+
 <p>One possible approach is to use reinforcement learning (RL).
 RL learns a control policy by interacting with an environment.
 Typically, RL converges after thousands of episodes, while one simulation of ABFs in blood require thousands of GPU-hours.
@@ -63,7 +80,11 @@ Check out the <a href="https://www.youtube.com/embed/sCirMyoGpUc?si=3sB9PzqTx-TW
 RL was also helpful to design policies that control multiple ABFs independently, a difficult task given that the magnetic field is essentially uniform at these scales.
 Additional details can be found in our <a href="https://doi.org/10.1002/aisy.202100183">2022 article in <em>Advanced Intelligence Systems</em></a>, where we have exploited the swimming properties of ABFs of different shapes.</p>
 <h2>ODIL: a method for control and path planning</h2>
-<p><img src="./images/hydrocube_picture.png" class="float-img-right" /></p>
+<div class="image-wrap float-img-right" style="width: 33%;">
+  <img src="images/hydrocube_picture.png" alt="">
+
+</div>
+
 <p>Reinforcement learning is a great tools for control, but does not always converge in the settings I am interesting in.
 Furthermore, I typically have a model of the systems I want to control. 
 This lead us to developping a novel method that learns policies from a path planning objective and from the dynamics of the system in the form of an ODE or a PDE.</p>
@@ -74,7 +95,11 @@ This approach is more efficient than RL in numerous benchmarks, summarized in ou
 Using the policy found by ODIL, the device can transport small beads to precise targets, as explained in our <a href="https://doi.org/10.1017/jfm.2025.10174">2025 publication in <em>Journal of Fluid Mechanics</em></a>.
 I have built this robot with <a href="https://pkarnakov.com/">Petr Karnakov</a> in less than two months to participate at the <a href="https://www.massrobotics.org/massrobotics-announces-form-function-challenge-winners-showcases-first-accelerator-cohort-at-the-robotics-summit-expo/">MassRobotics Form and Function Challenge</a> where we have placed second over more than 40 participants.</p>
 <h2>Hierarchical Bayesian inference for red blood cells models</h2>
-<p><img src="./images/DAG_RBC_UQ.png" class="float-img-left" /></p>
+<div class="image-wrap float-img-left" style="width: 40%;">
+  <img src="images/DAG_RBC_UQ.png" alt="">
+
+</div>
+
 <p>Calibrating the red blood cell (RBC) membrane model is crucial to predict blood flows. 
 Prior work has been fitting the membrane parameters to experimental datasets, but we found that this approach leads to a poor transferability of the model.
 Instead, we have combined <em>multiple experimental datasets</em> to find the model parameters.
