@@ -1,0 +1,44 @@
+body {
+  font-family: system-ui, sans-serif;
+  margin: 0;
+  scroll-behavior: smooth;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.top-nav {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background: white;
+  border-bottom: 1px solid #ddd;
+  padding: 1rem;
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  z-index: 1000;
+}
+
+.top-nav a {
+  text-decoration: none;
+  color: black;
+  font-weight: bold;
+}
+
+section {
+  padding: 100px 20px;
+  margin-top: 60px; /* offset for fixed nav */
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.markdown-body img {
+  max-width: 100%;
+  width: 100%;
+  height: auto;
+  display: block;
+  margin: 1rem auto; /* optional: center the image */
+}
