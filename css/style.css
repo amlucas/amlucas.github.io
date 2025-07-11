@@ -1,7 +1,25 @@
 body {
-  font-family: system-ui, sans-serif;
-  margin: 0;
-  scroll-behavior: smooth;
+    font-family: "Georgia", "Times New Roman", serif;
+    background-color: white;
+    color: #222;
+    line-height: 1.6;
+    margin: 0;
+    scroll-behavior: smooth;
+}
+
+h1, h2, h3 {
+  font-family: "Helvetica Neue", "Segoe UI", sans-serif;
+  font-weight: 600;
+  color: #3e6075;
+}
+
+a {
+  color: #3e6075;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
 }
 
 html {
@@ -22,21 +40,29 @@ html {
   gap: 1.5rem;
   z-index: 1000;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+  font-family: "Helvetica Neue", "Segoe UI", sans-serif;
 }
 
 .top-nav a {
   text-decoration: none;
-  color: black;
-  font-weight: bold;
+  color: #3e6075;
+  font-weight: 500;
+  font-size: 1rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.top-nav a:hover {
+  background-color: rgba(62, 96, 117, 0.1); /* subtle hover */
 }
 
 section {
-  padding-top: 20px;
-  padding-bottom: 40px;
   scroll-margin-top: 80px;
   max-width: 800px;
   margin-left: auto;
   margin-right: auto;
+  padding-bottom: 2rem;
 }
 
 
@@ -72,7 +98,7 @@ section {
   font-weight: 600;
   margin-top: 1.5rem;
   margin-bottom: 0.75rem;
-  color: #444;
+  color: #5a738b;
 }
 
 .markdown-body h3 {
@@ -80,7 +106,7 @@ section {
   font-weight: 500;
   margin-top: 1rem;
   margin-bottom: 0.5rem;
-  color: #666;
+  color: #5a738b;
 }
 
 
