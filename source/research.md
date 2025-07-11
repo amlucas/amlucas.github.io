@@ -39,7 +39,7 @@ Additional details can be found in our [2022 article in _Advanced Intelligence S
 
 
 
-## Methods for path planning
+## ODIL: a method for control and path planning
 
 <img src="./images/hydrocube_picture.png" class="float-img-right" />
 
@@ -54,3 +54,4 @@ This approach is more efficient than RL in numerous benchmarks, summarized in ou
 To check the performance of that method, we have built a robotic device (shown in the right picture) that creates flow with rotating disks.
 Using the policy found by ODIL, the device can transport small beads to precise targets, as explained in our [2025 publication in _Journal of Fluid Mechanics_](https://doi.org/10.1017/jfm.2025.10174).
 I have built this robot with [Petr Karnakov](https://pkarnakov.com/) in less than two months to participate at the [MassRobotics Form and Function Challenge](https://www.massrobotics.org/massrobotics-announces-form-function-challenge-winners-showcases-first-accelerator-cohort-at-the-robotics-summit-expo/) where we have placed second over more than 40 participants.
+
