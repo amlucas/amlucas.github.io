@@ -15,10 +15,8 @@ def main():
 
     sections = {
         "about": "about.md",
-        "publications": "publications.md",
-        "software": "software.md",
-        "gallery": "gallery.md",
-        "contact": "contact.md"
+        "research": "research.md",
+        "publications": "publications.md"
     }
 
     html_sections = ""
@@ -34,7 +32,7 @@ def main():
 
     nav_bar = ""
     for key in sections.keys():
-        name = key
+        name = key.title()
         nav_bar += f'  <a href="#{key}">{name}</a>\n'
 
 

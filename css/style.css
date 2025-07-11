@@ -39,11 +39,51 @@ section {
   margin-right: auto;
 }
 
+.markdown-body p {
+    text-align: justify
+}
 
-.markdown-body img {
+.markdown-body img:not(.float-img-left):not(.float-img-right) {
   max-width: 100%;
   width: 100%;
   height: auto;
   display: block;
   margin: 1rem auto; /* optional: center the image */
+}
+
+.markdown-body h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 0.3rem;
+}
+
+.markdown-body h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: #444;
+}
+
+.markdown-body h3 {
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: #666;
+}
+
+
+.float-img-right {
+  float: right;
+  width: 40%;
+  margin: 0 0 1em 1em;
+}
+.float-img-left {
+  float: left;
+  width: 40%;
+  margin: 0 1em 1em 0;
 }
