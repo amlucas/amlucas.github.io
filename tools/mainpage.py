@@ -3,6 +3,30 @@
 import argparse
 import markdown
 import os
+import re
+
+def embed_custom_images(md_text):
+    pattern = r'\{\{\s*image\("([^"]+)",\s*"([^"]*)",\s*"([^"]+)",\s*(\d+)\)\s*\}\}'
+
+    def replacer(match):
+        src = match.group(1)
+        caption = match.group(2).strip()
+        float_dir = match.group(3)
+        width = match.group(4)
+        float_class = f"float-img-{float_dir}" if float_dir in ["left", "right"] else ""
+        style = f'style="width: {width}%;"'
+
+        caption_html = f'<p class="image-caption">{caption}</p>' if caption else ''
+
+        return f'''
+<div class="image-wrap {float_class}" {style}>
+  <img src="{src}" alt="{caption}">
+  {caption_html}
+</div>
+        '''
+
+    return re.sub(pattern, replacer, md_text)
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -22,7 +46,9 @@ def main():
     html_sections = ""
     for section_id, filename in sections.items():
         with open(os.path.join(md_path, filename)) as f:
-            html_content = markdown.markdown(f.read())
+            raw_md = f.read()
+        processed_md = embed_custom_images(raw_md)
+        html_content = markdown.markdown(processed_md)
         html_sections += f'''<section id="{section_id}">
   <div class="markdown-body">
     {html_content}

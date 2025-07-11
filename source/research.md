@@ -6,7 +6,7 @@ My work combines high-performance computing, fluid dynamics, Bayesian inference,
 
 ## High performance computing for simulating blood...
 
-<img src="./images/rbc_tube.png" class="float-img-right" />
+{{ image("images/rbc_tube.png", "", "right", 40) }}
 
 Simulating blood at the cellular resolution is a complex task, as it involves resolving hydrodynamics between deforming cells.
 Blood is mainly composed of red blood cells (RBCs), and one of the contributions during my PhD was to accurately model these cells and their interactions at large scale.
@@ -20,7 +20,7 @@ Recently we have been tested the performance of Mirheo on the public cloud (arti
 
 ## ...and artificial microswimmers
 
-<img src="./images/ABF_single_tube.png" class="float-img-left" />
+{{ image("images/ABF_single_tube.png", "", "left", 40) }}
 
 Artificial bacterial flagella (ABFs) are micron-sized devices equiped with a magnetic head and a corkscrew shaped body, which makes them able to propel when they are immersed in a rotating magnetic field.
 They are great candidates to reach specific regions in the body in a non-invasive way by swimming through the circulatory system of the body.
@@ -29,7 +29,7 @@ I have extended our custom software Mirheo to simulate ABFs in blood.
 Here is a video of an [ABF swimming in blood](https://www.youtube.com/embed/pwEyiedh-Fg?si=ws153uPWyM9Y4fFl) and another one [of many ABFs in a bifurcation](https://www.youtube.com/embed/u-5yVLkBUdU?si=lef5Tuvq9pDQxAy7).
 One particular focus of my research tries to answer the following question: _how to control the external magnetic field to guide ABFs to a target?_
 
-<img src="./images/ABF_retina_RL.png" class="float-img-right" />
+{{ image("images/ABF_retina_RL.png", "", "right", 50) }}
 
 One possible approach is to use reinforcement learning (RL).
 RL learns a control policy by interacting with an environment.
@@ -45,7 +45,7 @@ Additional details can be found in our [2022 article in _Advanced Intelligence S
 
 ## ODIL: a method for control and path planning
 
-<img src="./images/hydrocube_picture.png" class="float-img-right" />
+{{ image("images/hydrocube_picture.png", "", "right", 33) }}
 
 Reinforcement learning is a great tools for control, but does not always converge in the settings I am interesting in.
 Furthermore, I typically have a model of the systems I want to control. 
@@ -63,7 +63,7 @@ I have built this robot with [Petr Karnakov](https://pkarnakov.com/) in less tha
 
 ## Hierarchical Bayesian inference for red blood cells models
 
-<img src="./images/DAG_RBC_UQ.png" class="float-img-left" />
+{{ image("images/DAG_RBC_UQ.png", "", "left", 40) }}
 
 Calibrating the red blood cell (RBC) membrane model is crucial to predict blood flows. 
 Prior work has been fitting the membrane parameters to experimental datasets, but we found that this approach leads to a poor transferability of the model.

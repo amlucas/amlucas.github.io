@@ -1,5 +1,7 @@
 # About
 
+{{ image("images/portrait.png", "", "right", 20) }}
+
 Welcome to my personal website!
 
 My name is Lucas Amoudruz, I'm currently a research associate at Harvard University in the [computational science and engineering laboratory](https://cse-lab.seas.harvard.edu/).  
