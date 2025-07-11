@@ -39,9 +39,6 @@ section {
   margin-right: auto;
 }
 
-.markdown-body p {
-    text-align: justify
-}
 
 .markdown-body img:not(.float-img-left):not(.float-img-right) {
   max-width: 100%;
@@ -49,6 +46,16 @@ section {
   height: auto;
   display: block;
   margin: 1rem auto; /* optional: center the image */
+}
+
+@media (max-width: 700px) {
+  .markdown-body {
+    padding: 0 1rem;
+  }
+}
+
+.markdown-body p {
+    text-align: justify
 }
 
 .markdown-body h1 {
