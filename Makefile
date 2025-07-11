@@ -29,7 +29,7 @@ data: output_dir
 css/codehilite.css:
 	pygmentize -S default -f html -a .codehilite > css/codehilite.css
 
-css: output_dir css/codehilite.css
+css: output_dir css/main.css css/codehilite.css
 	cp -r css $(OUTPUT_DIR)/
 
 clean:

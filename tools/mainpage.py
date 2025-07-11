@@ -3,30 +3,8 @@
 import argparse
 import markdown
 import os
-import re
 
-def embed_custom_images(md_text):
-    pattern = r'\{\{\s*image\("([^"]+)",\s*"([^"]*)",\s*"([^"]+)",\s*(\d+)\)\s*\}\}'
-
-    def replacer(match):
-        src = match.group(1)
-        caption = match.group(2).strip()
-        float_dir = match.group(3)
-        width = match.group(4)
-        float_class = f"float-img-{float_dir}" if float_dir in ["left", "right"] else ""
-        style = f'style="width: {width}%;"'
-
-        caption_html = f'<p class="image-caption">{caption}</p>' if caption else ''
-
-        return f'''
-<div class="image-wrap {float_class}" {style}>
-  <img src="{src}" alt="{caption}">
-  {caption_html}
-</div>
-        '''
-
-    return re.sub(pattern, replacer, md_text)
-
+from utils import embed_custom_images
 
 def main():
     parser = argparse.ArgumentParser()
@@ -70,7 +48,7 @@ def main():
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lucas Amoudruz</title>
-  <link rel="stylesheet" href="css/style.css" />
+g  <link rel="stylesheet" href="css/main.css" />
 </head>
 <body>
 
