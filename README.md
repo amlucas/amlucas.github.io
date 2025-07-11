@@ -1,15 +1,10 @@
-# personal website
+# Personal website
 
 * main branch contains static site
 * dev branch contains website generator
 
-## Hugo
 
-```
-go install github.com/gohugoio/hugo@latest
-```
-
-## Environment
+## Python Environment
 
 Python environment to run blog scripts
 

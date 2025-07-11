@@ -1,0 +1,57 @@
+#!/usr/bin/env python
+
+import argparse
+import markdown
+import os
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('md_path', type=str, help="Directory containing md files.")
+    parser.add_argument('--out-html', type=str, help="Path to output html file.")
+    args = parser.parse_args()
+
+    md_path  = args.md_path
+    out_html = args.out_html
+
+    sections = {
+        "about": "about.md",
+        "publications": "publications.md"
+    }
+
+    html_sections = ""
+    for section_id, filename in sections.items():
+        with open(os.path.join(md_path, filename)) as f:
+            html_content = markdown.markdown(f.read())
+        html_sections += f'<section id="{section_id}">\n{html_content}\n</section>\n'
+
+    nav_bar = ""
+    for key in sections.keys():
+        name = key
+        nav_bar += f'  <a href="#{key}">{name}</a>\n'
+
+
+    with open(out_html, "w") as f:
+        f.write(f"""
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lucas Amoudruz</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<nav class="top-nav">
+{nav_bar}
+</nav>
+
+{html_sections}
+
+</body>
+</html>
+""")
+
+
+if __name__ == '__main__':
+    main()
