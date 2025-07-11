@@ -38,8 +38,6 @@ css: output_dir css/codehilite.css
 	cp -r css $(OUTPUT_DIR)/blog/
 
 clean:
-	rm -f $(targets)
-	rm -f $(blog_targets)
 	rm -r $(OUTPUT_DIR)
 
 .PHONY: all clean css output_dir publish
