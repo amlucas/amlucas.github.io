@@ -50,7 +50,7 @@ data: output_dir
 	cp -r data $(OUTPUT_DIR)/
 
 css/codehilite.css:
-	pygmentize -S default -f html -a .codehilite > css/codehilite.css
+	pygmentize -S trac -f html -a .codehilite > css/codehilite.css
 
 css: output_dir css/main.css css/codehilite.css
 	cp -r css $(OUTPUT_DIR)/
@@ -58,4 +58,4 @@ css: output_dir css/main.css css/codehilite.css
 clean:
 	rm -r $(OUTPUT_DIR)
 
-.PHONY: all clean css output_dir publish images
+.PHONY: all clean css css/codehilite.css output_dir publish images

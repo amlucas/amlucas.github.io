@@ -43,7 +43,7 @@ def main():
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{title}</title>
   <link rel="stylesheet" href="../css/main.css" />
-  <link href="css/codehilite.css" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/codehilite.css" />
   <script type="text/javascript" async
       src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
   </script>
