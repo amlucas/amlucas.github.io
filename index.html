@@ -10,11 +10,9 @@
 <body>
 
 <nav class="top-nav">
-  <a href="#about">about</a>
-  <a href="#publications">publications</a>
-  <a href="#software">software</a>
-  <a href="#gallery">gallery</a>
-  <a href="#contact">contact</a>
+  <a href="#about">About</a>
+  <a href="#research">Research</a>
+  <a href="#publications">Publications</a>
 
 </nav>
 
@@ -25,6 +23,66 @@
 <p>My name is Lucas Amoudruz, I'm currently a research associate at Harvard University in the <a href="https://cse-lab.seas.harvard.edu/">computational science and engineering laboratory</a>.<br />
 My research interests include numerical simulations of microfluidics, red blood cells modeling, blood flow simulations, artificial microswimmers, reinforcement learning, high performance computing, cloud computing and Bayesian inference.<br />
 The most fun part for me is to combine multiple aspects of the above!  </p>
+<p><strong>Email:</strong> <a href="mailto:amlucas@seas.harvard.edu">amlucas@seas.harvard.edu</a><br />
+<strong>Scholar:</strong> <a href="https://scholar.google.ch/citations?user=eGRWGKYAAAAJ&amp;hl=en&amp;oi=ao">Lucas Amoudruz</a><br />
+<strong>Github:</strong> <a href="https://github.com/amlucas">amlucas</a><br />
+<strong>Address:</strong> 29 Oxford St, Cambridge, MA 02138  </p>
+  </div>
+</section>
+<section id="research">
+  <div class="markdown-body">
+    <h1>Research</h1>
+<p>I develop computational methods and software to simulate and control microscale systems, including blood flow and artificial microswimmers.
+My work combines high-performance computing, fluid dynamics, Bayesian inference, and artificial intelligence to enable biomedical applications such as targeted drug delivery and flow manipulation in microfluidics.</p>
+<h2>High performance computing for simulating blood...</h2>
+<p><img src="./images/rbc_tube.png" class="float-img-right" /></p>
+<p>Simulating blood at the cellular resolution is a complex task, as it involves resolving hydrodynamics between deforming cells.
+Blood is mainly composed of red blood cells (RBCs), and one of the contributions during my PhD was to accurately model these cells and their interactions at large scale.
+We use particles to represent RBCs and all fluids, via the dissipative particle dynamics (DPD) method.
+The membranes are discretized into a triangle mesh and elastic forces arise from bending and stretching energy potentials.
+Simulations typically consist of millions to billions of these particles, and we thus implemented a custom software package, <a href="https://github.com/cselab/Mirheo">Mirheo</a>.
+Mirheo is implemented in C++/CUDA/MPI and achieves above 98% weak scaling efficiency across 1000 GPUs.
+Check out our <a href="https://doi.org/10.1016/j.cpc.2020.107298">2020 paper in <em>Computer Physics Communications</em></a> for benchmarks and implementation details.
+Recently we have been tested the performance of Mirheo on the public cloud (article currently under review).</p>
+<h2>...and artificial microswimmers</h2>
+<p><img src="./images/ABF_single_tube.png" class="float-img-left" /></p>
+<p>Artificial bacterial flagella (ABFs) are micron-sized devices equiped with a magnetic head and a corkscrew shaped body, which makes them able to propel when they are immersed in a rotating magnetic field.
+They are great candidates to reach specific regions in the body in a non-invasive way by swimming through the circulatory system of the body.
+Applications are numerous: targeted drug delivery, microsurgery, remote sensing, cells manipulation...
+I have extended our custom software Mirheo to simulate ABFs in blood.
+Here is a video of an <a href="https://www.youtube.com/embed/pwEyiedh-Fg?si=ws153uPWyM9Y4fFl">ABF swimming in blood</a> and another one <a href="https://www.youtube.com/embed/u-5yVLkBUdU?si=lef5Tuvq9pDQxAy7">of many ABFs in a bifurcation</a>.
+One particular focus of my research tries to answer the following question: <em>how to control the external magnetic field to guide ABFs to a target?</em></p>
+<p><img src="./images/ABF_retina_RL.png" class="float-img-right" /></p>
+<p>One possible approach is to use reinforcement learning (RL).
+RL learns a control policy by interacting with an environment.
+Typically, RL converges after thousands of episodes, while one simulation of ABFs in blood require thousands of GPU-hours.
+Instead we train the RL agent on reduced order models, which are much cheaper.
+We then test the learned policy in large scale simulations, as shown on the picture on the right.
+Details are available in our <a href="https://doi.org/10.1063/5.0274623">2025 article in <em>Physics of Fluids</em></a>.
+Check out the <a href="https://www.youtube.com/embed/sCirMyoGpUc?si=3sB9PzqTx-TWlxVr">video</a> of the policy in action.
+RL was also helpful to design policies that control multiple ABFs independently, a difficult task given that the magnetic field is essentially uniform at these scales.
+Additional details can be found in our <a href="https://doi.org/10.1002/aisy.202100183">2022 article in <em>Advanced Intelligence Systems</em></a>, where we have exploited the swimming properties of ABFs of different shapes.</p>
+<h2>ODIL: a method for control and path planning</h2>
+<p><img src="./images/hydrocube_picture.png" class="float-img-right" /></p>
+<p>Reinforcement learning is a great tools for control, but does not always converge in the settings I am interesting in.
+Furthermore, I typically have a model of the systems I want to control. 
+This lead us to developping a novel method that learns policies from a path planning objective and from the dynamics of the system in the form of an ODE or a PDE.</p>
+<p>The method relies on ODIL, developped at CSE-Lab, originally used to solve PDE-based inverse problems.
+In the context of control and path planning, we use ODIL to solve both the system dynamics and the control policy at the same time.
+This approach is more efficient than RL in numerous benchmarks, summarized in our <a href="https://doi.org/10.1103/PhysRevLett.134.044001">2025 article published in <em>Physical Review Letters</em></a>.</p>
+<p>To check the performance of that method, we have built a robotic device (shown in the right picture) that creates flow with rotating disks.
+Using the policy found by ODIL, the device can transport small beads to precise targets, as explained in our <a href="https://doi.org/10.1017/jfm.2025.10174">2025 publication in <em>Journal of Fluid Mechanics</em></a>.
+I have built this robot with <a href="https://pkarnakov.com/">Petr Karnakov</a> in less than two months to participate at the <a href="https://www.massrobotics.org/massrobotics-announces-form-function-challenge-winners-showcases-first-accelerator-cohort-at-the-robotics-summit-expo/">MassRobotics Form and Function Challenge</a> where we have placed second over more than 40 participants.</p>
+<h2>Hierarchical Bayesian inference for red blood cells models</h2>
+<p><img src="./images/DAG_RBC_UQ.png" class="float-img-left" /></p>
+<p>Calibrating the red blood cell (RBC) membrane model is crucial to predict blood flows. 
+Prior work has been fitting the membrane parameters to experimental datasets, but we found that this approach leads to a poor transferability of the model.
+Instead, we have combined <em>multiple experimental datasets</em> to find the model parameters.
+Furthermore, the model and the data contain numerical, modeling and measurement errors.</p>
+<p>To handle these sources of uncertainties, and the multiple datasets, we have taken a hierarchical Bayesian approach, represented on the left diagram.
+This structure models the variability of the model parameters within populations of RBCs.
+We found that hierarchical Bayesian inference gave a transferable model which can predict RBC dynamics in situations that were not used during the calibration of the model.
+More details are available in our <a href="https://doi.org/10.1103/PhysRevApplied.15.034062">2021 publications in <em>Physical Review Applied</em></a> and our <a href="https://doi.org/10.1016/j.bpj.2023.03.019">2023 publication in <em>Biophysical Journal</em></a>. </p>
   </div>
 </section>
 <section id="publications">
@@ -75,45 +133,6 @@ The most fun part for me is to combine multiple aspects of the above!  </p>
 <p>Wälchli, D., Martin, S.M., Economides, A., <strong>Amoudruz, L.</strong>, Arampatzis, G., Bian, X. and Koumoutsakos, P., 2020, June. Load balancing in large scale bayesian inference. In Proceedings of the Platform for Advanced Scientific Computing Conference (pp. 1-12). <a href="https://doi.org/10.1145/3394277.3401849">DOI</a></p>
 </li>
 </ul>
-  </div>
-</section>
-<section id="software">
-  <div class="markdown-body">
-    <h1>Software</h1>
-<h2>Mirheo</h2>
-<p>Mirheo is a high performance computing software primarily designed to simulate blood flow, microfluidics and the evolution of rigid microswimmers.
-The code is written in C++/CUDA/MPI and targets GPU clusters.  </p>
-<p><strong>Github:</strong> <a href="https://github.com/cselab/Mirheo">https://github.com/cselab/Mirheo</a>  </p>
-<p><strong>Documentation:</strong> <a href="https://mirheo.readthedocs.io/en/latest/">web format</a>, also available in <a href="https://n.ethz.ch/~amlucas/mirheo_docs.pdf">pdf</a>  </p>
-<p><img alt="" src="./images/ABF_single_tube.png" />
-<em>Artificial Bacterial Flagellum swimming in blood. Simulation with Mirheo, rendering with Paraview 5.9.</em></p>
-<h2>SdfTools</h2>
-<p>A simple tool written in C++ with python bindings to generate geometries signed distance function (SDF).
-The tool composes simple shapes to generate complex geometries.  </p>
-<p><strong>Github:</strong> <a href="https://github.com/amlucas/sdfTools">https://github.com/amlucas/sdfTools</a>  </p>
-<p><strong>Documentation:</strong> <a href="https://sdftools.readthedocs.io/en/latest/">https://sdftools.readthedocs.io/en/latest/</a>  </p>
-<h2>stochsim</h2>
-<p>Stochastic simulation processes with python and json interface.  </p>
-<p><strong>Github:</strong> <a href="https://github.com/amlucas/stochsim">https://github.com/amlucas/stochsim</a>  </p>
-  </div>
-</section>
-<section id="gallery">
-  <div class="markdown-body">
-    <h1>Gallery</h1>
-<iframe width="560" height="315" src="https://www.youtube.com/embed/sCirMyoGpUc?si=3sB9PzqTx-TWlxVr" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-
-<iframe width="560" height="315" src="https://www.youtube.com/embed/u-5yVLkBUdU?si=lef5Tuvq9pDQxAy7" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-
-<iframe width="560" height="315" src="https://www.youtube.com/embed/pwEyiedh-Fg?si=ws153uPWyM9Y4fFl" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-  </div>
-</section>
-<section id="contact">
-  <div class="markdown-body">
-    <h1>Contact</h1>
-<p><strong>Email:</strong> <a href="mailto:amlucas@seas.harvard.edu">amlucas@seas.harvard.edu</a><br />
-<strong>Scholar:</strong> <a href="https://scholar.google.ch/citations?user=eGRWGKYAAAAJ&amp;hl=en&amp;oi=ao">Lucas Amoudruz</a><br />
-<strong>Github:</strong> <a href="https://github.com/amlucas">amlucas</a><br />
-<strong>Address:</strong> 29 Oxford St, Cambridge, MA 02138  </p>
   </div>
 </section>
 
