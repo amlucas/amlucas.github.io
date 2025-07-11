@@ -1,4 +1,4 @@
-# List of publications
+# Publications
 
 ## 2025
 

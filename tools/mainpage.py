@@ -15,14 +15,22 @@ def main():
 
     sections = {
         "about": "about.md",
-        "publications": "publications.md"
+        "publications": "publications.md",
+        "software": "software.md",
+        "gallery": "gallery.md",
+        "contact": "contact.md"
     }
 
     html_sections = ""
     for section_id, filename in sections.items():
         with open(os.path.join(md_path, filename)) as f:
             html_content = markdown.markdown(f.read())
-        html_sections += f'<section id="{section_id}">\n{html_content}\n</section>\n'
+        html_sections += f'''<section id="{section_id}">
+  <div class="markdown-body">
+    {html_content}
+  </div>
+</section>
+'''
 
     nav_bar = ""
     for key in sections.keys():
@@ -38,7 +46,7 @@ def main():
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lucas Amoudruz</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 
