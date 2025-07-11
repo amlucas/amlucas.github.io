@@ -9,7 +9,7 @@ blog_filenames = \
 
 targets = $(addprefix $(OUTPUT_DIR)/, $(filenames))
 
-all: $(OUTPUT_DIR)/index.html
+all: $(OUTPUT_DIR)/index.html css images
 
 publish: all
 	ghp-import -m "Generate site" -b $(GITHUB_PAGES_BRANCH) "$(OUTPUT_DIR)"
@@ -17,7 +17,6 @@ publish: all
 
 output_dir:
 	mkdir -p $(OUTPUT_DIR)
-	mkdir -p $(OUTPUT_DIR)/blog
 
 $(OUTPUT_DIR)/index.html: $(SOURCE_DIR)/about.md \
 		$(SOURCE_DIR)/contact.md \
@@ -25,7 +24,7 @@ $(OUTPUT_DIR)/index.html: $(SOURCE_DIR)/about.md \
 		$(SOURCE_DIR)/publications.md \
 		$(SOURCE_DIR)/software.md \
 		output_dir
-	$(TOOLS_DIR)/mainpage.py $(SOURCE_DIR) $< --out-html $@
+	$(TOOLS_DIR)/mainpage.py $(SOURCE_DIR) --out-html $@
 
 images: output_dir
 	cp -r images $(OUTPUT_DIR)/
