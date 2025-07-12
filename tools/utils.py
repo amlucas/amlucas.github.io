@@ -1,5 +1,6 @@
 import re
 
+# START_BLOG_IMAGE
 def embed_custom_images(md_text):
     pattern = r'\{\{\s*image\("([^"]+)",\s*"([^"]*)",\s*"([^"]+)",\s*(\d+)\)\s*\}\}'
 
@@ -21,7 +22,9 @@ def embed_custom_images(md_text):
         '''
 
     return re.sub(pattern, replacer, md_text)
+# END_BLOG_IMAGE
 
+# START_BLOG_CODE
 def embed_code_from_files(md_text):
     full_pattern = r'\{\{\s*file_full,\s*"([^"]+)",\s*"([^"]+)"(?:,\s*"([^"]+)")?\s*\}\}'
     partial_pattern = r'\{\{\s*file_partial,\s*"([^"]+)",\s*"([^"]+)",\s*"([^"]+)"(?:,\s*"([^"]+)")?\s*\}\}'
@@ -71,3 +74,4 @@ def embed_code_from_files(md_text):
     md_text = re.sub(full_pattern, full_replacer, md_text)
     md_text = re.sub(partial_pattern, partial_replacer, md_text)
     return md_text
+# END_BLOG_CODE
