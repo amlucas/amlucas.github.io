@@ -22,8 +22,8 @@ The [main page](../index.html) is created with the following script:
 
 {{file_full, "tools/mainpage.py", "python", "spoiler"}}
 
-It converts Markdown files, processes to parse custom directives, and combines them into a single html file. 
-The pre-processing stage helps placing floating images more easily, and it uses the function `embed_custom_images`.
+It converts Markdown files, parses custom directives, and combines everything into a single HTML file. 
+The pre-processing stage helps with placing floating images more easily, and it uses the function `embed_custom_images`.
 This function handles parsing custom image blocks and turns them into proper HTML:
 
 {{file_partial, "tools/utils.py", "python", "BLOG_IMAGE", "spoiler"}}
@@ -55,7 +55,7 @@ The pre-processing stage also contains an additional step, to include code from 
 
 {{file_partial, "tools/utils.py", "python", "BLOG_CODE", "spoiler"}}
 
-This function relies on a similar format than that used by the `image` pattern.
+This function uses a format similar to the one used by the `image` pattern.
 Here I have two options:
 
 * `{{file_full, "path/to/code", "language", "spoiler"} }` (spoiler is optional) to include the full file;
@@ -70,5 +70,5 @@ Here is my full CSS configuration.
 ## Conclusion
 
 I could quite easily get everything working with this approach.
-The Markdown format is great to write content without needs to write any HTML, and the python code is useful to process these Markdown files automatically and convert them into HTML.
+Markdown is a great format to write content without needing to write any HTML, and the python code is useful to process these Markdown files automatically and convert them into HTML.
 Here is the [github repository](https://github.com/amlucas/amlucas.github.io/tree/dev) of the full source code, hopefully this is useful to somebody.
