@@ -66,3 +66,9 @@ Here I have two options:
 Here is my full CSS configuration.
 
 {{file_full, "css/main.css", "css", "spoiler"}}
+
+## Conclusion
+
+I could quite easily get everything working with this approach.
+The Markdown format is great to write content without needs to write any HTML, and the python code is useful to process these Markdown files automatically and convert them into HTML.
+Here is the [github repository](https://github.com/amlucas/amlucas.github.io/tree/dev) of the full source code, hopefully this is useful to somebody.
