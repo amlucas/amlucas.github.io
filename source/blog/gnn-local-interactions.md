@@ -2,13 +2,13 @@
 
 May 20, 2024
 
-Graph neural networks (GNNs) are an increasingly popular approach to learn from complex data structures that can be represented as graphs.
-In computational science we can often represent a physical system by a graph:
+Graph neural networks (GNNs) are an increasingly popular approach to learn from data structures that can be represented with graphs.
+This is a common scenario in computational science:
 
 * A computational grid is a set of nodes connected with each other.
 * Molecular dynamics is essentially a list of particles (nodes) interacting with pairwise forces (edges).
-* Unstructured grids to represent PDEs.
-* Triangle mesh surfaces to represent membranes.
+* Unstructured grids to solve PDEs.
+* Triangle mesh surfaces to represent membranes (this is quite central in [my research](../index.html#research)).
 
 {{ image("../images/blog/gnn-local-interactions/dataset.svg", "The training data, 500 particles uniformly placed in a square box.", "right", 50) }}
 
