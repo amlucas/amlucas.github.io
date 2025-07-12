@@ -21,3 +21,53 @@ def embed_custom_images(md_text):
         '''
 
     return re.sub(pattern, replacer, md_text)
+
+def embed_code_from_files(md_text):
+    full_pattern = r'\{\{\s*file_full,\s*"([^"]+)",\s*"([^"]+)"(?:,\s*"([^"]+)")?\s*\}\}'
+    partial_pattern = r'\{\{\s*file_partial,\s*"([^"]+)",\s*"([^"]+)",\s*"([^"]+)"(?:,\s*"([^"]+)")?\s*\}\}'
+
+    def full_replacer(match):
+        path, lang = match.group(1), match.group(2)
+        spoiler = match.group(3) == "spoiler"
+        try:
+            with open(path, "r") as f:
+                code = f.read().strip()
+            code_block = f"\n```{lang}\n{code}\n```\n"
+            if spoiler:
+                return f"<details>\n<summary>Show code</summary>\n\n{code_block}</details>\n"
+            else:
+                return code_block
+        except Exception as e:
+            return f"**Error including file: {path} ({e})**"
+
+    def partial_replacer(match):
+        path, lang, marker = match.group(1), match.group(2), match.group(3)
+        spoiler = match.group(4) == "spoiler"
+        start_tag = f"# START_{marker}"
+        end_tag = f"# END_{marker}"
+        try:
+            with open(path, "r") as f:
+                lines = f.readlines()
+            inside = False
+            extracted = []
+            for line in lines:
+                if start_tag in line:
+                    inside = True
+                    continue
+                if end_tag in line:
+                    inside = False
+                    continue
+                if inside:
+                    extracted.append(line)
+            code = ''.join(extracted).strip()
+            code_block = f"\n```{lang}\n{code}\n```\n"
+            if spoiler:
+                return f"<details>\n<summary>Show code</summary>\n\n{code_block}</details>\n"
+            else:
+                return code_block
+        except Exception as e:
+            return f"**Error including partial code: {path} ({e})**"
+
+    md_text = re.sub(full_pattern, full_replacer, md_text)
+    md_text = re.sub(partial_pattern, partial_replacer, md_text)
+    return md_text
