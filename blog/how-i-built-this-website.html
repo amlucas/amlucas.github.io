@@ -118,8 +118,8 @@ Below, I describe the structure of the code in more details.</p>
 
 </details>
 
-<p>It converts Markdown files, processes to parse custom directives, and combines them into a single html file. 
-The pre-processing stage helps placing floating images more easily, and it uses the function <code>embed_custom_images</code>.
+<p>It converts Markdown files, parses custom directives, and combines everything into a single HTML file. 
+The pre-processing stage helps with placing floating images more easily, and it uses the function <code>embed_custom_images</code>.
 This function handles parsing custom image blocks and turns them into proper HTML:</p>
 <details>
 <summary>Show code</summary>
@@ -367,7 +367,7 @@ Code and equations are not needed in the main page.</p>
 
 </details>
 
-<p>This function relies on a similar format than that used by the <code>image</code> pattern.
+<p>This function uses a format similar to the one used by the <code>image</code> pattern.
 Here I have two options:</p>
 <ul>
 <li><code>{{file_full, "path/to/code", "language", "spoiler"} }</code> (spoiler is optional) to include the full file;</li>
@@ -543,6 +543,11 @@ Here I have two options:</p>
 
 
 </details>
+
+<h2>Conclusion</h2>
+<p>I could quite easily get everything working with this approach.
+Markdown is a great format to write content without needing to write any HTML, and the python code is useful to process these Markdown files automatically and convert them into HTML.
+Here is the <a href="https://github.com/amlucas/amlucas.github.io/tree/dev">github repository</a> of the full source code, hopefully this is useful to somebody.</p>
 </section>
 
 
