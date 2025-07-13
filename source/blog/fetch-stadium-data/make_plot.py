@@ -21,19 +21,16 @@ def main():
     durations = df['duration'].to_numpy() / 60 # minutes
     dates = [datetime.strptime(date, '%Y-%m-%d %H:%M:%S') for date in dates]
 
-    #W = 6
-    #mean = np.convolve(durations, np.ones(W), mode='same') / np.convolve(np.ones_like(durations), np.ones(W), mode='same')
-
     fig, ax = plt.subplots()
     color = 'C0'
     ax.plot(dates, durations, 'o', clip_on=False, color=color)
-    #ax.plot(dates, mean, '--k', clip_on=False)
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
     ax.xaxis.set_major_locator(mdates.AutoDateLocator())
     ax.tick_params(axis='x', labelrotation=45)
     if args.show_temp:
         ax.tick_params(axis='y', color=color, labelcolor=color)
         ax.set_ylabel('Duration (minutes)', color=color)
+        ax.spines['right'].set_visible(True)
     else:
         ax.set_ylabel('Duration (minutes)')
 

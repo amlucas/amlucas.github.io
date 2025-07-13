@@ -4,9 +4,13 @@ import argparse
 import datetime
 from datetime import datetime
 from garminconnect import Garmin, GarminConnectAuthenticationError
+# START_BLOG_WEATHER
 from meteostat import Point, Hourly
+
+# END_BLOG_WEATHER
 import pandas as pd
 
+# START_BLOG_IS_STADIUM
 # lat, lon of the stadium
 LAT_STADIUM =  42.3669
 LON_STADIUM = -71.1260
@@ -26,7 +30,9 @@ def is_stadium_run(activity):
     except:
         return False
     return False
+# END_BLOG_IS_STADIUM
 
+# START_BLOG_FETCH_DURATIONS
 def retrieve_stadium_dates_and_durations(garmin):
     start_times = []
     durations = []
@@ -37,6 +43,7 @@ def retrieve_stadium_dates_and_durations(garmin):
             durations.append(activity['duration'])
 
     return start_times, durations
+# END_BLOG_FETCH_DURATIONS
 
 def retrieve_sleep_scores(garmin, start_times):
     scores = []
@@ -46,6 +53,7 @@ def retrieve_sleep_scores(garmin, start_times):
         scores.append(data['dailySleepDTO']['sleepScores']['overall']['value'])
     return scores
 
+# START_BLOG_WEATHER
 def retrieve_weather_data(start_times):
     location = Point(LAT_STADIUM, LON_STADIUM)
     date_times = pd.to_datetime(start_times)
@@ -62,7 +70,7 @@ def retrieve_weather_data(start_times):
     df.rename(columns={'index' :'datetime'}, inplace=True )
     df['datetime'] = date_times
     return df
-
+# END_BLOG_WEATHER
 
 def main():
     parser = argparse.ArgumentParser()
