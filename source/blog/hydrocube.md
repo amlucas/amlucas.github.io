@@ -74,6 +74,22 @@ We first opted for bread boards during the prototyping phase but ended up keepin
 {{image_row, [
   ["../images/blog/hydrocube/breadboard_v0a.jpg", "First stepper motor test. Kria to A4988 chip to stepper motor, with an external power source.", 32],
   ["../images/blog/hydrocube/breadboard_v0b.jpg", "Incremental changes: using the breadboard to power the motor.", 32],
-  ["../images/blog/hydrocube/breadboard_v0b.jpg", "Incremental changes: using the breadboard to power the motor.", 32],
+  ["../images/blog/hydrocube/breadboard_v0c.jpg", "A4988 drivers on a breadboard.", 32],
 ]}}
+
+Once everything was connected to the breadboard, we have built a frame that holds all the electronicvs together: the Kria board on top, attached with screws, and the breadboad on the side, attached with double face tape.
+
+{{image_row, [
+  ["../images/blog/hydrocube/breadboard_final_a.jpg", "Petr attaching the last connections.", 32],
+  ["../images/blog/hydrocube/breadboard_final_b.jpg", "All the electronics on a single frame.", 32],
+  ["../images/blog/hydrocube/breadboard_final_c.jpg", "Top view with the PMOD of the Kria board.", 32],
+]}}
+
+## Cameras and vision
+
+{{image_row, [
+  ["../images/blog/hydrocube/camera_a.jpg", "Frame and arm of one camera.", 32],
+  ["../images/blog/hydrocube/camera_b.jpg", "USB camera, in its custom frame, view from behind.", 32],
+]}}
+
 
