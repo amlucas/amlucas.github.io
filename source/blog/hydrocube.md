@@ -26,7 +26,7 @@ Here I want to share some snapshots of what happened during the building process
 
 ## The chamber and rotating disks
 
-{{ image("../images/hydrocube/disks_design_v1a.jpg", "", "left", 30) }}
+{{ image("../images/blog/hydrocube/disks_design_v1a.jpg", "", "left", 30) }}
 
 The chamber and the rotating disks are the central element of this robot.
 The main challenge was to have thin disks that were _inside_ the chamber, but able to rotate reliably with no leaks.
@@ -37,9 +37,9 @@ We thus updated the design to account for these problems.
 The solution was to have a more flexible connection, as shown below.
 
 {{image_row, [
-  ["../images/hydrocube/disks_design_v3c.jpg", "", 30],
-  ["../images/hydrocube/disks_design_v3a.jpg", "", 30],
-  ["../images/hydrocube/disks_design_v3b.jpg", "", 16.9],
+  ["../images/blog/hydrocube/disks_design_v3c.jpg", "", 30],
+  ["../images/blog/hydrocube/disks_design_v3a.jpg", "", 30],
+  ["../images/blog/hydrocube/disks_design_v3b.jpg", "", 16.9],
 ]}}
 
 This new design uses ball bearings to ease the rotation of the disks, and a cross shaped connection that allows a more flexible connection with the shaft coupled to the motors.
@@ -47,18 +47,18 @@ Furthemore, the frame responsible to hold the motors, initially built from a pla
 Below are pictures of this first frame:
 
 {{image_row, [
-  ["../images/hydrocube/frame_v0a.jpg", "The first design of the frame was a drilled plastic box.", 32],
-  ["../images/hydrocube/frame_v0b.jpg", "Motors were directly screwed on the box.", 32],
-  ["../images/hydrocube/frame_v0c.jpg", "The motor shafts were then extended with shaft couplers to reach the chamber.", 32],
+  ["../images/blog/hydrocube/frame_v0a.jpg", "The first design of the frame was a drilled plastic box.", 32],
+  ["../images/blog/hydrocube/frame_v0b.jpg", "Motors were directly screwed on the box.", 32],
+  ["../images/blog/hydrocube/frame_v0c.jpg", "The motor shafts were then extended with shaft couplers to reach the chamber.", 32],
 ]}}
 
 We decided to redesign the frame to make it more robust, provide a better alignment, and more space to access the chamber.
 Below are the results:
 
 {{image_row, [
-  ["../images/hydrocube/frame_v1a.jpg", "One of the six parts of the 3D-printed frames.", 32],
-  ["../images/hydrocube/frame_v1b.jpg", "The new design is more robust and gives a better access to the chamber.", 32],
-  ["../images/hydrocube/frame_v1c.jpg", "The six parts of the frame are modular and can be removed if needed.", 32],
+  ["../images/blog/hydrocube/frame_v1a.jpg", "One of the six parts of the 3D-printed frames.", 32],
+  ["../images/blog/hydrocube/frame_v1b.jpg", "The new design is more robust and gives a better access to the chamber.", 32],
+  ["../images/blog/hydrocube/frame_v1c.jpg", "The six parts of the frame are modular and can be removed if needed.", 32],
 ]}}
 
 Note that these are the largest pieces we had to print for this device, and also the first 3D-printed pieces we ever made.
@@ -72,7 +72,8 @@ To do so, we used A4988 drivers, leading to many electric connections.
 We first opted for bread boards during the prototyping phase but ended up keeping those in the final design due to the time constraints.
 
 {{image_row, [
-  ["../images/hydrocube/breadboard_v0a.jpg", "First stepper motor test. Kria to A4988 chip to stepper motor, with an external power source.", 32],
-  ["../images/hydrocube/breadboard_v0b.jpg", "Incremental changes: using the breadboard to power the motor.", 32],
+  ["../images/blog/hydrocube/breadboard_v0a.jpg", "First stepper motor test. Kria to A4988 chip to stepper motor, with an external power source.", 32],
+  ["../images/blog/hydrocube/breadboard_v0b.jpg", "Incremental changes: using the breadboard to power the motor.", 32],
+  ["../images/blog/hydrocube/breadboard_v0b.jpg", "Incremental changes: using the breadboard to power the motor.", 32],
 ]}}
 
