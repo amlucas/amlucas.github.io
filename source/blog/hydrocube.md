@@ -2,7 +2,7 @@
 
 July 13, 2025
 
-My former colleague, [Petr Karnakov](https://pkarnakov.com/), and I have developped a novel method for path planning of objects when the dynamics of a system are known.
+My former colleague, [Petr Karnakov](https://pkarnakov.com/), and I have developed a novel method for path planning of objects when the dynamics of a system are known.
 The method is presented in details in our [2025 publication in _Physical Review Letters_](https://doi.org/10.1103/PhysRevLett.134.044001) (also available on [arxiv](https://doi.org/10.48550/arXiv.2506.15902)).
 The method beats reinforcement learning in several benchmarks, but we had tested this only in simulations so far (we are computational scientists after all).
 
@@ -11,7 +11,7 @@ We decided to participate and built a robot, the _Hydrocube_.
 
 The Hydrocube is a device that transports small objects suspended in a liquid towards prescribed targets in three dimensions.
 The transport is realized by creating a flow in the chamber with the help of 5 rotating disks.
-The method we developped learns, in simulations, how to choose the rotation speed of the disks given the current position of the beads and their targets.
+The method we developed learns, in simulations, how to choose the rotation speed of the disks given the current position of the beads and their targets.
 
 Therefore, the device required the following components:
 
@@ -37,13 +37,13 @@ We thus updated the design to account for these problems.
 The solution was to have a more flexible connection, as shown below.
 
 {{image_row, [
-  ["../images/blog/hydrocube/disks_design_v3c.jpg", "", 30],
-  ["../images/blog/hydrocube/disks_design_v3a.jpg", "", 30],
-  ["../images/blog/hydrocube/disks_design_v3b.jpg", "", 16.9],
+  ["../images/blog/hydrocube/disks_design_v3c.jpg", "", 37.4],
+  ["../images/blog/hydrocube/disks_design_v3a.jpg", "", 37.4],
+  ["../images/blog/hydrocube/disks_design_v3b.jpg", "", 21.05],
 ]}}
 
 This new design uses ball bearings to ease the rotation of the disks, and a cross shaped connection that allows a more flexible connection with the shaft coupled to the motors.
-Furthemore, the frame responsible to hold the motors, initially built from a plastic box, resulted in bad alignment of the motors.
+Furthermore, the frame responsible to hold the motors, initially built from a plastic box, resulted in bad alignment of the motors.
 Below are pictures of this first frame:
 
 {{image_row, [
@@ -77,7 +77,9 @@ We first opted for bread boards during the prototyping phase but ended up keepin
   ["../images/blog/hydrocube/breadboard_v0c.jpg", "A4988 drivers on a breadboard.", 32],
 ]}}
 
-Once everything was connected to the breadboard, we have built a frame that holds all the electronicvs together: the Kria board on top, attached with screws, and the breadboad on the side, attached with double face tape.
+Once everything was connected to the breadboard, things look a bit messy: many long cables between moving parts, making the whole thing rather fragile.
+We thus built another frame that holds all the electronic parts together: the Kria board on top, attached with screws, and the breadboard on the side, attached with double face tape.
+The power cable was also attached to the frame to avoid non-intentionally pulling on the connection.
 
 {{image_row, [
   ["../images/blog/hydrocube/breadboard_final_a.jpg", "Petr attaching the last connections.", 32],
@@ -85,11 +87,24 @@ Once everything was connected to the breadboard, we have built a frame that hold
   ["../images/blog/hydrocube/breadboard_final_c.jpg", "Top view with the PMOD of the Kria board.", 32],
 ]}}
 
+
+
 ## Cameras and vision
 
+The last main component is crucial: giving sight to the device so that it has feedback.
+The aim here is to estimate the 3D position of the suspended beads, which requires at least two cameras.
+Reconstructing the position is then a mix of tracking of the beads in image space and pose estimation of the cameras, taking into account the refraction of light between glycerol and air.
+It wasn't clear how to optimally place the cameras within the frame to have a view of the whole chamber from both cameras.
+We thus designed a camera frame attached to movable arms, so we could adjust the position of the cameras:
+
 {{image_row, [
-  ["../images/blog/hydrocube/camera_a.jpg", "Frame and arm of one camera.", 32],
-  ["../images/blog/hydrocube/camera_b.jpg", "USB camera, in its custom frame, view from behind.", 32],
+  ["../images/blog/hydrocube/camera_a.jpg", "Frame and arm of one camera.", 25.4],
+  ["../images/blog/hydrocube/camera_b.jpg", "View from behind.", 25.4],
+  ["../images/blog/hydrocube/camera_c.jpg", "The two cameras positioned within the main frame.", 45],
 ]}}
 
 
+## Final assembly
+
+
+## Conclusion
