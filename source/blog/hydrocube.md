@@ -4,10 +4,10 @@ July 13, 2025
 
 My former colleague, [Petr Karnakov](https://pkarnakov.com/), and I have developped a novel method for path planning of objects when the dynamics of a system are known.
 The method is presented in details in our [2025 publication in _Physical Review Letters_](https://doi.org/10.1103/PhysRevLett.134.044001) (also available on [arxiv](https://doi.org/10.48550/arXiv.2506.15902)).
-The method looked promiosing, as it beats reinforcement learning in several benchmarks, but we had tested this only in simulations (we are computational scientists after all).
+The method beats reinforcement learning in several benchmarks, but we had tested this only in simulations so far (we are computational scientists after all).
 
-One day our PI suggested that we try it in a physical setting, and pointed out that there was a robotics challenge in Boston, about two months later, organized by [MassRobotics](https://www.massrobotics.org/), called [_form and function challenge_](https://www.massrobotics.org/form-function-challenge/).
-We decided to participate and build a robot, the _Hydrocube_.
+One day our PI suggested that we apply it to physical settings, and he pointed out that there was a robotics challenge here in Boston, about two months later, organized by [MassRobotics](https://www.massrobotics.org/), called [_form and function challenge_](https://www.massrobotics.org/form-function-challenge/).
+We decided to participate and built a robot, the _Hydrocube_.
 
 The Hydrocube is a device that transports small objects suspended in a liquid towards prescribed targets in three dimensions.
 The transport is realized by creating a flow in the chamber with the help of 5 rotating disks.
@@ -17,9 +17,9 @@ Therefore, the device required the following components:
 
 * a cubic chamber filled with a liquid;
 * 5 rotating disks, at the bottom and sides of the chamber;
-* 5 motots to independently control each disk;
+* 5 motors to independently control each disk;
 * cameras, placed at the top of the chamber, to estimate the current position of beads;
-* a device to control the disks, and electronics between this device and the motots;
+* a device to control the disks, and electronics between this device and the motors;
 * the cameras and the device were connected to a laptop, which hosts the control algorithm.
 
 Here I want to share some snapshots of what happened during the building process of the Hydrocube.
@@ -66,8 +66,10 @@ These were all designed with SolidWorks, with a license provided by Dassault Sys
 
 ## Electronics
 
-Another challenge was to connect the Kria board, to the motors, as none of us had much experience with electronics.
-We ordered bread boards to experiment and ended up keeping those in the final design due to the time constraints.
+To rotate the disks, we chose Nema 17 stepper motors, which are relatively cheap and have a large enough torque to sustain disk rotation in highly viscous fluids.
+We had to connect them to the PMOD of the Kria board and to an external power source.
+To do so, we used A4988 drivers, leading to many electric connections.
+We first opted for bread boards during the prototyping phase but ended up keeping those in the final design due to the time constraints.
 
 {{image_row, [
   ["../images/hydrocube/breadboard_v0a.jpg", "First stepper motor test. Kria to A4988 chip to stepper motor, with an external power source.", 32],
