@@ -54,7 +54,7 @@ Additional details can be found in our [2022 article in _Advanced Intelligence S
 
 Reinforcement learning is a great tool for control, but does not always converge in the settings I am interesting in.
 Furthermore, I typically have a model of the systems I want to control. 
-This lead us to developping a novel method that learns policies from a path planning objective and from the dynamics of the system in the form of an ODE or a PDE.
+This led us to developping a novel method that learns policies from a path planning objective and from the dynamics of the system in the form of an ODE or a PDE.
 
 The method relies on ODIL, developped at CSE-Lab, originally used to solve PDE-based inverse problems.
 In the context of control and path planning, we use ODIL to solve both the system dynamics and the control policy at the same time.

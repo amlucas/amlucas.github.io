@@ -42,4 +42,4 @@ We can observe a few trends:
 * there is some plateau time that I probably won't cross if I keep doing it this way  
 * temperature seems to be a factor of performance.
 
-But much more analysis is needed - this will be the object of a future blog.
+But much more analysis is needed - this will be the object of a future post.

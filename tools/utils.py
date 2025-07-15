@@ -1,7 +1,8 @@
+import ast
 import re
 
 # START_BLOG_IMAGE
-def embed_custom_images(md_text):
+def embed_image_float(md_text):
     pattern = r'\{\{\s*image\("([^"]+)",\s*"([^"]*)",\s*"([^"]+)",\s*(\d+)\)\s*\}\}'
 
     def replacer(match):
@@ -23,6 +24,31 @@ def embed_custom_images(md_text):
 
     return re.sub(pattern, replacer, md_text)
 # END_BLOG_IMAGE
+
+def embed_image_row(md_text):
+    pattern = r'\{\{\s*image_row,\s*(\[[^\}]+)\s*\}\}'
+
+    def replacer(match):
+        try:
+            # Parse the list of lists
+            items = ast.literal_eval(match.group(1))  # Safe parsing of Python literal
+
+            image_html = ""
+            for path, caption, width in items:
+                image_html += f'''
+<div class="image-wrap" style="width: {width}%;">
+  <img src="{path}" alt="{caption}">
+  <p class="image-caption">{caption}</p>
+</div>
+'''
+
+            return f'<div class="image-row">\n{image_html}</div>\n'
+
+        except Exception as e:
+            return f"<p><strong>Error rendering image_row:</strong> {e}</p>"
+
+    return re.sub(pattern, replacer, md_text)
+
 
 # START_BLOG_CODE
 def embed_code_from_files(md_text):

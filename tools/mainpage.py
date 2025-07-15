@@ -4,7 +4,7 @@ import argparse
 import markdown
 import os
 
-from utils import embed_custom_images
+from utils import embed_image_float
 
 def main():
     parser = argparse.ArgumentParser()
@@ -27,7 +27,7 @@ def main():
     for section_id, filename in sections.items():
         with open(os.path.join(md_path, filename)) as f:
             raw_md = f.read()
-        processed_md = embed_custom_images(raw_md)
+        processed_md = embed_image_float(raw_md)
         html_content = markdown.markdown(processed_md)
         html_sections += f'''<section id="{section_id}">
   <div class="markdown-body">

@@ -8,7 +8,8 @@ targets = $(addprefix $(OUTPUT_DIR)/, $(filenames))
 blog_filenames = \
 	blog/gnn-local-interactions.html \
 	blog/how-i-built-this-website.html \
-	blog/fetch-stadium-data.html
+	blog/fetch-stadium-data.html \
+	blog/hydrocube.html
 
 
 blog_targets = $(addprefix $(OUTPUT_DIR)/, $(blog_filenames))
