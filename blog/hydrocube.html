@@ -1,0 +1,136 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>blog - hydrocube</title>
+  <link rel="stylesheet" href="../css/main.css" />
+  <link rel="stylesheet" href="../css/codehilite.css" />
+  <script type="text/javascript" async
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="../index.html">Home</a>
+  <a href="../blog.html">Blog</a>
+</nav>
+
+
+<section class="markdown-body">
+  <h1>Building a robot to test our algorithm</h1>
+<p>July 13, 2025</p>
+<p>My former colleague, <a href="https://pkarnakov.com/">Petr Karnakov</a>, and I have developped a novel method for path planning of objects when the dynamics of a system are known.
+The method is presented in details in our <a href="https://doi.org/10.1103/PhysRevLett.134.044001">2025 publication in <em>Physical Review Letters</em></a> (also available on <a href="https://doi.org/10.48550/arXiv.2506.15902">arxiv</a>).
+The method looked promiosing, as it beats reinforcement learning in several benchmarks, but we had tested this only in simulations (we are computational scientists after all).</p>
+<p>One day our PI suggested that we try it in a physical setting, and pointed out that there was a robotics challenge in Boston, about two months later, organized by <a href="https://www.massrobotics.org/">MassRobotics</a>, called <a href="https://www.massrobotics.org/form-function-challenge/"><em>form and function challenge</em></a>.
+We decided to participate and build a robot, the <em>Hydrocube</em>.</p>
+<p>The Hydrocube is a device that transports small objects suspended in a liquid towards prescribed targets in three dimensions.
+The transport is realized by creating a flow in the chamber with the help of 5 rotating disks.
+The method we developped learns, in simulations, how to choose the rotation speed of the disks given the current position of the beads and their targets.</p>
+<p>Therefore, the device required the following components:</p>
+<ul>
+<li>a cubic chamber filled with a liquid;</li>
+<li>5 rotating disks, at the bottom and sides of the chamber;</li>
+<li>5 motots to independently control each disk;</li>
+<li>cameras, placed at the top of the chamber, to estimate the current position of beads;</li>
+<li>a device to control the disks, and electronics between this device and the motots;</li>
+<li>the cameras and the device were connected to a laptop, which hosts the control algorithm.</li>
+</ul>
+<p>Here I want to share some snapshots of what happened during the building process of the Hydrocube.</p>
+<h2>The chamber and rotating disks</h2>
+<div class="image-wrap float-img-left" style="width: 30%;">
+  <img src="../images/hydrocube/disks_design_v1a.jpg" alt="">
+
+</div>
+
+<p>The chamber and the rotating disks are the central element of this robot.
+The main challenge was to have thin disks that were <em>inside</em> the chamber, but able to rotate reliably with no leaks.
+Due to the highly viscous liquid (glycerol) inside the chamber, rotating the disks requires a large torque.
+On the left was the first design: each disk is 3D-printed and linked via a thin rod to a shaft coupler that attached directly to the motors. 
+The first tests were rather unsuccessful: too much wobbling (due to the thin, flexible rods that were not well aligned with the motors), a bit of leaking, and sometimes the disks would stop rotating due to the thin rods slipping from the disks or from the shaft couplers.
+We thus updated the design to account for these problems.
+The solution was to have a more flexible connection, as shown below.</p>
+<div class="image-row">
+
+<div class="image-wrap" style="width: 30%;">
+  <img src="../images/hydrocube/disks_design_v3c.jpg" alt="">
+  <p class="image-caption"></p>
+</div>
+
+<div class="image-wrap" style="width: 30%;">
+  <img src="../images/hydrocube/disks_design_v3a.jpg" alt="">
+  <p class="image-caption"></p>
+</div>
+
+<div class="image-wrap" style="width: 16.9%;">
+  <img src="../images/hydrocube/disks_design_v3b.jpg" alt="">
+  <p class="image-caption"></p>
+</div>
+</div>
+
+<p>This new design uses ball bearings to ease the rotation of the disks, and a cross shaped connection that allows a more flexible connection with the shaft coupled to the motors.
+Furthemore, the frame responsible to hold the motors, initially built from a plastic box, resulted in bad alignment of the motors.
+Below are pictures of this first frame:</p>
+<div class="image-row">
+
+<div class="image-wrap" style="width: 32%;">
+  <img src="../images/hydrocube/frame_v0a.jpg" alt="The first design of the frame was a drilled plastic box.">
+  <p class="image-caption">The first design of the frame was a drilled plastic box.</p>
+</div>
+
+<div class="image-wrap" style="width: 32%;">
+  <img src="../images/hydrocube/frame_v0b.jpg" alt="Motors were directly screwed on the box.">
+  <p class="image-caption">Motors were directly screwed on the box.</p>
+</div>
+
+<div class="image-wrap" style="width: 32%;">
+  <img src="../images/hydrocube/frame_v0c.jpg" alt="The motor shafts were then extended with shaft couplers to reach the chamber.">
+  <p class="image-caption">The motor shafts were then extended with shaft couplers to reach the chamber.</p>
+</div>
+</div>
+
+<p>We decided to redesign the frame to make it more robust, provide a better alignment, and more space to access the chamber.
+Below are the results:</p>
+<div class="image-row">
+
+<div class="image-wrap" style="width: 32%;">
+  <img src="../images/hydrocube/frame_v1a.jpg" alt="One of the six parts of the 3D-printed frames.">
+  <p class="image-caption">One of the six parts of the 3D-printed frames.</p>
+</div>
+
+<div class="image-wrap" style="width: 32%;">
+  <img src="../images/hydrocube/frame_v1b.jpg" alt="The new design is more robust and gives a better access to the chamber.">
+  <p class="image-caption">The new design is more robust and gives a better access to the chamber.</p>
+</div>
+
+<div class="image-wrap" style="width: 32%;">
+  <img src="../images/hydrocube/frame_v1c.jpg" alt="The six parts of the frame are modular and can be removed if needed.">
+  <p class="image-caption">The six parts of the frame are modular and can be removed if needed.</p>
+</div>
+</div>
+
+<p>Note that these are the largest pieces we had to print for this device, and also the first 3D-printed pieces we ever made.
+These were all designed with SolidWorks, with a license provided by Dassault Systemes.</p>
+<h2>Electronics</h2>
+<p>Another challenge was to connect the Kria board, to the motors, as none of us had much experience with electronics.
+We ordered bread boards to experiment and ended up keeping those in the final design due to the time constraints.</p>
+<div class="image-row">
+
+<div class="image-wrap" style="width: 32%;">
+  <img src="../images/hydrocube/breadboard_v0a.jpg" alt="First stepper motor test. Kria to A4988 chip to stepper motor, with an external power source.">
+  <p class="image-caption">First stepper motor test. Kria to A4988 chip to stepper motor, with an external power source.</p>
+</div>
+
+<div class="image-wrap" style="width: 32%;">
+  <img src="../images/hydrocube/breadboard_v0b.jpg" alt="Incremental changes: using the breadboard to power the motor.">
+  <p class="image-caption">Incremental changes: using the breadboard to power the motor.</p>
+</div>
+</div>
+</section>
+
+
+</body>
+</html>
