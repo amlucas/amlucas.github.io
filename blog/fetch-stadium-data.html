@@ -30,7 +30,7 @@ So I wrote a python program that downloads my time from the Garmin server, and r
 <p>I used the <a href="https://github.com/cyberjunky/python-garminconnect/tree/master">python-garminconnect</a> package to do so.</p>
 <p>I usually record my stadium runs as <em>run activities</em>. 
 I thus need to retrieve the run data from <code>garmniconnect</code>; note that I assume all stadium runs are within my last 1000 running activities, which is likely:</p>
-<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">retrieve_stadium_dates_and_durations</span><span class="p">(</span><span class="n">garmin</span><span class="p">):</span>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">retrieve_stadium_dates_and_durations</span><span class="p">(</span><span class="n">garmin</span><span class="p">):</span>
     <span class="n">start_times</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">durations</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">activities</span> <span class="o">=</span> <span class="n">garmin</span><span class="o">.</span><span class="n">get_activities</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">activitytype</span><span class="o">=</span><span class="s1">&#39;running&#39;</span><span class="p">)</span>
@@ -49,7 +49,7 @@ This is why I filter them using the following function, assuming each stadium ru
 <span class="n">LAT_STADIUM</span> <span class="o">=</span>  <span class="mf">42.3669</span>
 <span class="n">LON_STADIUM</span> <span class="o">=</span> <span class="o">-</span><span class="mf">71.1260</span>
 
-<span class="k">def</span> <span class="nf">is_stadium_run</span><span class="p">(</span><span class="n">activity</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_stadium_run</span><span class="p">(</span><span class="n">activity</span><span class="p">):</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">lat</span> <span class="o">=</span> <span class="n">activity</span><span class="p">[</span><span class="s1">&#39;startLatitude&#39;</span><span class="p">]</span>
         <span class="n">lon</span> <span class="o">=</span> <span class="n">activity</span><span class="p">[</span><span class="s1">&#39;startLongitude&#39;</span><span class="p">]</span>
@@ -68,9 +68,9 @@ This is why I filter them using the following function, assuming each stadium ru
 
 <p>Now all we need to do is retrieve weather data at these activity times.
 Here I have chosen to use <a href="https://dev.meteostat.net/python/">meteostat</a> to do so:</p>
-<div class="codehilite"><pre><span></span><code><span class="kn">from</span> <span class="nn">meteostat</span> <span class="kn">import</span> <span class="n">Point</span><span class="p">,</span> <span class="n">Hourly</span>
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">meteostat</span><span class="w"> </span><span class="kn">import</span> <span class="n">Point</span><span class="p">,</span> <span class="n">Hourly</span>
 
-<span class="k">def</span> <span class="nf">retrieve_weather_data</span><span class="p">(</span><span class="n">start_times</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">retrieve_weather_data</span><span class="p">(</span><span class="n">start_times</span><span class="p">):</span>
     <span class="n">location</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="n">LAT_STADIUM</span><span class="p">,</span> <span class="n">LON_STADIUM</span><span class="p">)</span>
     <span class="n">date_times</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">start_times</span><span class="p">)</span>
     <span class="n">date_times_hour</span> <span class="o">=</span> <span class="n">date_times</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="s1">&#39;h&#39;</span><span class="p">)</span>
