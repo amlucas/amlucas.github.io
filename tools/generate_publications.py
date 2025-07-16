@@ -49,12 +49,33 @@ def main():
         with open(path, "w") as f:
             f.write(writer.write(bib_database))
 
-        # Short formatted line
-        md_lines.append(f"- **{title}**  \n  {authors}  \n  *{journal}*" + (
-            f" [DOI]({doi})" if doi else "") + (
-            f" [arxiv]({arxiv})" if arxiv else "") + (
-            f" [bibtex](data/bib/{key}.bib)\n"))
+        # Format publication
+        line = f"- **{title}**  \n  {authors}  \n"
+        if entry.get('ENTRYTYPE') == 'phdthesis':
+            school = entry.get("school")
+            line += f"  _PhD dissertation_, {school}"
+        else:
+            line += f"  _{journal}_"
+            volume = entry.get('volume')
+            number = entry.get('number')
+            pages = entry.get('pages')
+            if volume:
+                line += f", Vol. {volume}"
+            if number:
+                line += f", No. {number}"
+            if pages:
+                line += f", pp. {pages}"
+            if year:
+                line += f" ({year})"
 
+        if doi:
+            line += f"  [DOI]({doi})"
+        if arxiv:
+            line += f"  [arxiv]({arxiv})"
+        # bibtex
+        line += f" [bibtex](data/bib/{key}.bib)\n"
+
+        md_lines.append(line)
 
 
     with open(out_md_file, "w") as f:
