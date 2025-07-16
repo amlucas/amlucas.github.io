@@ -4,6 +4,9 @@ import argparse
 import bibtexparser
 import os
 
+def bold_author(authors_str, name="Amoudruz, Lucas"):
+    return authors_str.replace(name, f"**{name}**")
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('bib_file', type=str, help="input bibtex file")
@@ -42,6 +45,8 @@ def main():
             md_lines.append(f"\n## {year}\n")
             cur_year = year
 
+        authors = bold_author(authors)
+
         # dump bibtex entry to a file
         bib_database = bibtexparser.bibdatabase.BibDatabase()
         bib_database.entries = [entry]
@@ -50,7 +55,7 @@ def main():
             f.write(writer.write(bib_database))
 
         # Format publication
-        line = f"- **{title}**  \n  {authors}  \n"
+        line = f'- {authors}. _"{title}"_, '
         if entry.get('ENTRYTYPE') == 'phdthesis':
             school = entry.get("school")
             line += f"  _PhD dissertation_, {school}"
