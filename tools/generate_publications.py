@@ -2,7 +2,18 @@
 
 import argparse
 import bibtexparser
+import latexcodec
 import markdown
+import re
+
+def strip_braces(text):
+    return re.sub(r'[{}]', '', text)
+
+def decode_latex_string(text):
+    try:
+        return text.encode("utf-8").decode("latex")
+    except Exception:
+        return text
 
 def bold_author(authors_str, name="Amoudruz, Lucas"):
     return authors_str.replace(name, f"**{name}**")
@@ -41,7 +52,10 @@ def main():
             md_lines.append(f"\n## {year}\n")
             cur_year = year
 
+        title = strip_braces(decode_latex_string(title))
+        authors = strip_braces(decode_latex_string(authors))
         authors = bold_author(authors)
+        journal = strip_braces(journal)
 
         # dump bibtex entry to a file
         bib_database = bibtexparser.bibdatabase.BibDatabase()

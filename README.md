@@ -12,6 +12,6 @@ Python environment to run blog scripts and generate the website
 conda create -n amlucas python=3.12
 conda activate amlucas
 conda install conda-forge::pygments
-pip install markdown python-markdown-math bibtexparser
+pip install markdown python-markdown-math bibtexparser latexcodec
 pip install numpy matplotlib pandas scipy garminconnect meteostat readchar
 ```
