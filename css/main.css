@@ -158,15 +158,32 @@ section {
   line-height: 1.3;
 }
 
-details summary {
+details {
+  margin-bottom: 1rem;
+}
+
+.code-block summary {
   cursor: pointer;
   font-weight: bold;
   margin: 0.5rem 0;
   color: #3e6075;
 }
 
-details {
-  margin-bottom: 1rem;
+.pub-entry summary {
+  cursor: pointer;
+  font-weight: normal;
+  color: inherit;
+  margin: 0;
+  padding: 0;
+}
+
+.pub-entry pre {
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  padding: 0.75rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.9rem;
 }
 
 .codehilite {

@@ -2,5 +2,4 @@ output
 css/codehilite.css
 __pycache__
 .DS_Store
-data/bib
 source/publications.md

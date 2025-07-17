@@ -91,7 +91,7 @@ def embed_code_from_files(md_text):
             code = ''.join(extracted).strip()
             code_block = f"\n```{lang}\n{code}\n```\n"
             if spoiler:
-                return f"<details>\n<summary>Show code</summary>\n\n{code_block}</details>\n"
+                return f"""<details class="code-block">\n<summary>Show code</summary>\n\n{code_block}</details>\n"""
             else:
                 return code_block
         except Exception as e:

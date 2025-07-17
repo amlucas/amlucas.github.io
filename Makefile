@@ -36,8 +36,8 @@ $(OUTPUT_DIR)/index.html: $(TOOLS_DIR)/mainpage.py \
 		output_dir
 	$(TOOLS_DIR)/mainpage.py $(SOURCE_DIR) --out-html $@
 
-$(SOURCE_DIR)/publications.md data/bib: $(TOOLS_DIR)/generate_publications.py $(SOURCE_DIR)/publications.bib
-	$(TOOLS_DIR)/generate_publications.py $(SOURCE_DIR)/publications.bib $(SOURCE_DIR)/publications.md data/bib
+$(SOURCE_DIR)/publications.md: $(TOOLS_DIR)/generate_publications.py $(SOURCE_DIR)/publications.bib
+	$(TOOLS_DIR)/generate_publications.py $(SOURCE_DIR)/publications.bib $(SOURCE_DIR)/publications.md
 
 $(OUTPUT_DIR)/blog.html: $(TOOLS_DIR)/blogmainpage.py \
 		$(SOURCE_DIR)/blog.md \
@@ -52,7 +52,7 @@ $(OUTPUT_DIR)/blog/%.html: $(SOURCE_DIR)/blog/%.md \
 images: output_dir
 	cp -r images $(OUTPUT_DIR)/
 
-data: output_dir data/bib
+data: output_dir
 	cp -r data $(OUTPUT_DIR)/
 
 css/codehilite.css:
