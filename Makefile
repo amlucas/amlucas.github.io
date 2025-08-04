@@ -34,7 +34,7 @@ $(OUTPUT_DIR)/index.html: $(TOOLS_DIR)/mainpage.py \
 		$(SOURCE_DIR)/research.md \
 		$(SOURCE_DIR)/publications.md \
 		output_dir
-	$(TOOLS_DIR)/mainpage.py $(SOURCE_DIR) --out-html $@
+	$(TOOLS_DIR)/mainpage.py $(SOURCE_DIR) --blog --out-html $@
 
 $(SOURCE_DIR)/publications.md: $(TOOLS_DIR)/generate_publications.py $(SOURCE_DIR)/publications.bib
 	$(TOOLS_DIR)/generate_publications.py $(SOURCE_DIR)/publications.bib $(SOURCE_DIR)/publications.md
