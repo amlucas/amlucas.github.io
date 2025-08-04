@@ -36,7 +36,7 @@ Due to my very limited knowledge in CSS styling, I have heavily used chatGPT and
 Below, I describe the structure of the code in more details.</p>
 <h2>The main page</h2>
 <p>The <a href="../index.html">main page</a> is created with the following script:</p>
-<details>
+<details class="code-block">
 <summary>Show code</summary>
 
 
@@ -156,7 +156,7 @@ This function handles parsing custom image blocks and turns them into proper HTM
 <p>After being processed, each md file is placed in <code>section</code>, and a link is added to a navigation bar.</p>
 <h2>Blog pages</h2>
 <p>The main blog page is similar to the main page, except that there is a single section containing links to individual blog posts:</p>
-<details>
+<details class="code-block">
 <summary>Show code</summary>
 
 
@@ -221,7 +221,7 @@ This function handles parsing custom image blocks and turns them into proper HTM
 </details>
 
 <p>Individual blog pages follow the same pattern: a single md file is preprocessed and then embedded into a common html file format.</p>
-<details>
+<details class="code-block">
 <summary>Show code</summary>
 
 
@@ -326,7 +326,7 @@ Code and equations are not needed in the main page.</p>
                 <span class="n">code</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
             <span class="n">code_block</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">```</span><span class="si">{</span><span class="n">lang</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="se">\n</span><span class="s2">```</span><span class="se">\n</span><span class="s2">&quot;</span>
             <span class="k">if</span> <span class="n">spoiler</span><span class="p">:</span>
-                <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;details&gt;</span><span class="se">\n</span><span class="s2">&lt;summary&gt;Show code&lt;/summary&gt;</span><span class="se">\n\n</span><span class="si">{</span><span class="n">code_block</span><span class="si">}</span><span class="s2">&lt;/details&gt;</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;&lt;details class=&quot;code-block&quot;&gt;</span><span class="se">\n</span><span class="s1">&lt;summary&gt;Show code&lt;/summary&gt;</span><span class="se">\n\n</span><span class="si">{</span><span class="n">code_block</span><span class="si">}</span><span class="s1">&lt;/details&gt;</span><span class="se">\n</span><span class="s1">&#39;</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">code_block</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
@@ -376,7 +376,7 @@ Here I have two options:</p>
 </ul>
 <h2>CSS</h2>
 <p>Here is my full CSS configuration.</p>
-<details>
+<details class="code-block">
 <summary>Show code</summary>
 
 
