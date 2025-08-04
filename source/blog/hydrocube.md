@@ -33,7 +33,7 @@ The main challenge was to have thin disks that were _inside_ the chamber, but ab
 Due to the highly viscous liquid (glycerol) inside the chamber, rotating the disks requires a large torque.
 On the left was the first design: each disk is 3D-printed and linked via a thin rod to a shaft coupler that attached directly to the motors. 
 The first tests were rather unsuccessful: too much wobbling (due to the thin, flexible rods that were not well aligned with the motors), a bit of leaking, and sometimes the disks would stop rotating due to the thin rods slipping from the disks or from the shaft couplers.
-We thus updated the design to account for these problems.
+We updated the design to address these problems.
 The solution was to have a more flexible connection, as shown below.
 
 {{image_row, [
@@ -67,7 +67,7 @@ These were all designed with SolidWorks, with a license provided by Dassault Sys
 ## Electronics
 
 To rotate the disks, we chose Nema 17 stepper motors, which only cost a few dollars and have a large enough torque to sustain disk rotation in highly viscous fluids.
-We had to connect them to the PMOD of the Kria board (provided by our sponsor AMD) and to an external power source.
+We connected them to the PMOD of the Kria board (provided by AMD, one of the sponsors) and to an external power source.
 To do so, we used A4988 drivers, leading to many electric connections.
 We first opted for bread boards during the prototyping phase but ended up keeping those in the final design due to the time constraints.
 
@@ -78,7 +78,7 @@ We first opted for bread boards during the prototyping phase but ended up keepin
 ]}}
 
 Once everything was connected to the breadboard, things look a bit messy: many long cables between moving parts, making the whole thing rather fragile.
-We thus built another frame that holds all the electronic parts together: the Kria board on top, attached with screws, and the breadboard on the side, attached with double face tape.
+We thus built a new frame to organize all the electronic components: the Kria board on top, attached with screws, and the breadboard on the side, attached with double face tape.
 The power cable was also attached to the frame to avoid non-intentionally pulling on the connection.
 
 {{image_row, [
@@ -126,5 +126,5 @@ We ended up second at the robotics competition, despite having only 2 months for
 {{ image("../images/blog/hydrocube/prize.jpg", "", "left", 100) }}
 
 What a great and exciting experience! 
-It is a rare thing to see my numerical work applied to physical settings, and it was almost surprising to see how well it works given all the approximations we had to make during the simulations.
+It's rare to see my numerical work directly applied to a real-world setting, and it was almost surprising to see how well it works given all the approximations we had to make during the simulations.
 This is very promising for other applications and I can't wait to apply this method to even more complex systems.
