@@ -18,6 +18,7 @@ blog_targets = $(addprefix $(OUTPUT_DIR)/, $(blog_filenames))
 all: \
 	$(OUTPUT_DIR)/index.html \
 	$(OUTPUT_DIR)/blog.html \
+	$(OUTPUT_DIR)/favicon.ico \
 	$(blog_targets) \
 	css images data
 
@@ -51,6 +52,9 @@ $(OUTPUT_DIR)/blog/%.html: $(SOURCE_DIR)/blog/%.md \
 
 images: output_dir
 	cp -r images $(OUTPUT_DIR)/
+
+$(OUTPUT_DIR)/favicon.ico: favicon.ico
+	cp -r $< $@
 
 data: output_dir
 	cp -r data $(OUTPUT_DIR)/
