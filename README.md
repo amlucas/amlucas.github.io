@@ -13,5 +13,5 @@ conda create -n amlucas python=3.12
 conda activate amlucas
 conda install conda-forge::pygments
 pip install markdown python-markdown-math bibtexparser latexcodec
-pip install numpy matplotlib pandas scipy garminconnect meteostat readchar
+pip install numpy matplotlib pandas scipy garminconnect meteostat readchar torch
 ```
