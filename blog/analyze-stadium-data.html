@@ -78,36 +78,128 @@ S_i = \frac{\hat{\theta}_i^2 \sigma_i^2}{\sum\limits_{k=1}^N \hat{\theta}_k^2 \s
 </script>
 where <script type="math/tex">\sigma_i^2 = \mathrm{Var}[X_i]</script>.
 The list of features and their first order Sobol index are summarized below:</p>
-<div class="codehilite"><pre><span></span><code><span class="n">temp</span><span class="w">                      </span><span class="o">:</span><span class="w"> </span><span class="n">S</span><span class="o">=</span><span class="mf">2.965</span><span class="n">e</span><span class="o">-</span><span class="mi">01</span>
-<span class="n">sleep_score</span><span class="w">               </span><span class="o">:</span><span class="w"> </span><span class="n">S</span><span class="o">=</span><span class="mf">1.641</span><span class="n">e</span><span class="o">-</span><span class="mi">01</span>
-<span class="n">sleep_score</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sleep_score</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">S</span><span class="o">=</span><span class="mf">1.569</span><span class="n">e</span><span class="o">-</span><span class="mi">01</span>
-<span class="n">sleep_score</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">temp</span><span class="w">        </span><span class="o">:</span><span class="w"> </span><span class="n">S</span><span class="o">=</span><span class="mf">1.039</span><span class="n">e</span><span class="o">-</span><span class="mi">01</span>
-<span class="n">dwpt</span><span class="w">                      </span><span class="o">:</span><span class="w"> </span><span class="n">S</span><span class="o">=</span><span class="mf">6.586</span><span class="n">e</span><span class="o">-</span><span class="mi">02</span>
-<span class="n">hour</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">temp</span><span class="w">               </span><span class="o">:</span><span class="w"> </span><span class="n">S</span><span class="o">=</span><span class="mf">2.944</span><span class="n">e</span><span class="o">-</span><span class="mi">02</span>
-<span class="n">hour</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">dwpt</span><span class="w">               </span><span class="o">:</span><span class="w"> </span><span class="n">S</span><span class="o">=</span><span class="mf">2.788</span><span class="n">e</span><span class="o">-</span><span class="mi">02</span>
-<span class="n">temp</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">temp</span><span class="w">               </span><span class="o">:</span><span class="w"> </span><span class="n">S</span><span class="o">=</span><span class="mf">2.558</span><span class="n">e</span><span class="o">-</span><span class="mi">02</span>
-<span class="n">num_runs_2m</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">num_runs_2m</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">S</span><span class="o">=</span><span class="mf">2.119</span><span class="n">e</span><span class="o">-</span><span class="mi">02</span>
-<span class="n">hour</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sleep_score</span><span class="w">        </span><span class="o">:</span><span class="w"> </span><span class="n">S</span><span class="o">=</span><span class="mf">1.966</span><span class="n">e</span><span class="o">-</span><span class="mi">02</span>
-<span class="n">month</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">month</span><span class="w">             </span><span class="o">:</span><span class="w"> </span><span class="n">S</span><span class="o">=</span><span class="mf">1.458</span><span class="n">e</span><span class="o">-</span><span class="mi">02</span>
-<span class="n">num_runs_2m</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sleep_score</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">S</span><span class="o">=</span><span class="mf">1.198</span><span class="n">e</span><span class="o">-</span><span class="mi">02</span>
-<span class="n">month</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">num_runs_2m</span><span class="w">       </span><span class="o">:</span><span class="w"> </span><span class="n">S</span><span class="o">=</span><span class="mf">1.103</span><span class="n">e</span><span class="o">-</span><span class="mi">02</span>
-<span class="n">hour</span><span class="w">                      </span><span class="o">:</span><span class="w"> </span><span class="n">S</span><span class="o">=</span><span class="mf">9.858</span><span class="n">e</span><span class="o">-</span><span class="mi">03</span>
-<span class="n">dwpt</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">temp</span><span class="w">               </span><span class="o">:</span><span class="w"> </span><span class="n">S</span><span class="o">=</span><span class="mf">8.317</span><span class="n">e</span><span class="o">-</span><span class="mi">03</span>
-<span class="n">month</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sleep_score</span><span class="w">       </span><span class="o">:</span><span class="w"> </span><span class="n">S</span><span class="o">=</span><span class="mf">5.056</span><span class="n">e</span><span class="o">-</span><span class="mi">03</span>
-<span class="n">month</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">temp</span><span class="w">              </span><span class="o">:</span><span class="w"> </span><span class="n">S</span><span class="o">=</span><span class="mf">4.274</span><span class="n">e</span><span class="o">-</span><span class="mi">03</span>
-<span class="n">hour</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">hour</span><span class="w">               </span><span class="o">:</span><span class="w"> </span><span class="n">S</span><span class="o">=</span><span class="mf">4.237</span><span class="n">e</span><span class="o">-</span><span class="mi">03</span>
-<span class="n">month</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">dwpt</span><span class="w">              </span><span class="o">:</span><span class="w"> </span><span class="n">S</span><span class="o">=</span><span class="mf">4.218</span><span class="n">e</span><span class="o">-</span><span class="mi">03</span>
-<span class="n">hour</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">month</span><span class="w">              </span><span class="o">:</span><span class="w"> </span><span class="n">S</span><span class="o">=</span><span class="mf">3.899</span><span class="n">e</span><span class="o">-</span><span class="mi">03</span>
-<span class="n">num_runs_2m</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">temp</span><span class="w">        </span><span class="o">:</span><span class="w"> </span><span class="n">S</span><span class="o">=</span><span class="mf">3.733</span><span class="n">e</span><span class="o">-</span><span class="mi">03</span>
-<span class="n">dwpt</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">dwpt</span><span class="w">               </span><span class="o">:</span><span class="w"> </span><span class="n">S</span><span class="o">=</span><span class="mf">2.436</span><span class="n">e</span><span class="o">-</span><span class="mi">03</span>
-<span class="n">month</span><span class="w">                     </span><span class="o">:</span><span class="w"> </span><span class="n">S</span><span class="o">=</span><span class="mf">2.003</span><span class="n">e</span><span class="o">-</span><span class="mi">03</span>
-<span class="n">hour</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">num_runs_2m</span><span class="w">        </span><span class="o">:</span><span class="w"> </span><span class="n">S</span><span class="o">=</span><span class="mf">1.588</span><span class="n">e</span><span class="o">-</span><span class="mi">03</span>
-<span class="n">sleep_score</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">dwpt</span><span class="w">        </span><span class="o">:</span><span class="w"> </span><span class="n">S</span><span class="o">=</span><span class="mf">1.021</span><span class="n">e</span><span class="o">-</span><span class="mi">03</span>
-<span class="n">num_runs_2m</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">dwpt</span><span class="w">        </span><span class="o">:</span><span class="w"> </span><span class="n">S</span><span class="o">=</span><span class="mf">6.389</span><span class="n">e</span><span class="o">-</span><span class="mi">04</span>
-<span class="n">num_runs_2m</span><span class="w">               </span><span class="o">:</span><span class="w"> </span><span class="n">S</span><span class="o">=</span><span class="mf">1.508</span><span class="n">e</span><span class="o">-</span><span class="mi">04</span>
-<span class="mi">1</span><span class="w">                         </span><span class="o">:</span><span class="w"> </span><span class="n">S</span><span class="o">=</span><span class="mf">0.000</span><span class="n">e</span><span class="o">+</span><span class="mi">00</span>
-</code></pre></div>
-
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Feature</th>
+<th style="text-align: left;">First order Sobol index</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">temp</td>
+<td style="text-align: left;">0.297</td>
+</tr>
+<tr>
+<td style="text-align: left;">sleep_score</td>
+<td style="text-align: left;">0.164</td>
+</tr>
+<tr>
+<td style="text-align: left;">sleep_score * sleep_score</td>
+<td style="text-align: left;">0.157</td>
+</tr>
+<tr>
+<td style="text-align: left;">sleep_score * temp</td>
+<td style="text-align: left;">0.104</td>
+</tr>
+<tr>
+<td style="text-align: left;">dwpt</td>
+<td style="text-align: left;">0.066</td>
+</tr>
+<tr>
+<td style="text-align: left;">hour * temp</td>
+<td style="text-align: left;">0.029</td>
+</tr>
+<tr>
+<td style="text-align: left;">hour * dwpt</td>
+<td style="text-align: left;">0.028</td>
+</tr>
+<tr>
+<td style="text-align: left;">temp * temp</td>
+<td style="text-align: left;">0.026</td>
+</tr>
+<tr>
+<td style="text-align: left;">num_runs_2m * num_runs_2m</td>
+<td style="text-align: left;">0.021</td>
+</tr>
+<tr>
+<td style="text-align: left;">hour * sleep_score</td>
+<td style="text-align: left;">0.020</td>
+</tr>
+<tr>
+<td style="text-align: left;">month * month</td>
+<td style="text-align: left;">0.015</td>
+</tr>
+<tr>
+<td style="text-align: left;">num_runs_2m * sleep_score</td>
+<td style="text-align: left;">0.012</td>
+</tr>
+<tr>
+<td style="text-align: left;">month * num_runs_2m</td>
+<td style="text-align: left;">0.011</td>
+</tr>
+<tr>
+<td style="text-align: left;">hour</td>
+<td style="text-align: left;">0.010</td>
+</tr>
+<tr>
+<td style="text-align: left;">dwpt * temp</td>
+<td style="text-align: left;">0.008</td>
+</tr>
+<tr>
+<td style="text-align: left;">month * sleep_score</td>
+<td style="text-align: left;">0.005</td>
+</tr>
+<tr>
+<td style="text-align: left;">month * temp</td>
+<td style="text-align: left;">0.004</td>
+</tr>
+<tr>
+<td style="text-align: left;">hour * hour</td>
+<td style="text-align: left;">0.004</td>
+</tr>
+<tr>
+<td style="text-align: left;">month * dwpt</td>
+<td style="text-align: left;">0.004</td>
+</tr>
+<tr>
+<td style="text-align: left;">hour * month</td>
+<td style="text-align: left;">0.004</td>
+</tr>
+<tr>
+<td style="text-align: left;">num_runs_2m * temp</td>
+<td style="text-align: left;">0.004</td>
+</tr>
+<tr>
+<td style="text-align: left;">dwpt * dwpt</td>
+<td style="text-align: left;">0.002</td>
+</tr>
+<tr>
+<td style="text-align: left;">month</td>
+<td style="text-align: left;">0.002</td>
+</tr>
+<tr>
+<td style="text-align: left;">hour * num_runs_2m</td>
+<td style="text-align: left;">0.002</td>
+</tr>
+<tr>
+<td style="text-align: left;">sleep_score * dwpt</td>
+<td style="text-align: left;">0.001</td>
+</tr>
+<tr>
+<td style="text-align: left;">num_runs_2m * dwpt</td>
+<td style="text-align: left;">0.001</td>
+</tr>
+<tr>
+<td style="text-align: left;">num_runs_2m</td>
+<td style="text-align: left;">0.000</td>
+</tr>
+<tr>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">0.000</td>
+</tr>
+</tbody>
+</table>
 <p>Perhaps unsurprisingly, the temperature is the most important feature to predict the run time, followed by the sleep score and the dewpoint (related to humidity).</p>
 <p>So now we can ask, given this model and this data, what are the perfect conditions to run the stairs?
 What I did here is to replace in my feature vectors one quantity of interest at a time, and compute the average of the predicted durations.
@@ -211,8 +303,10 @@ This certainly won't limit my stadium runs to these "optimal" conditions, I'm su
     <span class="n">sobol_indices</span> <span class="o">=</span> <span class="n">theta</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">varx</span>
     <span class="n">sobol_indices</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">sobol_indices</span><span class="p">)</span>
 
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Feature                   | First order Sobol index&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;:------------------------ | :----------------------&quot;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">sobol_indices</span><span class="p">)):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Xvars</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">26</span><span class="p">)</span><span class="si">}</span><span class="s2">: S=</span><span class="si">{</span><span class="n">sobol_indices</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">:</span><span class="s2">.3e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Xvars</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">26</span><span class="p">)</span><span class="si">}</span><span class="s2">| </span><span class="si">{</span><span class="n">sobol_indices</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="c1"># plot predictions</span>
     <span class="n">Ypred</span> <span class="o">=</span> <span class="n">X</span> <span class="o">@</span> <span class="n">theta</span>
