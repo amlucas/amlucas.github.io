@@ -24,7 +24,7 @@
 <p>August 9, 2025</p>
 <p>Running the stairs at the Harvard stadium always feels rough (and yet I keep doing it because it's really fun to do with friends).
 In a previous post, I have described how I could automatically <a href="./fetch-stadium-data.html">retrieve statistics and weather data</a> of all my stadium runs.
-Today I want to see if one can understand this data: Can I predict the run time, given weather and sleep scores data? What parameters are most important?</p>
+Today I want to see if one can learn anything from this data: Can I predict the run time, given weather and sleep scores? What parameters are most important?</p>
 <p>So far I have collected <script type="math/tex">N=67</script> data points, still in the low-data regime, so deep learning won't work.
 But maybe we can learn a lot with a simple linear model,
 <script type="math/tex; mode=display">
@@ -141,13 +141,13 @@ This certainly won't limit my stadium runs to these "optimal" conditions, I'm su
 
 <div class="codehilite"><pre><span></span><code><span class="ch">#!/usr/bin/env python</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
-<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;csv_data&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Path to csv file&#39;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--skip&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;number of first points to skip for the analysis&#39;</span><span class="p">)</span>
@@ -173,8 +173,8 @@ This certainly won't limit my stadium runs to these "optimal" conditions, I'm su
     <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">time</span><span class="p">[</span><span class="n">skip</span><span class="p">:]:</span>
         <span class="n">n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">time</span> <span class="o">&lt;=</span> <span class="n">t</span><span class="p">,</span> <span class="n">t</span> <span class="o">-</span> <span class="n">pd</span><span class="o">.</span><span class="n">DateOffset</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">time</span><span class="p">))</span>
         <span class="n">num_runs_2m</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
-    <span class="c1">#X.append(np.array(num_runs_2m))</span>
-    <span class="c1">#Xvars.append(&#39;num_runs_2m&#39;)</span>
+    <span class="n">X</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">num_runs_2m</span><span class="p">))</span>
+    <span class="n">Xvars</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;num_runs_2m&#39;</span><span class="p">)</span>
 
     <span class="c1"># Engineered variable: time of the year</span>
     <span class="n">X</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;datetime&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">month</span><span class="p">[</span><span class="n">skip</span><span class="p">:])</span>
