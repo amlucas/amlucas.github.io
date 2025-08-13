@@ -4,7 +4,7 @@ August 9, 2025
 
 Running the stairs at the Harvard stadium always feels rough (and yet I keep doing it because it's really fun to do with friends).
 In a previous post, I have described how I could automatically [retrieve statistics and weather data](./fetch-stadium-data.html) of all my stadium runs.
-Today I want to see if one can understand this data: Can I predict the run time, given weather and sleep scores data? What parameters are most important?
+Today I want to see if one can learn anything from this data: Can I predict the run time, given weather and sleep scores? What parameters are most important?
 
 So far I have collected \(N=67\) data points, still in the low-data regime, so deep learning won't work.
 But maybe we can learn a lot with a simple linear model,

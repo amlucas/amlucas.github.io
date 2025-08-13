@@ -32,8 +32,8 @@ def main():
     for t in time[skip:]:
         n = np.count_nonzero(np.logical_and(time <= t, t - pd.DateOffset(days=60) < time))
         num_runs_2m.append(n)
-    #X.append(np.array(num_runs_2m))
-    #Xvars.append('num_runs_2m')
+    X.append(np.array(num_runs_2m))
+    Xvars.append('num_runs_2m')
 
     # Engineered variable: time of the year
     X.append(pd.to_datetime(df['datetime']).dt.month[skip:])
