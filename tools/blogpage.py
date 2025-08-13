@@ -27,7 +27,8 @@ def main():
     html_content = markdown.markdown(processed_md,
                                      extensions=['mdx_math',
                                                  'fenced_code',
-                                                 'codehilite'])
+                                                 'codehilite',
+                                                 'tables'])
 
 
     html_section = f"""

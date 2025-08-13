@@ -60,36 +60,36 @@ $$
 where \(\sigma_i^2 = \mathrm{Var}[X_i]\).
 The list of features and their first order Sobol index are summarized below:
 
-```
-temp                      : S=2.965e-01
-sleep_score               : S=1.641e-01
-sleep_score * sleep_score : S=1.569e-01
-sleep_score * temp        : S=1.039e-01
-dwpt                      : S=6.586e-02
-hour * temp               : S=2.944e-02
-hour * dwpt               : S=2.788e-02
-temp * temp               : S=2.558e-02
-num_runs_2m * num_runs_2m : S=2.119e-02
-hour * sleep_score        : S=1.966e-02
-month * month             : S=1.458e-02
-num_runs_2m * sleep_score : S=1.198e-02
-month * num_runs_2m       : S=1.103e-02
-hour                      : S=9.858e-03
-dwpt * temp               : S=8.317e-03
-month * sleep_score       : S=5.056e-03
-month * temp              : S=4.274e-03
-hour * hour               : S=4.237e-03
-month * dwpt              : S=4.218e-03
-hour * month              : S=3.899e-03
-num_runs_2m * temp        : S=3.733e-03
-dwpt * dwpt               : S=2.436e-03
-month                     : S=2.003e-03
-hour * num_runs_2m        : S=1.588e-03
-sleep_score * dwpt        : S=1.021e-03
-num_runs_2m * dwpt        : S=6.389e-04
-num_runs_2m               : S=1.508e-04
-1                         : S=0.000e+00
-```
+Feature                   | First order Sobol index
+:------------------------ | :----------------------
+temp                      | 0.297
+sleep_score               | 0.164
+sleep_score * sleep_score | 0.157
+sleep_score * temp        | 0.104
+dwpt                      | 0.066
+hour * temp               | 0.029
+hour * dwpt               | 0.028
+temp * temp               | 0.026
+num_runs_2m * num_runs_2m | 0.021
+hour * sleep_score        | 0.020
+month * month             | 0.015
+num_runs_2m * sleep_score | 0.012
+month * num_runs_2m       | 0.011
+hour                      | 0.010
+dwpt * temp               | 0.008
+month * sleep_score       | 0.005
+month * temp              | 0.004
+hour * hour               | 0.004
+month * dwpt              | 0.004
+hour * month              | 0.004
+num_runs_2m * temp        | 0.004
+dwpt * dwpt               | 0.002
+month                     | 0.002
+hour * num_runs_2m        | 0.002
+sleep_score * dwpt        | 0.001
+num_runs_2m * dwpt        | 0.001
+num_runs_2m               | 0.000
+1                         | 0.000
 
 Perhaps unsurprisingly, the temperature is the most important feature to predict the run time, followed by the sleep score and the dewpoint (related to humidity).
 

@@ -70,8 +70,10 @@ def main():
     sobol_indices = theta**2 * varx
     sobol_indices /= np.sum(sobol_indices)
 
+    print("Feature                   | First order Sobol index")
+    print(":------------------------ | :----------------------")
     for i in reversed(np.argsort(sobol_indices)):
-        print(f"{Xvars[i].ljust(26)}: S={sobol_indices[i]:.3e}")
+        print(f"{Xvars[i].ljust(26)}| {sobol_indices[i]:.3f}")
 
     # plot predictions
     Ypred = X @ theta
