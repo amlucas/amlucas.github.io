@@ -43,7 +43,7 @@ def main():
         year = entry.get("year", "????")
         title = entry.get("title", "Untitled").strip("{}")
         authors = entry.get("author", "Unknown")
-        journal = entry.get("journal") or entry.get("booktitle") or ""
+        journal = entry.get("journal") or entry.get("booktitle") or "arxiv preprint"
         doi = entry.get("doi")
         arxiv = entry.get("eprint") if "arxiv" in entry.get("eprint", "").lower() else None
         key = entry.get("ID")
