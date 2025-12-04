@@ -158,6 +158,31 @@ section {
   line-height: 1.3;
 }
 
+.image-wrap {
+  margin-bottom: 1rem;
+}
+
+.float-img-left {
+  float: left;
+  margin: 0 1em 1em 0;
+}
+
+.float-img-right {
+  float: right;
+  margin: 0 0 1em 1em;
+}
+
+.image-center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+.image-center img {
+  display: block;
+  margin: 0 auto;
+}
+
 details {
   margin-bottom: 1rem;
 }

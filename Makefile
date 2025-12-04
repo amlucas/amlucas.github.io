@@ -10,7 +10,8 @@ blog_filenames = \
 	blog/how-i-built-this-website.html \
 	blog/fetch-stadium-data.html \
 	blog/hydrocube.html \
-	blog/analyze-stadium-data.html
+	blog/analyze-stadium-data.html \
+	blog/sauteed-potatoes.html
 
 
 blog_targets = $(addprefix $(OUTPUT_DIR)/, $(blog_filenames))

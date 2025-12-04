@@ -10,9 +10,15 @@ def embed_image_float(md_text):
         caption = match.group(2).strip()
         float_dir = match.group(3)
         width = match.group(4)
-        float_class = f"float-img-{float_dir}" if float_dir in ["left", "center", "right"] else ""
-        style = f'style="width: {width}%;"'
 
+        if float_dir == "center":
+            float_class = "image-center"
+        elif float_dir in ["left", "right"]:
+            float_class = f"float-img-{float_dir}"
+        else:
+            float_class = ""
+
+        style = f'style="width: {width}%;"'
         caption_html = f'<p class="image-caption">{caption}</p>' if caption else ''
 
         return f'''
