@@ -1,5 +1,5 @@
 IMAGES = ../../../images
-DST_DIR = $(IMAGES)/blog/sauteed-potatoes
+DST_DIR = $(IMAGES)/blog/tossing-potatoes
 
 all: $(DST_DIR)/Pt.svg $(DST_DIR)/binomial.svg
 

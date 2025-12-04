@@ -37,20 +37,20 @@ $$
 This follows the [inclusion-exclusion principle](https://en.wikipedia.org/wiki/Inclusion%E2%80%93exclusion_principle).
 The probability \(P_t\) tends exponentially to 1 as \(t\) increases, as illustrated in the following figure:
 
-{{image("../images/blog/sauteed-potatoes/Pt.svg", "Probability that a potato has touched all four sides after t tosses.", "center", 70)}}
+{{image("../images/blog/tossing-potatoes/Pt.svg", "Probability that a potato has touched all four sides after t tosses.", "center", 70)}}
 
 As expected, under 4 tosses, the probability that the potato is well cooked is zero, because it cannot have been on 4 faces.
 The figure shows that after 20 tosses, there is already a 99% probability that the potato cube has visited all 4 faces.
 I don't have only one potato piece, but \(N\) of them (say 40).
 The number of well cooked potatoes follows a binomial distribution, with success probability \(P_t\).
 
-{{image("../images/blog/sauteed-potatoes/binomial.svg", "Median number of well cooked potatoes out of \(N=40\), against the number of tosses. Error bars indicate the 5 to 95% quantiles.", "center", 70)}}
+{{image("../images/blog/tossing-potatoes/binomial.svg", "Median number of well cooked potatoes out of \(N=40\), against the number of tosses. Error bars indicate the 5 to 95% quantiles.", "center", 70)}}
 
 In my pan, most of the 40 potatoes will be well cooked after about 28 tosses.
 It's hard work, but totally worth it.
 
 The figures were produced with these two scripts:
-{{file_full, "source/blog/sauteed-potatoes/Pt.py", "python", "spoiler"}}
-{{file_full, "source/blog/sauteed-potatoes/binomial.py", "python", "spoiler"}}
+{{file_full, "source/blog/tossing-potatoes/Pt.py", "python", "spoiler"}}
+{{file_full, "source/blog/tossing-potatoes/binomial.py", "python", "spoiler"}}
 
 

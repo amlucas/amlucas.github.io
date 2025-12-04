@@ -2,6 +2,7 @@
 
 A few notes on projects, code, and things I find interesting.
 
+* **December 02, 2025** [Tossing potatoes](blog/tossing-potatoes.html)
 * **August 09, 2025** [Running the Harvard stadium: what makes me run faster?](blog/analyze-stadium-data.html)
 * **August 03, 2025** [Building a robot to test our algorithm](blog/hydrocube.html)
 * **July 12, 2025:** [Running the Harvard stadium: automatically retrieve data](blog/fetch-stadium-data.html)
