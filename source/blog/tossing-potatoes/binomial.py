@@ -13,13 +13,15 @@ def main():
 
     out = args.out
 
-    N = 40
-    t = np.arange(1, 50)
+    m = 6 # number of faces
 
-    Pt = 1 \
-        - 4 * (3/4)**t \
-        + 6 * (1/2)**t \
-        - 4 * (1/4)**t
+    N = 40
+    t = np.arange(0, 50)
+
+    Pt = np.zeros(len(t))
+    for k in range(m+1):
+        Pt += (-1)**k * math.comb(m, k) * ((m-k)/m)**t
+    Pt = np.clip(Pt, 0, 1)
 
     median = binom.median(N, Pt)
     lo = binom.ppf(0.05, N, Pt)
