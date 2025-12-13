@@ -1,0 +1,190 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>blog - tossing-potatoes</title>
+  <link rel="stylesheet" href="../css/main.css" />
+  <link rel="stylesheet" href="../css/codehilite.css" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap" rel="stylesheet">
+  <script type="text/javascript" async
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="../index.html">Home</a>
+  <a href="../blog.html">Blog</a>
+</nav>
+
+
+<section class="markdown-body">
+  <h1>Tossing potatoes</h1>
+<p>December 2, 2025</p>
+<p>Tonight I have prepared sautéed potatoes.
+It's pretty simple: cut the potatoes in rough cubes, ideally of the same size, and throw them in a pan that contains enough oil (or better, duck fat).
+Then you just need to sauté them while they cook on a relatively high heat.
+Salt, pepper, and there you have it, crispy sautéed potatoes.</p>
+<p>As I was cooking my potatoes, I asked myself: how many times should I toss them?</p>
+<p>Let's try to estimate this. 
+We have <script type="math/tex">N</script> potatoes with four sides.
+Every time I toss the potatoes, each cube lands randomly on one of its sides with equal probabilities, assuming my tossing technique is good enough.
+We'll assume that a potato cube is well cooked only after each of its four sides has been against the pan. </p>
+<p>Let's first look at a single potato cube: what's the probability <script type="math/tex">P(t)</script> that it is well cooked after <script type="math/tex">t</script> tosses? 
+It's a combinatorial problem, let's break it down:</p>
+<ol>
+<li>
+<script type="math/tex">P(t) = 1 - P(\text{at least one side never touched the pan})</script>
+</li>
+<li>There are <script type="math/tex">4^t</script> possible sequences.</li>
+<li>There are <script type="math/tex">3^t</script> possible sequences that have never touched face <script type="math/tex">1</script>. The same applies to face 2, 3, and 4.</li>
+<li>
+<script type="math/tex">4 \cdot 3^t</script> is more than the number of sequences that miss at least one side: for example, sequences where faces 1 and 2 are both missing will be counted twice.
+Thus, we need to subtract the number of sequences where two faces were missing.
+There are <script type="math/tex">{4 \choose 2} = 6</script> possible missing doublets, and each of them have <script type="math/tex">2^t</script> possible sequences.
+Therefore we remove <script type="math/tex">6\cdot 2^t</script> of these double counted sequences.
+Finally, removing this number, we have removed cases where 3 faces were missing from the whole sequence.
+The first term counted them 3 times, while the second term counts them also 3 times, thus we need to add them back to count them exactly once.</li>
+</ol>
+<p>The final result is 
+<script type="math/tex; mode=display">
+\begin{aligned}
+P(t) &= 1 - \frac{1}{4^t} \left(4 \cdot 3^t - 6 \cdot 2^t + 4 \cdot 1^t \right) \\
+&= 1 - 4 \cdot \left(\frac{3}{4}\right)^t + 6 \cdot \left(\frac{1}{2}\right)^t - 4 \cdot \left(\frac{1}{4}\right)^t.
+\end{aligned}
+</script>
+This follows the <a href="https://en.wikipedia.org/wiki/Inclusion%E2%80%93exclusion_principle">inclusion-exclusion principle</a>.</p>
+<p>Of course potato cubes have 6 faces, not 4, oops.
+Luckily, this gave us an intuition of the inclusion-exclusion principle.
+The generalization of the above result for <script type="math/tex">m</script> faces is given by:
+<script type="math/tex; mode=display">
+P_m(t) = \sum\limits_{k=0}^m (-1)^k {m \choose k} \left( \frac{m-k}{m} \right)^t.
+</script>
+</p>
+<p>The probability <script type="math/tex">P_m(t)</script> tends exponentially to 1 as <script type="math/tex">t</script> increases, as illustrated in the following figure:</p>
+<div class="image-wrap image-center" style="width: 70%;">
+  <img src="../images/blog/tossing-potatoes/Pt.svg" alt="Probability that a potato has touched all 6 sides after t tosses.">
+  <p class="image-caption">Probability that a potato has touched all 6 sides after t tosses.</p>
+</div>
+
+<p>As expected, under 6 tosses, the probability that the potato is well cooked is zero, because it cannot have been on 6 faces.
+The figure shows that after 27 tosses, there is already more than 95% probability that the potato cube has visited all 6 faces.
+I don't have only one potato piece, but <script type="math/tex">N</script> of them (say 40).
+The number of well cooked potatoes follows a binomial distribution, with success probability <script type="math/tex">P_6(t)</script>.</p>
+<div class="image-wrap image-center" style="width: 70%;">
+  <img src="../images/blog/tossing-potatoes/binomial.svg" alt="Median number of well cooked potatoes out of \(N=40\), against the number of tosses. Error bars indicate the 5 to 95% quantiles.">
+  <p class="image-caption">Median number of well cooked potatoes out of \(N=40\), against the number of tosses. Error bars indicate the 5 to 95% quantiles.</p>
+</div>
+
+<p>In my pan, most of the 40 potatoes will be well cooked after about 30 tosses.
+It's hard work, but totally worth it.</p>
+<p>Of course many of the approximations I made are impractical, and this shouldn't serve as a 3 Michelin star level cooking guide. 
+But this little exercise made me discover the inclusion-exclusion principle, and next time I'll count how many tosses I naturally do.</p>
+<p>The figures were produced with these two scripts:</p>
+<details class="code-block">
+<summary>Show code</summary>
+
+
+
+<div class="codehilite"><pre><span></span><code><span class="ch">#!/usr/bin/env python</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--out&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;output plot&#39;</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="n">out</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">out</span>
+
+    <span class="n">m</span> <span class="o">=</span> <span class="mi">6</span> <span class="c1"># number of faces</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+
+    <span class="n">Pt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">Pt</span> <span class="o">+=</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="n">k</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">comb</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="o">*</span> <span class="p">((</span><span class="n">m</span><span class="o">-</span><span class="n">k</span><span class="p">)</span><span class="o">/</span><span class="n">m</span><span class="p">)</span><span class="o">**</span><span class="n">t</span>
+    <span class="n">Pt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">Pt</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">t_</span><span class="p">,</span> <span class="n">Pt_</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Pt</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">t_</span><span class="p">,</span> <span class="n">Pt_</span><span class="p">)</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">Pt</span><span class="p">,</span> <span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="n">clip_on</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$t$&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$P_6(t)$&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</code></pre></div>
+
+
+</details>
+
+<details class="code-block">
+<summary>Show code</summary>
+
+
+
+<div class="codehilite"><pre><span></span><code><span class="ch">#!/usr/bin/env python</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">binom</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--out&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;output plot&#39;</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="n">out</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">out</span>
+
+    <span class="n">m</span> <span class="o">=</span> <span class="mi">6</span> <span class="c1"># number of faces</span>
+
+    <span class="n">N</span> <span class="o">=</span> <span class="mi">40</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+
+    <span class="n">Pt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">m</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">Pt</span> <span class="o">+=</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="n">k</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">comb</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span> <span class="o">*</span> <span class="p">((</span><span class="n">m</span><span class="o">-</span><span class="n">k</span><span class="p">)</span><span class="o">/</span><span class="n">m</span><span class="p">)</span><span class="o">**</span><span class="n">t</span>
+    <span class="n">Pt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">Pt</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">median</span> <span class="o">=</span> <span class="n">binom</span><span class="o">.</span><span class="n">median</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">Pt</span><span class="p">)</span>
+    <span class="n">lo</span> <span class="o">=</span> <span class="n">binom</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">Pt</span><span class="p">)</span>
+    <span class="n">hi</span> <span class="o">=</span> <span class="n">binom</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="mf">0.95</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">Pt</span><span class="p">)</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">median</span><span class="p">,</span> <span class="n">yerr</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">((</span><span class="n">median</span><span class="o">-</span><span class="n">lo</span><span class="p">,</span> <span class="n">hi</span><span class="o">-</span><span class="n">median</span><span class="p">)),</span> <span class="n">capsize</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="n">clip_on</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;Number of tosses $t$&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;Number of well cooked potatoes $k$ out of $N=</span><span class="si">{}</span><span class="s1">$&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">N</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</code></pre></div>
+
+
+</details>
+</section>
+
+
+</body>
+</html>

@@ -1,0 +1,109 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>blog - fetch-stadium-data</title>
+  <link rel="stylesheet" href="../css/main.css" />
+  <link rel="stylesheet" href="../css/codehilite.css" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap" rel="stylesheet">
+  <script type="text/javascript" async
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="../index.html">Home</a>
+  <a href="../blog.html">Blog</a>
+</nav>
+
+
+<section class="markdown-body">
+  <h1>Running the Harvard stadium: automatically retrieve data</h1>
+<p>July 12, 2025</p>
+<p>My friends and I took the habit to run the stairs at the Harvard stadium.
+The principle is simple: walk (or run!) up the big steps and down the small ones every row (37 times).
+I record my time every week to keep track of my progress with my Garmin watch.
+In the summer heat my friends and I asked ourselves how much the weather impacts our time.
+So I wrote a python program that downloads my time from the Garmin server, and retrieves weather data at those times and location.</p>
+<p>I used the <a href="https://github.com/cyberjunky/python-garminconnect/tree/master">python-garminconnect</a> package to do so.</p>
+<p>I usually record my stadium runs as <em>run activities</em>. 
+I thus need to retrieve the run data from <code>garmniconnect</code>; note that I assume all stadium runs are within my last 1000 running activities, which is likely:</p>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">retrieve_stadium_dates_and_durations</span><span class="p">(</span><span class="n">garmin</span><span class="p">):</span>
+    <span class="n">start_times</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">durations</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">activities</span> <span class="o">=</span> <span class="n">garmin</span><span class="o">.</span><span class="n">get_activities</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">activitytype</span><span class="o">=</span><span class="s1">&#39;running&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">activity</span> <span class="ow">in</span> <span class="n">activities</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">is_stadium_run</span><span class="p">(</span><span class="n">activity</span><span class="p">):</span>
+            <span class="n">start_times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">activity</span><span class="p">[</span><span class="s1">&#39;startTimeLocal&#39;</span><span class="p">])</span>
+            <span class="n">durations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">activity</span><span class="p">[</span><span class="s1">&#39;duration&#39;</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">start_times</span><span class="p">,</span> <span class="n">durations</span>
+</code></pre></div>
+
+<p>where <code>garmin</code> is a <a href="https://github.com/cyberjunky/python-garminconnect/blob/master/garminconnect/__init__.py#L16">Garmin</a> object that contains my credentials.</p>
+<p>All my runs are not stadium runs.
+This is why I filter them using the following function, assuming each stadium run starts within 100m of the stadium location, and has a sufficient elevation gain to distinguish from the relatively flat runs in Boston (my watch usually measures between 350 and 380m for a stadium run):</p>
+<div class="codehilite"><pre><span></span><code><span class="c1"># lat, lon of the stadium</span>
+<span class="n">LAT_STADIUM</span> <span class="o">=</span>  <span class="mf">42.3669</span>
+<span class="n">LON_STADIUM</span> <span class="o">=</span> <span class="o">-</span><span class="mf">71.1260</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">is_stadium_run</span><span class="p">(</span><span class="n">activity</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">lat</span> <span class="o">=</span> <span class="n">activity</span><span class="p">[</span><span class="s1">&#39;startLatitude&#39;</span><span class="p">]</span>
+        <span class="n">lon</span> <span class="o">=</span> <span class="n">activity</span><span class="p">[</span><span class="s1">&#39;startLongitude&#39;</span><span class="p">]</span>
+        <span class="n">el</span> <span class="o">=</span> <span class="n">activity</span><span class="p">[</span><span class="s1">&#39;elevationGain&#39;</span><span class="p">]</span>
+
+        <span class="n">m_per_degrees</span> <span class="o">=</span> <span class="mi">110</span> <span class="o">*</span> <span class="mi">1000</span>
+        <span class="n">dist</span> <span class="o">=</span> <span class="n">m_per_degrees</span> <span class="o">*</span> <span class="p">((</span><span class="n">lat</span> <span class="o">-</span> <span class="n">LAT_STADIUM</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">lon</span> <span class="o">-</span> <span class="n">LON_STADIUM</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">dist_threshold</span> <span class="o">=</span> <span class="mi">100</span> <span class="c1"># m</span>
+
+        <span class="k">if</span> <span class="n">dist</span> <span class="o">&lt;</span> <span class="n">dist_threshold</span> <span class="ow">and</span> <span class="n">el</span> <span class="o">&gt;</span> <span class="mi">300</span> <span class="ow">and</span> <span class="n">el</span> <span class="o">&lt;</span> <span class="mi">400</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">False</span>
+</code></pre></div>
+
+<p>Now all we need to do is retrieve weather data at these activity times.
+Here I have chosen to use <a href="https://dev.meteostat.net/python/">meteostat</a> to do so:</p>
+<div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">meteostat</span><span class="w"> </span><span class="kn">import</span> <span class="n">Point</span><span class="p">,</span> <span class="n">Hourly</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">retrieve_weather_data</span><span class="p">(</span><span class="n">start_times</span><span class="p">):</span>
+    <span class="n">location</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="n">LAT_STADIUM</span><span class="p">,</span> <span class="n">LON_STADIUM</span><span class="p">)</span>
+    <span class="n">date_times</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">start_times</span><span class="p">)</span>
+    <span class="n">date_times_hour</span> <span class="o">=</span> <span class="n">date_times</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="s1">&#39;h&#39;</span><span class="p">)</span>
+
+    <span class="n">start</span> <span class="o">=</span> <span class="n">date_times_hour</span><span class="o">.</span><span class="n">min</span><span class="p">()</span><span class="o">.</span><span class="n">to_pydatetime</span><span class="p">()</span>
+    <span class="n">end</span> <span class="o">=</span> <span class="n">date_times_hour</span><span class="o">.</span><span class="n">max</span><span class="p">()</span><span class="o">.</span><span class="n">to_pydatetime</span><span class="p">()</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">Hourly</span><span class="p">(</span><span class="n">location</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">fetch</span><span class="p">()</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">date_times_hour</span><span class="p">]</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;index&#39;</span> <span class="p">:</span><span class="s1">&#39;datetime&#39;</span><span class="p">},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span> <span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s1">&#39;datetime&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">date_times</span>
+    <span class="k">return</span> <span class="n">df</span>
+</code></pre></div>
+
+<p>Note that the data is hourly so I had to round the start times to the closest hour.
+We are now ready to plot the durations and temperature of all my stadium runs!</p>
+<p>The plot below shows the activities duration and the temperature over time.</p>
+<p><img alt="" src="../images/blog/fetch-stadium-data/raw_data.svg" /></p>
+<p>We can observe a few trends:</p>
+<ul>
+<li>the time improves when I went consistently (high density of points along the time axis)  </li>
+<li>not going for a few weeks resulted in higher times  </li>
+<li>there is some plateau time that I probably won't cross if I keep doing it this way  </li>
+<li>temperature seems to be a factor of performance.</li>
+</ul>
+<p>But much more analysis is needed - this will be the object of a future post.</p>
+</section>
+
+
+</body>
+</html>

@@ -1,0 +1,465 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>blog - analyze-stadium-data</title>
+  <link rel="stylesheet" href="../css/main.css" />
+  <link rel="stylesheet" href="../css/codehilite.css" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap" rel="stylesheet">
+  <script type="text/javascript" async
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="../index.html">Home</a>
+  <a href="../blog.html">Blog</a>
+</nav>
+
+
+<section class="markdown-body">
+  <h1>Running the Harvard stadium: what makes me run faster?</h1>
+<p>August 9, 2025</p>
+<p>Running the stairs at the Harvard stadium always feels rough (and yet I keep doing it because it's really fun to do with friends).
+In a previous post, I have described how I could automatically <a href="./fetch-stadium-data.html">retrieve statistics and weather data</a> of all my stadium runs.
+Today I want to see if one can learn anything from this data: Can I predict the run time, given weather and sleep scores? What parameters are most important?</p>
+<p>So far I have collected <script type="math/tex">N=67</script> data points, still in the low-data regime, so deep learning won't work.
+But maybe we can learn a lot with a simple linear model,
+<script type="math/tex; mode=display">
+y = \mathbf{\theta} \cdot \mathbf{x},
+</script>
+where <script type="math/tex">y</script> is the duration of the stadium runs, <script type="math/tex">\mathbf{x}</script> the input features (temperature, dew point, sleep score, number of stadiums I ran within the past 2 months prior this run, or combination of these variables), and <script type="math/tex">\mathbf{\theta}</script> are parameters of the model, to be inferred. 
+The input features also contain an entry of value <script type="math/tex">1</script>, to allow for a bias.</p>
+<p>It is clear that the run duration depends on a lot more variables than these features: what I ate before running, if I feel like pushing hard, if someone is in front of me and I cannot pass them, if a friend pushes/pulls me to go faster...
+We model these unknowns with Gaussian noise added to the output of the linear model:
+<script type="math/tex; mode=display">
+y_k = \mathbf{\theta} \cdot \mathbf{x}_k + \sigma \xi, \;\; k=1,\dots,N,
+</script>
+where <script type="math/tex">\sigma</script> is a positive scalar to infer and <script type="math/tex">\xi \sim \mathcal{N}(0, 1)</script> are i.i.d. normally distributed random variables.
+The likelihood corresponding to the data <script type="math/tex">\mathcal{D} = \{\mathbf{x}_k, y_k\}</script> reads
+<script type="math/tex; mode=display">
+P(\mathcal{D} | \mathbf{\theta}, \sigma) = \prod\limits_{i=1}^N \frac{1}{\sqrt{2\pi \sigma^2}} \exp\left( -\frac{(y_k - \mathbf{\theta} \cdot \mathbf{x}_k)^2}{2 \sigma^2} \right).
+</script>
+Taking the logarithm, we get the log likelihood
+<script type="math/tex; mode=display">
+\log (\mathcal{D} | \mathbf{\theta}, \sigma) = - \sum\limits_{i=1}^N \frac{(y_k - \mathbf{\theta} \cdot \mathbf{x}_k)^2}{2 \sigma^2} - \frac{N}{2}\log{2\pi \sigma^2}.
+</script>
+The maximum likelihood gives us the best parameters to fit the data:
+<script type="math/tex; mode=display">
+\mathbf{\hat{\theta}} = (X^T X)^{-1} (X^T Y), \quad \quad  \hat{\sigma} = \sqrt{\frac{1}{2N} (Y - X \hat{\theta})\cdot(Y - X \hat{\theta})},
+</script>
+where <script type="math/tex">X</script> is a matrix whose rows contain the features of each sample, and <script type="math/tex">Y</script> is a vector containing the duration of all samples. 
+Here is the list of features I have used:</p>
+<ul>
+<li>temperature;</li>
+<li>dewpoint;</li>
+<li>sleep score (as estimated by my watch);</li>
+<li>number of times I have run the stadium in the past 2 months;</li>
+<li>month of the year;</li>
+<li>time of the day;</li>
+<li>all quadratic combinations of the above.</li>
+</ul>
+<p>The program is very simple and only requires solving a linear system with the size of the number of features.
+Below are the results of the predictions:</p>
+<div class="image-wrap image-center" style="width: 75%;">
+  <img src="../images/blog/analyze-stadium-data/predictions.svg" alt="Predictions of the model against the real values used to calibrate this model. Error bars correspond to 1 \(\sigma\).">
+  <p class="image-caption">Predictions of the model against the real values used to calibrate this model. Error bars correspond to 1 \(\sigma\).</p>
+</div>
+
+<p>The model seems to do reasonably well, at least in capturing the general trends.
+The important question now is the following: what are the important variables to predict the run time?</p>
+<p>We assume that until now we have explored a reasonably wide set of conditions.
+Thus, we can expect each input feature to take values with a standard deviation that is close to the empirical one.
+The importance of feature <script type="math/tex">i</script> on the duration can be quantified with first order Sobol indices, computed as
+<script type="math/tex; mode=display">
+S_i = \frac{\hat{\theta}_i^2 \sigma_i^2}{\sum\limits_{k=1}^N \hat{\theta}_k^2 \sigma_k^2},
+</script>
+where <script type="math/tex">\sigma_i^2 = \mathrm{Var}[X_i]</script>.
+The list of features and their first order Sobol index are summarized below:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Feature</th>
+<th style="text-align: left;">First order Sobol index</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">temp</td>
+<td style="text-align: left;">0.297</td>
+</tr>
+<tr>
+<td style="text-align: left;">sleep_score</td>
+<td style="text-align: left;">0.164</td>
+</tr>
+<tr>
+<td style="text-align: left;">sleep_score * sleep_score</td>
+<td style="text-align: left;">0.157</td>
+</tr>
+<tr>
+<td style="text-align: left;">sleep_score * temp</td>
+<td style="text-align: left;">0.104</td>
+</tr>
+<tr>
+<td style="text-align: left;">dwpt</td>
+<td style="text-align: left;">0.066</td>
+</tr>
+<tr>
+<td style="text-align: left;">hour * temp</td>
+<td style="text-align: left;">0.029</td>
+</tr>
+<tr>
+<td style="text-align: left;">hour * dwpt</td>
+<td style="text-align: left;">0.028</td>
+</tr>
+<tr>
+<td style="text-align: left;">temp * temp</td>
+<td style="text-align: left;">0.026</td>
+</tr>
+<tr>
+<td style="text-align: left;">num_runs_2m * num_runs_2m</td>
+<td style="text-align: left;">0.021</td>
+</tr>
+<tr>
+<td style="text-align: left;">hour * sleep_score</td>
+<td style="text-align: left;">0.020</td>
+</tr>
+<tr>
+<td style="text-align: left;">month * month</td>
+<td style="text-align: left;">0.015</td>
+</tr>
+<tr>
+<td style="text-align: left;">num_runs_2m * sleep_score</td>
+<td style="text-align: left;">0.012</td>
+</tr>
+<tr>
+<td style="text-align: left;">month * num_runs_2m</td>
+<td style="text-align: left;">0.011</td>
+</tr>
+<tr>
+<td style="text-align: left;">hour</td>
+<td style="text-align: left;">0.010</td>
+</tr>
+<tr>
+<td style="text-align: left;">dwpt * temp</td>
+<td style="text-align: left;">0.008</td>
+</tr>
+<tr>
+<td style="text-align: left;">month * sleep_score</td>
+<td style="text-align: left;">0.005</td>
+</tr>
+<tr>
+<td style="text-align: left;">month * temp</td>
+<td style="text-align: left;">0.004</td>
+</tr>
+<tr>
+<td style="text-align: left;">hour * hour</td>
+<td style="text-align: left;">0.004</td>
+</tr>
+<tr>
+<td style="text-align: left;">month * dwpt</td>
+<td style="text-align: left;">0.004</td>
+</tr>
+<tr>
+<td style="text-align: left;">hour * month</td>
+<td style="text-align: left;">0.004</td>
+</tr>
+<tr>
+<td style="text-align: left;">num_runs_2m * temp</td>
+<td style="text-align: left;">0.004</td>
+</tr>
+<tr>
+<td style="text-align: left;">dwpt * dwpt</td>
+<td style="text-align: left;">0.002</td>
+</tr>
+<tr>
+<td style="text-align: left;">month</td>
+<td style="text-align: left;">0.002</td>
+</tr>
+<tr>
+<td style="text-align: left;">hour * num_runs_2m</td>
+<td style="text-align: left;">0.002</td>
+</tr>
+<tr>
+<td style="text-align: left;">sleep_score * dwpt</td>
+<td style="text-align: left;">0.001</td>
+</tr>
+<tr>
+<td style="text-align: left;">num_runs_2m * dwpt</td>
+<td style="text-align: left;">0.001</td>
+</tr>
+<tr>
+<td style="text-align: left;">num_runs_2m</td>
+<td style="text-align: left;">0.000</td>
+</tr>
+<tr>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">0.000</td>
+</tr>
+</tbody>
+</table>
+<p>Perhaps unsurprisingly, the temperature is the most important feature to predict the run time, followed by the sleep score and the dewpoint (a proxy for humidity).</p>
+<p>So what are the perfect conditions to run the stairs, given this model and data?
+To answer this, I varied one quantity of interest at a time in the feature vectors, and looked at the prediction of the model.
+Here is what I got when varying the temperature, sleep score, and dew point:</p>
+<div class="image-row">
+
+<div class="image-wrap" style="width: 32%;">
+  <img src="../images/blog/analyze-stadium-data/optimal_temp.svg" alt="">
+  <p class="image-caption"></p>
+</div>
+
+<div class="image-wrap" style="width: 32%;">
+  <img src="../images/blog/analyze-stadium-data/optimal_sleep_score.svg" alt="">
+  <p class="image-caption"></p>
+</div>
+
+<div class="image-wrap" style="width: 32%;">
+  <img src="../images/blog/analyze-stadium-data/optimal_dewpoint.svg" alt="">
+  <p class="image-caption"></p>
+</div>
+</div>
+
+<p>According to this simple model, the best temperature to run the stadium would be around 15 Celcius degrees, with a dewpoint at 3 Celcius degrees and after a relatively good night of sleep (score of 80).
+Obviously this analysis relies on crude assumptions, such as the form of this simple model, but we still obtain reasonable values.
+This certainly won't limit my stadium runs to these "optimal" conditions, I'm sure that the main factor is more training!</p>
+<p>The results were produced with the following code:</p>
+<details class="code-block">
+<summary>Show code</summary>
+
+
+
+<div class="codehilite"><pre><span></span><code><span class="ch">#!/usr/bin/env python</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;csv_data&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Path to csv file&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--skip&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;number of first points to skip for the analysis&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--out-dir&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;output directory&#39;</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="n">out_dir</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">out_dir</span>
+    <span class="n">skip</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">skip</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">csv_data</span><span class="p">,</span> <span class="n">parse_dates</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;datetime&#39;</span><span class="p">])</span>
+
+    <span class="n">Xvars</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;temp&#39;</span><span class="p">,</span> <span class="s1">&#39;dwpt&#39;</span><span class="p">,</span> <span class="s1">&#39;sleep_score&#39;</span><span class="p">]</span>
+    <span class="n">Yvar</span> <span class="o">=</span> <span class="s1">&#39;duration&#39;</span>
+
+    <span class="n">X</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">Yvar</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()[</span><span class="n">skip</span><span class="p">:]</span>
+
+    <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">Xvars</span><span class="p">:</span>
+        <span class="n">X</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()[</span><span class="n">skip</span><span class="p">:])</span>
+
+    <span class="c1"># Engineered variable: number of runs the past 2 months</span>
+    <span class="n">time</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;datetime&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+    <span class="n">num_runs_2m</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">time</span><span class="p">[</span><span class="n">skip</span><span class="p">:]:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">time</span> <span class="o">&lt;=</span> <span class="n">t</span><span class="p">,</span> <span class="n">t</span> <span class="o">-</span> <span class="n">pd</span><span class="o">.</span><span class="n">DateOffset</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">time</span><span class="p">))</span>
+        <span class="n">num_runs_2m</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">X</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">num_runs_2m</span><span class="p">))</span>
+    <span class="n">Xvars</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;num_runs_2m&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Engineered variable: time of the year</span>
+    <span class="n">X</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;datetime&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">month</span><span class="p">[</span><span class="n">skip</span><span class="p">:])</span>
+    <span class="n">Xvars</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;month&#39;</span><span class="p">)</span>
+
+    <span class="n">X</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;datetime&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">hour</span><span class="p">[</span><span class="n">skip</span><span class="p">:])</span>
+    <span class="n">Xvars</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;hour&#39;</span><span class="p">)</span>
+
+    <span class="c1"># add quadratic term for features</span>
+    <span class="n">nbase</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbase</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">X</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">X</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+            <span class="n">Xvars</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">Xvars</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s1"> * </span><span class="si">{</span><span class="n">Xvars</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="c1"># bias</span>
+    <span class="n">X</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+    <span class="n">Xvars</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">)</span>
+
+    <span class="c1"># max likelihood estimate</span>
+    <span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+    <span class="n">Y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">Y</span><span class="p">)</span>
+
+    <span class="n">A</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">T</span> <span class="o">@</span> <span class="n">X</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
+
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+    <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">((</span><span class="n">Y</span> <span class="o">-</span> <span class="n">X</span> <span class="o">@</span> <span class="n">theta</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="p">)</span>
+
+
+    <span class="c1"># test sensitivity of the model</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span>
+    <span class="n">varx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">sobol_indices</span> <span class="o">=</span> <span class="n">theta</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">varx</span>
+    <span class="n">sobol_indices</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">sobol_indices</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Feature                   | First order Sobol index&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;:------------------------ | :----------------------&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">sobol_indices</span><span class="p">)):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Xvars</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">ljust</span><span class="p">(</span><span class="mi">26</span><span class="p">)</span><span class="si">}</span><span class="s2">| </span><span class="si">{</span><span class="n">sobol_indices</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># plot predictions</span>
+    <span class="n">Ypred</span> <span class="o">=</span> <span class="n">X</span> <span class="o">@</span> <span class="n">theta</span>
+
+    <span class="n">tlo</span> <span class="o">=</span> <span class="mi">22</span>
+    <span class="n">thi</span> <span class="o">=</span> <span class="mi">26</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">Y</span><span class="o">/</span><span class="mi">60</span><span class="p">,</span> <span class="n">Ypred</span><span class="o">/</span><span class="mi">60</span><span class="p">,</span> <span class="n">yerr</span><span class="o">=</span><span class="n">sigma</span><span class="o">/</span><span class="mi">60</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">capsize</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">tlo</span><span class="p">,</span> <span class="n">thi</span><span class="p">],</span> <span class="p">[</span><span class="n">tlo</span><span class="p">,</span> <span class="n">thi</span><span class="p">],</span> <span class="s1">&#39;--k&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">tlo</span><span class="p">,</span> <span class="n">thi</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="n">tlo</span><span class="p">,</span> <span class="n">thi</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;run time (min)&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;predicted run time (min)&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">out_dir</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="s1">&#39;predictions.svg&#39;</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+
+    <span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mf">2.2</span><span class="p">)</span>
+    <span class="c1"># best temperature?</span>
+    <span class="n">Tmin</span> <span class="o">=</span> <span class="o">-</span><span class="mi">10</span>
+    <span class="n">Tmax</span> <span class="o">=</span> <span class="mi">40</span>
+
+    <span class="n">temps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">Tmin</span><span class="p">,</span> <span class="n">Tmax</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+    <span class="n">mean_duration</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">std_duration</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">T</span> <span class="ow">in</span> <span class="n">temps</span><span class="p">:</span>
+        <span class="n">X_</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">X_</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">T</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="n">nbase</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbase</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                <span class="n">X_</span><span class="p">[:,</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">X_</span><span class="p">[:,</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">X_</span><span class="p">[:,</span><span class="n">j</span><span class="p">]</span>
+                <span class="n">k</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">mean_duration</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">X_</span> <span class="o">@</span> <span class="n">theta</span><span class="p">))</span>
+        <span class="n">std_duration</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">X_</span> <span class="o">@</span> <span class="n">theta</span><span class="p">)</span> <span class="o">+</span> <span class="n">sigma</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+
+    <span class="n">mean_duration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">mean_duration</span><span class="p">)</span> <span class="o">/</span> <span class="mi">60</span>
+    <span class="n">std_duration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">std_duration</span><span class="p">)</span> <span class="o">/</span> <span class="mi">60</span>
+
+    <span class="n">id_T_opt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">mean_duration</span><span class="p">)</span>
+    <span class="n">T_opt</span> <span class="o">=</span> <span class="n">temps</span><span class="p">[</span><span class="n">id_T_opt</span><span class="p">]</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">temps</span><span class="p">,</span> <span class="n">mean_duration</span><span class="o">-</span><span class="n">std_duration</span><span class="p">,</span> <span class="n">mean_duration</span><span class="o">+</span><span class="n">std_duration</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C0&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">temps</span><span class="p">,</span> <span class="n">mean_duration</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">temps</span><span class="p">[</span><span class="n">id_T_opt</span><span class="p">]],</span> <span class="p">[</span><span class="n">mean_duration</span><span class="p">[</span><span class="n">id_T_opt</span><span class="p">]],</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C0&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;temperature (Celcius degrees)&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;run time (min)&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">Tmin</span><span class="p">,</span> <span class="n">Tmax</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">out_dir</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="s1">&#39;optimal_temp.svg&#39;</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="c1"># best sleep score?</span>
+    <span class="n">ssmin</span> <span class="o">=</span> <span class="mi">50</span>
+    <span class="n">ssmax</span> <span class="o">=</span> <span class="mi">100</span>
+
+    <span class="n">sleep_scores</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">ssmin</span><span class="p">,</span> <span class="n">ssmax</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+    <span class="n">mean_duration</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">std_duration</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">ss</span> <span class="ow">in</span> <span class="n">sleep_scores</span><span class="p">:</span>
+        <span class="n">X_</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">X_</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">ss</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="n">nbase</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbase</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                <span class="n">X_</span><span class="p">[:,</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">X_</span><span class="p">[:,</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">X_</span><span class="p">[:,</span><span class="n">j</span><span class="p">]</span>
+                <span class="n">k</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">mean_duration</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">X_</span> <span class="o">@</span> <span class="n">theta</span><span class="p">))</span>
+        <span class="n">std_duration</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">X_</span> <span class="o">@</span> <span class="n">theta</span><span class="p">)</span> <span class="o">+</span> <span class="n">sigma</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+
+    <span class="n">mean_duration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">mean_duration</span><span class="p">)</span> <span class="o">/</span> <span class="mi">60</span>
+    <span class="n">std_duration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">std_duration</span><span class="p">)</span> <span class="o">/</span> <span class="mi">60</span>
+
+    <span class="n">id_ss_opt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">mean_duration</span><span class="p">)</span>
+    <span class="n">ss_opt</span> <span class="o">=</span> <span class="n">sleep_scores</span><span class="p">[</span><span class="n">id_ss_opt</span><span class="p">]</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">sleep_scores</span><span class="p">,</span> <span class="n">mean_duration</span><span class="o">-</span><span class="n">std_duration</span><span class="p">,</span> <span class="n">mean_duration</span><span class="o">+</span><span class="n">std_duration</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C0&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">sleep_scores</span><span class="p">,</span> <span class="n">mean_duration</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">sleep_scores</span><span class="p">[</span><span class="n">id_ss_opt</span><span class="p">]],</span> <span class="p">[</span><span class="n">mean_duration</span><span class="p">[</span><span class="n">id_ss_opt</span><span class="p">]],</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C0&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;sleep score&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;run time (min)&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">ssmin</span><span class="p">,</span> <span class="n">ssmax</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">out_dir</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="s1">&#39;optimal_sleep_score.svg&#39;</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+
+    <span class="c1"># best dew point?</span>
+    <span class="n">dpmin</span> <span class="o">=</span> <span class="o">-</span><span class="mi">20</span>
+    <span class="n">dpmax</span> <span class="o">=</span> <span class="mi">20</span>
+
+    <span class="n">dewpoints</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">dpmin</span><span class="p">,</span> <span class="n">dpmax</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+    <span class="n">mean_duration</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">std_duration</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">dp</span> <span class="ow">in</span> <span class="n">dewpoints</span><span class="p">:</span>
+        <span class="n">X_</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">X_</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">dp</span>
+        <span class="n">k</span> <span class="o">=</span> <span class="n">nbase</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbase</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+                <span class="n">X_</span><span class="p">[:,</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">X_</span><span class="p">[:,</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">X_</span><span class="p">[:,</span><span class="n">j</span><span class="p">]</span>
+                <span class="n">k</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">mean_duration</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">X_</span> <span class="o">@</span> <span class="n">theta</span><span class="p">))</span>
+        <span class="n">std_duration</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">X_</span> <span class="o">@</span> <span class="n">theta</span><span class="p">)</span> <span class="o">+</span> <span class="n">sigma</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+
+    <span class="n">mean_duration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">mean_duration</span><span class="p">)</span> <span class="o">/</span> <span class="mi">60</span>
+    <span class="n">std_duration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">std_duration</span><span class="p">)</span> <span class="o">/</span> <span class="mi">60</span>
+
+    <span class="n">id_dp_opt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmin</span><span class="p">(</span><span class="n">mean_duration</span><span class="p">)</span>
+    <span class="n">dp_opt</span> <span class="o">=</span> <span class="n">dewpoints</span><span class="p">[</span><span class="n">id_dp_opt</span><span class="p">]</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">dewpoints</span><span class="p">,</span> <span class="n">mean_duration</span><span class="o">-</span><span class="n">std_duration</span><span class="p">,</span> <span class="n">mean_duration</span><span class="o">+</span><span class="n">std_duration</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C0&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dewpoints</span><span class="p">,</span> <span class="n">mean_duration</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">dewpoints</span><span class="p">[</span><span class="n">id_dp_opt</span><span class="p">]],</span> <span class="p">[</span><span class="n">mean_duration</span><span class="p">[</span><span class="n">id_dp_opt</span><span class="p">]],</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C0&#39;</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;dew point (Celcius degrees)&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;run time (min)&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">dpmin</span><span class="p">,</span> <span class="n">dpmax</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">out_dir</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="s1">&#39;optimal_dewpoint.svg&#39;</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Best temperature: </span><span class="si">{</span><span class="n">T_opt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Best sleep score: </span><span class="si">{</span><span class="n">ss_opt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Best dew point:   </span><span class="si">{</span><span class="n">dp_opt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</code></pre></div>
+
+
+</details>
+</section>
+
+
+</body>
+</html>

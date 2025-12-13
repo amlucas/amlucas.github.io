@@ -1,0 +1,394 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lucas Amoudruz</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="#about">About</a>
+  <a href="#research">Research</a>
+  <a href="#publications">Publications</a>
+  <a href="./blog.html">Blog</a>
+
+</nav>
+
+<section id="about">
+  <div class="markdown-body">
+    <h1>About</h1>
+<p>Welcome to my personal website!</p>
+<div class="image-wrap float-img-right" style="width: 20%;">
+  <img src="images/portrait.png" alt="">
+
+</div>
+
+<p>My name is Lucas Amoudruz, I'm currently a research associate at Harvard University in the <a href="https://cse-lab.seas.harvard.edu/">CSE laboratory</a>.
+My research interests include numerical simulations of microfluidics, red blood cells modeling, blood flow simulations, artificial microswimmers, reinforcement learning, high performance computing, cloud computing, Bayesian inference, tumor growth in the brain and in the prostate, and the prediction of pyrocumulonimbus from weather and wildfire data.
+The most fun part for me is to combine multiple aspects of the above to solve real-world problems.
+Since September 2025, I am also a lecturer at Harvard university for the class "Advanced Scientific Computing: Stochastic Methods for Data Analysis, Inference and Optimization".</p>
+<p><strong>Email:</strong> <a href="mailto:amlucas@seas.harvard.edu">amlucas@seas.harvard.edu</a><br />
+<strong>Scholar:</strong> <a href="https://scholar.google.ch/citations?user=eGRWGKYAAAAJ&amp;hl=en&amp;oi=ao">Lucas Amoudruz</a><br />
+<strong>Github:</strong> <a href="https://github.com/amlucas">amlucas</a><br />
+<strong>Full CV (PDF):</strong> <a href="./data/Lucas_Amoudruz_CV.pdf">Last updated in July 2025</a>  </p>
+  </div>
+</section>
+<section id="research">
+  <div class="markdown-body">
+    <h1>Research</h1>
+<p>I develop computational methods and software to simulate and control microscale systems, including blood flow and artificial microswimmers.
+My work combines high-performance computing, fluid dynamics, Bayesian inference, and artificial intelligence to enable biomedical applications such as targeted drug delivery and flow manipulation in microfluidics.</p>
+<h2>High performance computing for simulating blood...</h2>
+<div class="image-wrap float-img-right" style="width: 40%;">
+  <img src="images/rbc_tube.png" alt="">
+
+</div>
+
+<p>Simulating blood at the cellular resolution is a complex task, as it involves resolving hydrodynamics between deforming cells.
+Blood is mainly composed of red blood cells (RBCs), and one of the contributions during my PhD was to accurately model these cells and their interactions at large scale.
+We use particles to represent RBCs and all fluids, via the dissipative particle dynamics (DPD) method.
+The membranes are discretized into a triangle mesh and elastic forces arise from bending and stretching energy potentials.
+Simulations typically consist of millions to billions of these particles, and we thus implemented a custom software package, <a href="https://github.com/cselab/Mirheo">Mirheo</a>.
+Mirheo is implemented in C++/CUDA/MPI and achieves above 98% weak scaling efficiency across 1000 GPUs.
+Check out our <a href="https://doi.org/10.1016/j.cpc.2020.107298">2020 paper in <em>Computer Physics Communications</em></a> for benchmarks and implementation details.
+Recently we have been tested the performance of Mirheo on the public cloud (article currently under review).</p>
+<p>Mirheo has been used in a number of applications, and I am excited to make new predictions of blood flow, design novel microfluidics devices, and understand the biomechanics of RBCs.
+For example, we have used Mirheo to partly answer the question: <em>Are RBCs optimal for transporting oxygen?</em> 
+Numerical simulations suggest that their shape, and in particular their area-to-volume ratio, maximizes oxygen transport in geometries similar to arterioles (more details in our <a href="https://doi.org/10.1016/j.bpj.2024.04.015">2024 publication in <em>Biophysical Journal</em></a>).
+Similarly, in our <a href="https://doi.org/10.1103/PhysRevFluids.10.054202">2025 publication in <em>Physical Review Fluids</em></a>, Mirheo was used to study the effect of objects rotation in inertial focusing microfluidics. </p>
+<h2>...and artificial microswimmers</h2>
+<div class="image-wrap float-img-left" style="width: 40%;">
+  <img src="images/ABF_single_tube.png" alt="">
+
+</div>
+
+<p>Artificial bacterial flagella (ABFs) are micron-sized devices equiped with a magnetic head and a corkscrew shaped body, which makes them able to propel when they are immersed in a rotating magnetic field.
+They are great candidates to reach specific regions in the body in a non-invasive way by swimming through the circulatory system of the body.
+Applications are numerous: targeted drug delivery, microsurgery, remote sensing, cells manipulation...
+I have extended our custom software Mirheo to simulate ABFs in blood.
+Here is a video of an <a href="https://www.youtube.com/embed/pwEyiedh-Fg?si=ws153uPWyM9Y4fFl">ABF swimming in blood</a> and another one <a href="https://www.youtube.com/embed/u-5yVLkBUdU?si=lef5Tuvq9pDQxAy7">of many ABFs in a bifurcation</a>.
+One particular focus of my research tries to answer the following question: <em>how to control the external magnetic field to guide ABFs to a target?</em></p>
+<div class="image-wrap float-img-right" style="width: 50%;">
+  <img src="images/ABF_retina_RL.png" alt="">
+
+</div>
+
+<p>One possible approach is to use reinforcement learning (RL).
+RL learns a control policy by interacting with an environment.
+Typically, RL converges after thousands of episodes, while one simulation of ABFs in blood require thousands of GPU-hours.
+Instead we train the RL agent on reduced order models, which are much cheaper.
+We then test the learned policy in large scale simulations, as shown on the picture on the right.
+Details are available in our <a href="https://doi.org/10.1063/5.0274623">2025 article in <em>Physics of Fluids</em></a>.
+Check out the <a href="https://www.youtube.com/embed/sCirMyoGpUc?si=3sB9PzqTx-TWlxVr">video</a> of the policy in action.
+RL was also helpful to design policies that control multiple ABFs independently, a difficult task given that the magnetic field is essentially uniform at these scales.
+Additional details can be found in our <a href="https://doi.org/10.1002/aisy.202100183">2022 article in <em>Advanced Intelligence Systems</em></a>, where we have exploited the swimming properties of ABFs of different shapes.</p>
+<h2>ODIL: a method for control and path planning</h2>
+<div class="image-wrap float-img-right" style="width: 33%;">
+  <img src="images/hydrocube_picture.png" alt="">
+
+</div>
+
+<p>Reinforcement learning is a great tool for control, but does not always converge in the settings I am interesting in.
+Furthermore, I typically have a model of the systems I want to control. 
+This led us to developping a novel method that learns policies from a path planning objective and from the dynamics of the system in the form of an ODE or a PDE.</p>
+<p>The method relies on ODIL, developped at CSE-Lab, originally used to solve PDE-based inverse problems.
+In the context of control and path planning, we use ODIL to solve both the system dynamics and the control policy at the same time.
+This approach is more efficient than RL in numerous benchmarks, summarized in our <a href="https://doi.org/10.1103/PhysRevLett.134.044001">2025 article published in <em>Physical Review Letters</em></a>.</p>
+<p>To check the performance of that method, we have built a robotic device (shown in the right picture) that creates flow with rotating disks.
+Using the policy found by ODIL, the device can transport small beads to precise targets, as explained in our <a href="https://doi.org/10.1017/jfm.2025.10174">2025 publication in <em>Journal of Fluid Mechanics</em></a>.
+I have built this robot with <a href="https://pkarnakov.com/">Petr Karnakov</a> in less than two months to participate at the <a href="https://www.massrobotics.org/massrobotics-announces-form-function-challenge-winners-showcases-first-accelerator-cohort-at-the-robotics-summit-expo/">MassRobotics Form and Function Challenge</a> where we have placed second over more than 40 participants.</p>
+<h2>Hierarchical Bayesian inference for red blood cells models</h2>
+<div class="image-wrap float-img-left" style="width: 40%;">
+  <img src="images/DAG_RBC_UQ.png" alt="">
+
+</div>
+
+<p>Calibrating the red blood cell (RBC) membrane model is crucial to predict blood flows. 
+Prior work has been fitting the membrane parameters to experimental datasets, but we found that this approach leads to a poor transferability of the model.
+Instead, we have combined <em>multiple experimental datasets</em> to find the model parameters.
+Furthermore, the model and the data contain numerical, modeling and measurement errors.</p>
+<p>To handle these sources of uncertainties, and the multiple datasets, we have taken a hierarchical Bayesian approach, represented on the left diagram.
+This structure models the variability of the model parameters within populations of RBCs.
+We found that hierarchical Bayesian inference gave a transferable model which can predict RBC dynamics in situations that were not used during the calibration of the model.
+More details are available in our <a href="https://doi.org/10.1103/PhysRevApplied.15.034062">2021 publications in <em>Physical Review Applied</em></a> and our <a href="https://doi.org/10.1016/j.bpj.2023.03.019">2023 publication in <em>Biophysical Journal</em></a>. </p>
+  </div>
+</section>
+<section id="publications">
+  <div class="markdown-body">
+    <h1>Publications</h1>
+<h2>2025</h2>
+<details class="pub-entry">
+<summary>Rivetti, Luciano and Buti, Gregory and <strong>Amoudruz, Lucas</strong> and Ajdari, Ali and Sharp, Gregory C and Studen, Andrej and Jeraj, Robert and Bortfeld, Thomas R. <em>"Probabilistic clinical target definition with nearest neighbor correlation"</em>,   <em>Physics in Medicine and Biology</em> (2025)  <a href="https://doi.org/10.1088/1361-6560/ae2aa1">[DOI]</a>  <a href="data/publications/rivetti2025a.pdf">[pdf]</a></p>
+</summary>
+
+<pre><code class="language-bibtex">@article{rivetti2025a,
+  author = {Rivetti, Luciano and Buti, Gregory and Amoudruz, Lucas and Ajdari, Ali and Sharp, Gregory C and Studen, Andrej and Jeraj, Robert and Bortfeld, Thomas R},
+  doi = {https://doi.org/10.1088/1361-6560/ae2aa1},
+  journal = {Physics in Medicine and Biology},
+  title = {Probabilistic clinical target definition with nearest neighbor correlation},
+  year = {2025}
+}
+</code></pre></details>
+
+<details class="pub-entry">
+<summary><strong>Amoudruz, Lucas</strong> and Litvinov, Sergey and Papadimitriou, Costas and Koumoutsakos, Petros. <em>"Bayesian Inference for PDE-based Inverse Problems using the Optimization of a Discrete Loss"</em>,   <em>arxiv preprint</em> (2025)  <a href="https://doi.org/10.48550/arXiv.2510.15664">[arxiv]</a></p>
+</summary>
+
+<pre><code class="language-bibtex">@misc{amoudruz2025e,
+  archiveprefix = {arXiv},
+  author = {Amoudruz, Lucas and Litvinov, Sergey and Papadimitriou, Costas and Koumoutsakos, Petros},
+  eprint = {https://doi.org/10.48550/arXiv.2510.15664},
+  primaryclass = {stat.ME},
+  title = {Bayesian Inference for PDE-based Inverse Problems using the Optimization of a Discrete Loss},
+  url = {https://arxiv.org/abs/2510.15664},
+  year = {2025}
+}
+</code></pre></details>
+
+<details class="pub-entry">
+<summary><strong>Amoudruz, Lucas</strong> and Buti, Gregory and Rivetti, Luciano and Ajdari, Ali and Sharp, Gregory and Koumoutsakos, Petros and Spohn, Simon and Grosu, Anca L and Bortfeld, Thomas. <em>"Ising energy model for the stochastic prediction of tumor islets"</em>,   <em>arxiv preprint</em> (2025)  <a href="https://doi.org/10.48550/arXiv.2508.20804">[arxiv]</a></p>
+</summary>
+
+<pre><code class="language-bibtex">@misc{amoudruz2025d,
+  archiveprefix = {arXiv},
+  author = {Amoudruz, Lucas and Buti, Gregory and Rivetti, Luciano and Ajdari, Ali and Sharp, Gregory and Koumoutsakos, Petros and Spohn, Simon and Grosu, Anca L and Bortfeld, Thomas},
+  eprint = {https://doi.org/10.48550/arXiv.2508.20804},
+  primaryclass = {physics.med-ph},
+  title = {Ising energy model for the stochastic prediction of tumor islets},
+  url = {https://arxiv.org/abs/2508.20804},
+  year = {2025}
+}
+</code></pre></details>
+
+<details class="pub-entry">
+<summary><strong>Amoudruz, Lucas</strong> and Litvinov, Sergey and Murri, Riccardo and Eyrich, Volker and Zudrop, Jens and Bekas, Costas and Koumoutsakos, Petros. <em>"Scalable, Cloud-Based Simulations of Blood Flow and Targeted Drug Delivery in Retinal Capillaries"</em>,   <em>Computer Physics Communications</em>, pp. 109967 (2025)  <a href="https://doi.org/10.1016/j.cpc.2025.109967">[DOI]</a>  <a href="https://doi.org/10.48550/arXiv.2512.02090">[arxiv]</a>  <a href="data/publications/amoudruz2025c.pdf">[pdf]</a></p>
+</summary>
+
+<pre><code class="language-bibtex">@article{amoudruz2025c,
+  author = {Amoudruz, Lucas and Litvinov, Sergey and Murri, Riccardo and Eyrich, Volker and Zudrop, Jens and Bekas, Costas and Koumoutsakos, Petros},
+  doi = {https://doi.org/10.1016/j.cpc.2025.109967},
+  eprint = {https://doi.org/10.48550/arXiv.2512.02090},
+  issn = {0010-4655},
+  journal = {Computer Physics Communications},
+  pages = {109967},
+  title = {Scalable, Cloud-Based Simulations of Blood Flow and Targeted Drug Delivery in Retinal Capillaries},
+  url = {https://www.sciencedirect.com/science/article/pii/S0010465525004680},
+  year = {2025}
+}
+</code></pre></details>
+
+<details class="pub-entry">
+<summary><strong>Amoudruz, Lucas</strong> and Litvinov, Sergey and Koumoutsakos, Petros. <em>"Optimal navigation of magnetic artificial microswimmers in blood capillaries with deep reinforcement learning"</em>,   <em>Physics of Fluids</em>, Vol. 37, No. 7 (2025)  <a href="https://doi.org/10.1063/5.0274623">[DOI]</a>  <a href="https://doi.org/10.48550/arXiv.2404.02171">[arxiv]</a>  <a href="data/publications/amoudruz2025b.pdf">[pdf]</a></p>
+</summary>
+
+<pre><code class="language-bibtex">@article{amoudruz2025b,
+  author = {Amoudruz, Lucas and Litvinov, Sergey and Koumoutsakos, Petros},
+  doi = {https://doi.org/10.1063/5.0274623},
+  eprint = {https://doi.org/10.48550/arXiv.2404.02171},
+  journal = {Physics of Fluids},
+  number = {7},
+  publisher = {AIP Publishing},
+  title = {Optimal navigation of magnetic artificial microswimmers in blood capillaries with deep reinforcement learning},
+  volume = {37},
+  year = {2025}
+}
+</code></pre></details>
+
+<details class="pub-entry">
+<summary><strong>Amoudruz, Lucas</strong> and Karnakov, Petr and Koumoutsakos, Petros. <em>"Contactless precision steering of particles in a fluid inside a cube with rotating walls"</em>,   <em>Journal of Fluid Mechanics</em>, Vol. 1014, pp. A15 (2025)  <a href="https://doi.org/10.1017/jfm.2025.10174">[DOI]</a>  <a href="https://doi.org/10.48550/arXiv.2506.15958">[arxiv]</a>  <a href="data/publications/amoudruz2025a.pdf">[pdf]</a></p>
+</summary>
+
+<pre><code class="language-bibtex">@article{amoudruz2025a,
+  author = {Amoudruz, Lucas and Karnakov, Petr and Koumoutsakos, Petros},
+  doi = {https://doi.org/10.1017/jfm.2025.10174},
+  eprint = {https://doi.org/10.48550/arXiv.2506.15958},
+  journal = {Journal of Fluid Mechanics},
+  pages = {A15},
+  publisher = {Cambridge University Press},
+  title = {Contactless precision steering of particles in a fluid inside a cube with rotating walls},
+  volume = {1014},
+  year = {2025}
+}
+</code></pre></details>
+
+<details class="pub-entry">
+<summary>Alexeev, Dmitry and Litvinov, Sergey and Economides, Athena and <strong>Amoudruz, Lucas</strong> and Toner, Mehmet and Koumoutsakos, Petros. <em>"Inertial focusing of spherical particles: The effects of rotational motion"</em>,   <em>Physical Review Fluids</em>, Vol. 10, No. 5, pp. 054202 (2025)  <a href="https://doi.org/10.1103/PhysRevFluids.10.054202">[DOI]</a>  <a href="https://doi.org/10.48550/arXiv.2408.09552">[arxiv]</a>  <a href="data/publications/alexeev2025a.pdf">[pdf]</a></p>
+</summary>
+
+<pre><code class="language-bibtex">@article{alexeev2025a,
+  author = {Alexeev, Dmitry and Litvinov, Sergey and Economides, Athena and Amoudruz, Lucas and Toner, Mehmet and Koumoutsakos, Petros},
+  doi = {https://doi.org/10.1103/PhysRevFluids.10.054202},
+  eprint = {https://doi.org/10.48550/arXiv.2408.09552},
+  journal = {Physical Review Fluids},
+  number = {5},
+  pages = {054202},
+  publisher = {APS},
+  title = {Inertial focusing of spherical particles: The effects of rotational motion},
+  volume = {10},
+  year = {2025}
+}
+</code></pre></details>
+
+<details class="pub-entry">
+<summary>Karnakov, Petr and <strong>Amoudruz, Lucas</strong> and Koumoutsakos, Petros. <em>"Optimal navigation in microfluidics via the optimization of a discrete loss"</em>,   <em>Physical Review Letters</em>, Vol. 134, No. 4, pp. 044001 (2025)  <a href="https://doi.org/10.1103/PhysRevLett.134.044001">[DOI]</a>  <a href="https://doi.org/10.48550/arXiv.2506.15902">[arxiv]</a>  <a href="data/publications/karnakov2025a.pdf">[pdf]</a></p>
+</summary>
+
+<pre><code class="language-bibtex">@article{karnakov2025a,
+  author = {Karnakov, Petr and Amoudruz, Lucas and Koumoutsakos, Petros},
+  doi = {https://doi.org/10.1103/PhysRevLett.134.044001},
+  eprint = {https://doi.org/10.48550/arXiv.2506.15902},
+  journal = {Physical Review Letters},
+  number = {4},
+  pages = {044001},
+  publisher = {APS},
+  title = {Optimal navigation in microfluidics via the optimization of a discrete loss},
+  volume = {134},
+  year = {2025}
+}
+</code></pre></details>
+
+<h2>2024</h2>
+<details class="pub-entry">
+<summary><strong>Amoudruz, Lucas</strong> and Economides, Athena and Koumoutsakos, Petros. <em>"The volume of healthy red blood cells is optimal for advective oxygen transport in arterioles"</em>,   <em>Biophysical journal</em>, Vol. 123, No. 10, pp. 1289--1296 (2024)  <a href="https://doi.org/10.1016/j.bpj.2024.04.015">[DOI]</a>  <a href="https://doi.org/10.48550/arXiv.2305.02197">[arxiv]</a>  <a href="data/publications/amoudruz2024a.pdf">[pdf]</a></p>
+</summary>
+
+<pre><code class="language-bibtex">@article{amoudruz2024a,
+  author = {Amoudruz, Lucas and Economides, Athena and Koumoutsakos, Petros},
+  doi = {https://doi.org/10.1016/j.bpj.2024.04.015},
+  eprint = {https://doi.org/10.48550/arXiv.2305.02197},
+  journal = {Biophysical journal},
+  number = {10},
+  pages = {1289--1296},
+  publisher = {Elsevier},
+  title = {The volume of healthy red blood cells is optimal for advective oxygen transport in arterioles},
+  volume = {123},
+  year = {2024}
+}
+</code></pre></details>
+
+<h2>2023</h2>
+<details class="pub-entry">
+<summary><strong>Amoudruz, Lucas</strong> and Economides, Athena and Arampatzis, Georgios and Koumoutsakos, Petros. <em>"The stress-free state of human erythrocytes: Data-driven inference of a transferable RBC model"</em>,   <em>Biophysical journal</em>, Vol. 122, No. 8, pp. 1517--1525 (2023)  <a href="https://doi.org/10.1016/j.bpj.2023.03.019">[DOI]</a>  <a href="https://doi.org/10.48550/arXiv.2303.03404">[arxiv]</a>  <a href="data/publications/amoudruz2023a.pdf">[pdf]</a></p>
+</summary>
+
+<pre><code class="language-bibtex">@article{amoudruz2023a,
+  author = {Amoudruz, Lucas and Economides, Athena and Arampatzis, Georgios and Koumoutsakos, Petros},
+  doi = {https://doi.org/10.1016/j.bpj.2023.03.019},
+  eprint = {https://doi.org/10.48550/arXiv.2303.03404},
+  journal = {Biophysical journal},
+  number = {8},
+  pages = {1517--1525},
+  publisher = {Elsevier},
+  title = {The stress-free state of human erythrocytes: Data-driven inference of a transferable RBC model},
+  volume = {122},
+  year = {2023}
+}
+</code></pre></details>
+
+<h2>2022</h2>
+<details class="pub-entry">
+<summary><strong>Amoudruz, Lucas</strong>. <em>"Simulations and control of artificial microswimmers in blood"</em>,   <em>PhD dissertation</em>, ETH Zurich  <a href="https://doi.org/10.3929/ethz-b-000550202">[DOI]</a></p>
+</summary>
+
+<pre><code class="language-bibtex">@phdthesis{amoudruz2022b,
+  author = {Amoudruz, Lucas},
+  doi = {https://doi.org/10.3929/ethz-b-000550202},
+  school = {ETH Zurich},
+  title = {Simulations and control of artificial microswimmers in blood},
+  year = {2022}
+}
+</code></pre></details>
+
+<details class="pub-entry">
+<summary><strong>Amoudruz, Lucas</strong> and Koumoutsakos, Petros. <em>"Independent control and path planning of microswimmers with a uniform magnetic field"</em>,   <em>Advanced Intelligent Systems</em>, Vol. 4, No. 3, pp. 2100183 (2022)  <a href="https://doi.org/10.1002/aisy.202100183">[DOI]</a>  <a href="https://doi.org/10.48550/arXiv.2101.10628">[arxiv]</a>  <a href="data/publications/amoudruz2022a.pdf">[pdf]</a></p>
+</summary>
+
+<pre><code class="language-bibtex">@article{amoudruz2022a,
+  author = {Amoudruz, Lucas and Koumoutsakos, Petros},
+  doi = {https://doi.org/10.1002/aisy.202100183},
+  eprint = {https://doi.org/10.48550/arXiv.2101.10628},
+  journal = {Advanced Intelligent Systems},
+  number = {3},
+  pages = {2100183},
+  publisher = {Wiley Online Library},
+  title = {Independent control and path planning of microswimmers with a uniform magnetic field},
+  volume = {4},
+  year = {2022}
+}
+</code></pre></details>
+
+<h2>2021</h2>
+<details class="pub-entry">
+<summary>Economides, Athena and Arampatzis, Georgios and Alexeev, Dmitry and Litvinov, Sergey and <strong>Amoudruz, Lucas</strong> and Kulakova, Lina and Papadimitriou, Costas and Koumoutsakos, Petros. <em>"Hierarchical Bayesian uncertainty quantification for a model of the red blood cell"</em>,   <em>Physical Review Applied</em>, Vol. 15, No. 3, pp. 034062 (2021)  <a href="https://doi.org/10.1103/PhysRevApplied.15.034062">[DOI]</a>  <a href="data/publications/economides2021a.pdf">[pdf]</a></p>
+</summary>
+
+<pre><code class="language-bibtex">@article{economides2021a,
+  author = {Economides, Athena and Arampatzis, Georgios and Alexeev, Dmitry and Litvinov, Sergey and Amoudruz, Lucas and Kulakova, Lina and Papadimitriou, Costas and Koumoutsakos, Petros},
+  doi = {https://doi.org/10.1103/PhysRevApplied.15.034062},
+  journal = {Physical Review Applied},
+  number = {3},
+  pages = {034062},
+  publisher = {APS},
+  title = {Hierarchical Bayesian uncertainty quantification for a model of the red blood cell},
+  volume = {15},
+  year = {2021}
+}
+</code></pre></details>
+
+<h2>2020</h2>
+<details class="pub-entry">
+<summary>Alexeev, Dmitry and <strong>Amoudruz, Lucas</strong> and Litvinov, Sergey and Koumoutsakos, Petros. <em>"Mirheo: High-performance mesoscale simulations for microfluidics"</em>,   <em>Computer Physics Communications</em>, Vol. 254, pp. 107298 (2020)  <a href="https://doi.org/10.1016/j.cpc.2020.107298">[DOI]</a>  <a href="https://doi.org/10.48550/arXiv.1911.04712">[arxiv]</a>  <a href="data/publications/alexeev2020a.pdf">[pdf]</a></p>
+</summary>
+
+<pre><code class="language-bibtex">@article{alexeev2020a,
+  author = {Alexeev, Dmitry and Amoudruz, Lucas and Litvinov, Sergey and Koumoutsakos, Petros},
+  doi = {https://doi.org/10.1016/j.cpc.2020.107298},
+  eprint = {https://doi.org/10.48550/arXiv.1911.04712},
+  journal = {Computer Physics Communications},
+  pages = {107298},
+  publisher = {Elsevier},
+  title = {Mirheo: High-performance mesoscale simulations for microfluidics},
+  volume = {254},
+  year = {2020}
+}
+</code></pre></details>
+
+<details class="pub-entry">
+<summary>Wälchli, Daniel and Martin, Sergio M and Economides, Athena and <strong>Amoudruz, Lucas</strong> and Arampatzis, George and Bian, Xin and Koumoutsakos, Petros. <em>"Load balancing in large scale bayesian inference"</em>,   <em>Proceedings of the Platform for Advanced Scientific Computing Conference</em>, pp. 1--12 (2020)  <a href="https://doi.org/10.1145/3394277.3401849">[DOI]</a>  <a href="data/publications/walchli2020a.pdf">[pdf]</a></p>
+</summary>
+
+<pre><code class="language-bibtex">@inproceedings{walchli2020a,
+  author = {W{\"a}lchli, Daniel and Martin, Sergio M and Economides, Athena and Amoudruz, Lucas and Arampatzis, George and Bian, Xin and Koumoutsakos, Petros},
+  booktitle = {Proceedings of the Platform for Advanced Scientific Computing Conference},
+  doi = {https://doi.org/10.1145/3394277.3401849},
+  pages = {1--12},
+  title = {Load balancing in large scale bayesian inference},
+  year = {2020}
+}
+</code></pre></details>
+
+<h2>2017</h2>
+<details class="pub-entry">
+<summary>Economides, Athena and <strong>Amoudruz, Lucas</strong> and Litvinov, Sergey and Alexeev, Dmitry and Nizzero, Sara and Hadjidoukas, Panagiotis E and Rossinelli, Diego and Koumoutsakos, Petros. <em>"Towards the Virtual Rheometer: High Performance Computing for the Red Blood Cell Microstructure"</em>,   <em>Proceedings of the Platform for Advanced Scientific Computing Conference</em>, pp. 1--13 (2017)  <a href="https://doi.org/10.1145/3093172.3093226">[DOI]</a>  <a href="data/publications/economides2017a.pdf">[pdf]</a></p>
+</summary>
+
+<pre><code class="language-bibtex">@inproceedings{economides2017a,
+  author = {Economides, Athena and Amoudruz, Lucas and Litvinov, Sergey and Alexeev, Dmitry and Nizzero, Sara and Hadjidoukas, Panagiotis E and Rossinelli, Diego and Koumoutsakos, Petros},
+  booktitle = {Proceedings of the Platform for Advanced Scientific Computing Conference},
+  doi = {https://doi.org/10.1145/3093172.3093226},
+  pages = {1--13},
+  title = {Towards the Virtual Rheometer: High Performance Computing for the Red Blood Cell Microstructure},
+  year = {2017}
+}
+</code></pre></details>
+  </div>
+</section>
+
+
+</body>
+</html>

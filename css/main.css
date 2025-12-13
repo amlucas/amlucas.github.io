@@ -1,0 +1,253 @@
+body {
+  font-family: "IBM Plex Serif", serif;
+  background-color: white;
+  color: #222;
+  line-height: 1.6;
+  margin: 0;
+  scroll-behavior: smooth;
+}
+
+h1, h2, h3 {
+  font-family: "IBM Plex Sans", sans-serif;
+  font-weight: 600;
+  color: #3e6075;
+}
+
+a {
+  color: #3e6075;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+.top-nav {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: auto;
+  background: white;
+  border-bottom: 1px solid #ddd;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  z-index: 1000;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+  font-family:  "IBM Plex Sans", sans-serif;
+}
+
+.top-nav a {
+  text-decoration: none;
+  color: #3e6075;
+  font-weight: 500;
+  font-size: 1rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.top-nav a:hover {
+  background-color: rgba(62, 96, 117, 0.1); /* subtle hover */
+}
+
+section {
+  scroll-margin-top: 80px;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-bottom: 2rem;
+}
+
+
+.markdown-body img:not(.float-img-left):not(.float-img-right) {
+  max-width: 100%;
+  width: 100%;
+  height: auto;
+  display: block;
+  margin: 1rem auto; /* optional: center the image */
+}
+
+@media (max-width: 700px) {
+  .markdown-body {
+    padding: 0 1rem;
+  }
+}
+
+.markdown-body p {
+    text-align: justify
+}
+
+.markdown-body h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 0.3rem;
+}
+
+.markdown-body h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: #5a738b;
+}
+
+.markdown-body h3 {
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: #5a738b;
+}
+
+
+.float-img-right {
+  float: right;
+  width: 40%;
+  margin: 0 0 1em 1em;
+}
+.float-img-left {
+  float: left;
+  width: 40%;
+  margin: 0 1em 1em 0;
+}
+
+
+.image-row {
+  display: flex;
+  gap: 2%;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 1.5rem 0;
+}
+
+.image-row .image-wrap {
+  margin: 0;
+}
+
+.image-row img {
+  width: 100%;
+  height: auto;
+}
+
+@media (max-width: 700px) {
+  .image-row {
+    flex-direction: column;
+  }
+
+  .image-row .image-wrap {
+    width: 100% !important;
+  }
+}
+
+.image-caption {
+  font-style: italic;
+  font-size: 0.9rem;
+  color: #555;
+  margin-top: 0.25rem;
+  text-align: center;
+  line-height: 1.3;
+}
+
+.image-wrap {
+  margin-bottom: 1rem;
+}
+
+.float-img-left {
+  float: left;
+  margin: 0 1em 1em 0;
+}
+
+.float-img-right {
+  float: right;
+  margin: 0 0 1em 1em;
+}
+
+.image-center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+.image-center img {
+  display: block;
+  margin: 0 auto;
+}
+
+details {
+  margin-bottom: 1rem;
+}
+
+.code-block summary {
+  cursor: pointer;
+  font-weight: bold;
+  margin: 0.5rem 0;
+  color: #3e6075;
+}
+
+.pub-entry summary {
+  cursor: pointer;
+  font-weight: normal;
+  color: inherit;
+  margin: 0;
+  padding: 0;
+}
+
+.pub-entry pre {
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  padding: 0.75rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-size: 0.9rem;
+}
+
+.codehilite {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 1rem;
+  overflow-x: auto;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.codehilite pre {
+  margin: 0;
+  font-family: "JetBrains Mono", Consolas, Menlo, Monaco, monospace;
+  background: none;
+  border: none;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1rem 0;
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 0.4rem 0.75rem;
+  text-align: left;
+}
+
+th {
+  background-color: #f5f5f5;
+  font-weight: 600;
+}
+
+hr {
+  border: none;
+  height: 1px;
+  background: #ccc;          /* light gray line */
+  opacity: 0.4;              /* softer appearance */
+}
