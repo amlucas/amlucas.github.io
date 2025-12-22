@@ -130,7 +130,7 @@ Here is the code I have used:</p>
 
 </details>
 
-<p>This gives me time series of the elevation and the corresponding duration from the start of my run.
+<p>This gives time series of the elevation and the corresponding duration from the start of my run.
 The time series are remarkably smooth.
 We can easily distinguish the ups and downs of each row (recall: there is a total of 37 flights of stairs to run up.)</p>
 <div class="image-wrap image-center" style="width: 75%;">
@@ -161,10 +161,91 @@ Using GPS-computed distance would be a lot noisier, especially due to the sharp 
   <p class="image-caption">Same plot as before, with the mean coming from my best 10 runs of all times.</p>
 </div>
 
-<p>Well, it looks like my best pacing strategy is just to be faster everywhere.
-Maybe that's the real lesson, or maybe there's a smarter way of using this data.
-For now I'll just keep training at the stairs. 
-I might revisit this data to find something more subtle later.</p>
+<p>Well, it seems like I won't learn too much from the global progress alone: my best runs were just constantly faster than the average run.
+This can't be the whole story.
+Let's zoom in individual segments of the time series.</p>
+<p>Below, I am plotting the elevation profiles of each up and down, centered around the top of each row.
+On each plot, there are thus 36 curves (I skip row 37 which is only up, no down).
+These are 3 of my best runs: </p>
+<div class="image-row">
+
+<div class="image-wrap" style="width: 32%;">
+  <img src="../images/blog/stadium-pacing/best_profile_runs/000.svg" alt="">
+  <p class="image-caption"></p>
+</div>
+
+<div class="image-wrap" style="width: 32%;">
+  <img src="../images/blog/stadium-pacing/best_profile_runs/001.svg" alt="">
+  <p class="image-caption"></p>
+</div>
+
+<div class="image-wrap" style="width: 32%;">
+  <img src="../images/blog/stadium-pacing/best_profile_runs/002.svg" alt="">
+  <p class="image-caption"></p>
+</div>
+</div>
+
+<p>And 3 slower runs:</p>
+<div class="image-row">
+
+<div class="image-wrap" style="width: 32%;">
+  <img src="../images/blog/stadium-pacing/average_profile_runs/000.svg" alt="">
+  <p class="image-caption"></p>
+</div>
+
+<div class="image-wrap" style="width: 32%;">
+  <img src="../images/blog/stadium-pacing/average_profile_runs/001.svg" alt="">
+  <p class="image-caption"></p>
+</div>
+
+<div class="image-wrap" style="width: 32%;">
+  <img src="../images/blog/stadium-pacing/average_profile_runs/002.svg" alt="">
+  <p class="image-caption"></p>
+</div>
+</div>
+
+<p>From these plots, we can see that my runs follow a three-phase structure for each up and down:</p>
+<ul>
+<li>Zone 1: short initial run up.</li>
+<li>Zone 2: slower walk to the top.</li>
+<li>Zone 3: descent.</li>
+</ul>
+<p>This is clearly visible on first set of graphs.
+Going down takes about the same time as going up.</p>
+<p>Let's quantify the time spent in each zone.
+For each up and down trajectory, I assume that I have a constant vertical speed in each zone.
+This leads to a piecewise linear approximation of the elevation against time.
+A fit over all cycles is illustrated below for the three "fast" runs:</p>
+<div class="image-row">
+
+<div class="image-wrap" style="width: 32%;">
+  <img src="../images/blog/stadium-pacing/detailed/000.svg" alt="">
+  <p class="image-caption"></p>
+</div>
+
+<div class="image-wrap" style="width: 32%;">
+  <img src="../images/blog/stadium-pacing/detailed/001.svg" alt="">
+  <p class="image-caption"></p>
+</div>
+
+<div class="image-wrap" style="width: 32%;">
+  <img src="../images/blog/stadium-pacing/detailed/002.svg" alt="">
+  <p class="image-caption"></p>
+</div>
+</div>
+
+<p>The black dot indicates the transition from running to walking up.
+The average time spent in each zone can be extracted from this approximation.
+It is shown below for all runs and for my ten fastest runs:</p>
+<div class="image-wrap image-center" style="width: 75%;">
+  <img src="../images/blog/stadium-pacing/time_zones_comp.svg" alt="Average time spent in each zone. Zone 1: Run up; Zone 2: walk up; Zone 3: run down.">
+  <p class="image-caption">Average time spent in each zone. Zone 1: Run up; Zone 2: walk up; Zone 3: run down.</p>
+</div>
+
+<p>In my faster runs, I was faster in zone 1 (run up) and zone 3 (run down), but not in zone 2 (walk up).
+My best strategy yet, focuses on a powerful run up only in the first third, and saving extra seconds on my way down.</p>
+<p>This was a fun deep dive in the elevation data recorded by my watch over the past 77 stadium runs.
+I now have evidence that my best strategy is not to sprint the whole thing, but to go hard at the start of each flight of stairs, followed by a steady walk up to the top, and then let my legs go on the way down.</p>
 <p>The results were produced with the following code:</p>
 <details class="code-block">
 <summary>Show code</summary>
@@ -290,6 +371,338 @@ I might revisit this data to find something more subtle later.</p>
     <span class="n">plot_peaks</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">samples</span><span class="o">=</span><span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">22</span><span class="p">,</span> <span class="mi">23</span><span class="p">],</span> <span class="n">out_dir</span><span class="o">=</span><span class="n">out_dir</span><span class="p">)</span>
     <span class="n">plot_p2p_durations</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="n">out_dir</span><span class="p">)</span>
     <span class="n">plot_p2p_durations_and_best</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">out_dir</span><span class="o">=</span><span class="n">out_dir</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</code></pre></div>
+
+
+</details>
+
+<details class="code-block">
+<summary>Show code</summary>
+
+
+
+<div class="codehilite"><pre><span></span><code><span class="ch">#!/usr/bin/env python</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.signal</span><span class="w"> </span><span class="kn">import</span> <span class="n">find_peaks</span>
+
+<span class="n">NUM_ROWS</span> <span class="o">=</span> <span class="mi">37</span>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;json&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;data to plot&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--run-ids&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;plot only for these run ids&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--out-dir&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;output directory for plots&#39;</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="n">out_dir</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">out_dir</span>
+    <span class="n">run_ids</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">run_ids</span>
+
+    <span class="k">if</span> <span class="n">out_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">json</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+
+    <span class="n">plot_id</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="n">duration</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;duration&#39;</span><span class="p">])</span>
+        <span class="n">elevation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;elevation&#39;</span><span class="p">])</span>
+
+        <span class="c1"># High peaks (top of each row)</span>
+        <span class="n">hpids</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">find_peaks</span><span class="p">(</span><span class="n">elevation</span><span class="p">,</span>
+                              <span class="n">prominence</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">elevation</span><span class="p">),</span>
+                              <span class="n">distance</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">elevation</span><span class="p">)</span> <span class="o">//</span> <span class="n">NUM_ROWS</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">hpids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hpids</span><span class="p">,</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">duration</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">hpids</span><span class="p">)</span> <span class="o">!=</span> <span class="n">NUM_ROWS</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="c1"># Low peaks (bottom of each row)</span>
+        <span class="n">lpids</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">find_peaks</span><span class="p">(</span><span class="o">-</span><span class="n">elevation</span><span class="p">,</span>
+                              <span class="n">prominence</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">elevation</span><span class="p">),</span>
+                              <span class="n">distance</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">elevation</span><span class="p">)</span> <span class="o">//</span> <span class="n">NUM_ROWS</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">lpids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">],</span> <span class="n">lpids</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lpids</span><span class="p">)</span> <span class="o">!=</span> <span class="n">NUM_ROWS</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="k">if</span> <span class="n">run_ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">run_id</span> <span class="ow">in</span> <span class="n">run_ids</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="n">profiles</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># go over every up and down;</span>
+        <span class="c1"># row 37 doesn t count as we do not go down.</span>
+
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NUM_ROWS</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">lpids</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">mid</span> <span class="o">=</span> <span class="n">hpids</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="n">lpids</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="n">tup</span> <span class="o">=</span> <span class="n">duration</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">mid</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">eup</span> <span class="o">=</span> <span class="n">elevation</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">mid</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">tdown</span> <span class="o">=</span> <span class="n">duration</span><span class="p">[</span><span class="n">mid</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
+            <span class="n">edown</span> <span class="o">=</span> <span class="n">elevation</span><span class="p">[</span><span class="n">mid</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
+
+            <span class="c1"># normalize</span>
+            <span class="n">tshift</span> <span class="o">=</span> <span class="n">tup</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="c1">#tscale = tdown[-1] - tup[0]</span>
+            <span class="n">tscale</span> <span class="o">=</span> <span class="mi">1</span>
+
+            <span class="n">tup</span>   <span class="o">=</span> <span class="p">(</span><span class="n">tup</span> <span class="o">-</span> <span class="n">tshift</span><span class="p">)</span> <span class="o">/</span> <span class="n">tscale</span>
+            <span class="n">tdown</span> <span class="o">=</span> <span class="p">(</span><span class="n">tdown</span> <span class="o">-</span> <span class="n">tshift</span><span class="p">)</span> <span class="o">/</span> <span class="n">tscale</span>
+
+            <span class="n">eshift</span> <span class="o">=</span> <span class="n">eup</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">escale</span> <span class="o">=</span> <span class="n">edown</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">eup</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="n">edown</span> <span class="o">=</span> <span class="p">(</span><span class="n">edown</span> <span class="o">-</span> <span class="n">eshift</span><span class="p">)</span> <span class="o">/</span> <span class="n">escale</span>
+            <span class="n">eup</span> <span class="o">=</span> <span class="p">(</span><span class="n">eup</span> <span class="o">-</span> <span class="n">eshift</span><span class="p">)</span> <span class="o">/</span> <span class="n">escale</span>
+
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tup</span><span class="p">,</span> <span class="n">eup</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C0&#39;</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="n">i</span> <span class="o">/</span> <span class="n">NUM_ROWS</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tdown</span><span class="p">,</span> <span class="n">edown</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C1&#39;</span><span class="p">,</span> <span class="n">alpha</span> <span class="o">=</span> <span class="n">i</span> <span class="o">/</span> <span class="n">NUM_ROWS</span><span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$t$(s)&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;normalized elevation&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">30</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">duration</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">//</span><span class="mi">60</span><span class="p">)</span><span class="si">}</span><span class="s2"> minutes </span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">duration</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">%</span><span class="mi">60</span><span class="p">)</span><span class="si">}</span><span class="s2"> sec&quot;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="n">run_id</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">out_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">plot_id</span><span class="si">:</span><span class="s1">03d</span><span class="si">}</span><span class="s1">.svg&#39;</span><span class="p">))</span>
+
+        <span class="n">plot_id</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</code></pre></div>
+
+
+</details>
+
+<details class="code-block">
+<summary>Show code</summary>
+
+
+
+<div class="codehilite"><pre><span></span><code><span class="ch">#!/usr/bin/env python</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.signal</span><span class="w"> </span><span class="kn">import</span> <span class="n">find_peaks</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.optimize</span><span class="w"> </span><span class="kn">import</span> <span class="n">least_squares</span>
+
+<span class="n">NUM_ROWS</span> <span class="o">=</span> <span class="mi">37</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">piecewise_linear</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">aup1</span><span class="p">,</span> <span class="n">tau12</span><span class="p">,</span> <span class="n">aup2</span><span class="p">,</span> <span class="n">bup2</span><span class="p">,</span> <span class="n">ado</span><span class="p">):</span>
+    <span class="c1"># bup1 + aup1 * tau12 = bup2 + aup2 * tau12</span>
+    <span class="n">bup1</span> <span class="o">=</span> <span class="n">bup2</span> <span class="o">+</span> <span class="n">tau12</span> <span class="o">*</span> <span class="p">(</span><span class="n">aup2</span> <span class="o">-</span> <span class="n">aup1</span><span class="p">)</span>
+    <span class="n">bdo</span> <span class="o">=</span> <span class="n">bup2</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+        <span class="n">t</span> <span class="o">&lt;</span> <span class="n">tau12</span><span class="p">,</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">bup1</span> <span class="o">+</span> <span class="n">aup1</span> <span class="o">*</span> <span class="n">t</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">t</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">,</span>
+                 <span class="n">bup2</span> <span class="o">+</span> <span class="n">aup2</span> <span class="o">*</span> <span class="n">t</span><span class="p">,</span>
+                 <span class="n">bdo</span> <span class="o">+</span> <span class="n">ado</span> <span class="o">*</span> <span class="n">t</span><span class="p">))</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">find_piecewise_linear_params</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fun</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+        <span class="n">aup1</span><span class="p">,</span> <span class="n">tau12</span><span class="p">,</span> <span class="n">aup2</span><span class="p">,</span> <span class="n">bup2</span><span class="p">,</span> <span class="n">ado</span> <span class="o">=</span> <span class="n">p</span>
+        <span class="n">pred</span> <span class="o">=</span> <span class="n">piecewise_linear</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="o">*</span><span class="n">p</span><span class="p">)</span>
+        <span class="n">diff</span> <span class="o">=</span> <span class="n">pred</span> <span class="o">-</span> <span class="n">e</span>
+        <span class="c1"># prior</span>
+        <span class="n">logprior_res</span> <span class="o">=</span> <span class="p">[(</span><span class="n">tau12</span> <span class="o">+</span> <span class="mi">15</span><span class="p">)</span> <span class="o">/</span> <span class="mi">5</span><span class="p">,</span>
+                        <span class="nb">max</span><span class="p">(</span><span class="n">aup2</span> <span class="o">-</span> <span class="n">aup1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">0.01</span><span class="p">,</span> <span class="c1"># prior: aup1 &gt; aup2</span>
+                        <span class="nb">max</span><span class="p">(</span><span class="o">-</span><span class="n">aup1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">0.01</span><span class="p">,</span> <span class="c1"># prior: aup1 &gt; 0</span>
+                        <span class="nb">max</span><span class="p">(</span><span class="o">-</span><span class="n">aup2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">0.01</span><span class="p">,</span> <span class="c1"># prior: aup2 &gt; 0</span>
+                        <span class="nb">max</span><span class="p">(</span><span class="n">ado</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">0.01</span><span class="p">]</span> <span class="c1"># prior: ado &lt; 0</span>
+
+        <span class="n">diff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">diff</span><span class="p">,</span> <span class="n">logprior_res</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">diff</span>
+
+    <span class="n">res</span> <span class="o">=</span> <span class="n">least_squares</span><span class="p">(</span><span class="n">fun</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.6</span><span class="p">,</span> <span class="o">-</span><span class="mi">15</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">res</span><span class="o">.</span><span class="n">x</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;json&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;data to plot&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--run-ids&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;plot details for these run ids&#39;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--out-dir&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;output directory for plots&#39;</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="n">out_dir</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">out_dir</span>
+    <span class="n">run_ids</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">run_ids</span>
+
+    <span class="k">if</span> <span class="n">out_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">run_ids</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="s1">&#39;detailed&#39;</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">json</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+    <span class="n">all_params</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">durations</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">plot_id</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">run_id</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="n">duration</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;duration&#39;</span><span class="p">])</span>
+        <span class="n">elevation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;elevation&#39;</span><span class="p">])</span>
+
+        <span class="c1"># High peaks (top of each row)</span>
+        <span class="n">hpids</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">find_peaks</span><span class="p">(</span><span class="n">elevation</span><span class="p">,</span>
+                              <span class="n">prominence</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">elevation</span><span class="p">),</span>
+                              <span class="n">distance</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">elevation</span><span class="p">)</span> <span class="o">//</span> <span class="n">NUM_ROWS</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">hpids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hpids</span><span class="p">,</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">duration</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">hpids</span><span class="p">)</span> <span class="o">!=</span> <span class="n">NUM_ROWS</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="c1"># Low peaks (bottom of each row)</span>
+        <span class="n">lpids</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">find_peaks</span><span class="p">(</span><span class="o">-</span><span class="n">elevation</span><span class="p">,</span>
+                              <span class="n">prominence</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">elevation</span><span class="p">),</span>
+                              <span class="n">distance</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">elevation</span><span class="p">)</span> <span class="o">//</span> <span class="n">NUM_ROWS</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">lpids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="mi">0</span><span class="p">],</span> <span class="n">lpids</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lpids</span><span class="p">)</span> <span class="o">!=</span> <span class="n">NUM_ROWS</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="c1"># go over every up and down;</span>
+        <span class="c1"># row 37 doesn t count as we do not go down.</span>
+
+        <span class="n">ts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">es</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">ps</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NUM_ROWS</span><span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">lpids</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">mid</span> <span class="o">=</span> <span class="n">hpids</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="n">lpids</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="n">t</span> <span class="o">=</span> <span class="n">duration</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="n">elevation</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
+
+            <span class="c1"># normalize</span>
+            <span class="n">t</span> <span class="o">-=</span> <span class="n">t</span><span class="p">[</span><span class="n">mid</span> <span class="o">-</span> <span class="n">start</span><span class="p">]</span>
+            <span class="n">e</span> <span class="o">-=</span> <span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="n">ps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">find_piecewise_linear_params</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
+            <span class="n">ts</span> <span class="o">+=</span> <span class="n">t</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+            <span class="n">es</span> <span class="o">+=</span> <span class="n">e</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">ts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ts</span><span class="p">)</span>
+        <span class="n">es</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">es</span><span class="p">)</span>
+        <span class="n">ps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ps</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">run_id</span> <span class="ow">in</span> <span class="n">run_ids</span><span class="p">:</span>
+            <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+            <span class="n">aup1</span><span class="p">,</span> <span class="n">tau12</span><span class="p">,</span> <span class="n">aup2</span><span class="p">,</span> <span class="n">bup2</span><span class="p">,</span> <span class="n">ado</span> <span class="o">=</span> <span class="n">find_piecewise_linear_params</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">es</span><span class="p">)</span>
+            <span class="n">t_</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">ts</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">ts</span><span class="p">),</span> <span class="mi">1000</span><span class="p">)</span>
+            <span class="n">e_</span> <span class="o">=</span> <span class="n">piecewise_linear</span><span class="p">(</span><span class="n">t_</span><span class="p">,</span> <span class="n">aup1</span><span class="p">,</span> <span class="n">tau12</span><span class="p">,</span> <span class="n">aup2</span><span class="p">,</span> <span class="n">bup2</span><span class="p">,</span> <span class="n">ado</span><span class="p">)</span>
+
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">es</span><span class="p">,</span> <span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C0&#39;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_</span><span class="p">,</span> <span class="n">e_</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C1&#39;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">([</span><span class="n">tau12</span><span class="p">],</span> <span class="p">[</span><span class="n">bup2</span> <span class="o">+</span> <span class="n">aup2</span> <span class="o">*</span> <span class="n">tau12</span><span class="p">],</span> <span class="s1">&#39;ok&#39;</span><span class="p">)</span>
+
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;$t$(s)&#39;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;elevation (m)&#39;</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">30</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">14</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">duration</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">//</span><span class="mi">60</span><span class="p">)</span><span class="si">}</span><span class="s2"> minutes </span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">duration</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">%</span><span class="mi">60</span><span class="p">)</span><span class="si">}</span><span class="s2"> sec&quot;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">out_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="s1">&#39;detailed&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">plot_id</span><span class="si">:</span><span class="s2">03d</span><span class="si">}</span><span class="s2">.svg&quot;</span><span class="p">))</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+            <span class="n">plot_id</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">all_params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ps</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+        <span class="n">durations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">duration</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="n">durations</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">durations</span><span class="p">)</span>
+    <span class="n">all_params</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">all_params</span><span class="p">)</span> <span class="c1"># shape (nsamples, nrows, nparams)</span>
+    <span class="n">order</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">durations</span><span class="p">)</span>
+    <span class="n">durations</span> <span class="o">=</span> <span class="n">durations</span><span class="p">[</span><span class="n">order</span><span class="p">]</span>
+    <span class="n">all_params</span> <span class="o">=</span> <span class="n">all_params</span><span class="p">[</span><span class="n">order</span><span class="p">]</span>
+
+    <span class="n">aup1</span><span class="p">,</span> <span class="n">tau12</span><span class="p">,</span> <span class="n">aup2</span><span class="p">,</span> <span class="n">bup2</span><span class="p">,</span> <span class="n">ado</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">all_params</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span> <span class="c1"># shape(nsamples, nrows)</span>
+    <span class="n">bup1</span> <span class="o">=</span> <span class="n">bup2</span> <span class="o">+</span> <span class="n">tau12</span> <span class="o">*</span> <span class="p">(</span><span class="n">aup2</span> <span class="o">-</span> <span class="n">aup1</span><span class="p">)</span>
+    <span class="n">bdo</span> <span class="o">=</span> <span class="n">bup2</span>
+    <span class="n">tzone1</span> <span class="o">=</span> <span class="n">bup1</span> <span class="o">/</span> <span class="n">aup1</span> <span class="o">+</span> <span class="n">tau12</span>
+    <span class="n">tzone2</span> <span class="o">=</span> <span class="o">-</span><span class="n">tau12</span>
+    <span class="n">tzone3</span> <span class="o">=</span> <span class="o">-</span><span class="n">bdo</span> <span class="o">/</span> <span class="n">ado</span>
+
+    <span class="n">row_id</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">NUM_ROWS</span><span class="p">)</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">row_id</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">tzone1</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C0&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;zone 1&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">row_id</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">tzone2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C1&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;zone 2&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">row_id</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">tzone3</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C2&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;zone 3&#39;</span><span class="p">)</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">row_id</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">tzone1</span><span class="p">[:</span><span class="mi">10</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C0&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">row_id</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">tzone2</span><span class="p">[:</span><span class="mi">10</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C1&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">row_id</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">tzone3</span><span class="p">[:</span><span class="mi">10</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span> <span class="s1">&#39;--&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;C2&#39;</span><span class="p">)</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;row number&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;duration in each zone (s)&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">out_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="s2">&quot;time_zones_rows.svg&quot;</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+
+    <span class="n">tzones</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">tzone1</span><span class="p">),</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">tzone2</span><span class="p">),</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">tzone3</span><span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="n">tzones_fast</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">tzone1</span><span class="p">[:</span><span class="mi">10</span><span class="p">]),</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">tzone2</span><span class="p">[:</span><span class="mi">10</span><span class="p">]),</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">tzone3</span><span class="p">[:</span><span class="mi">10</span><span class="p">])</span>
+    <span class="p">]</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span><span class="o">-</span><span class="mf">0.15</span><span class="p">,</span> <span class="n">tzones</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;all runs&#39;</span><span class="p">,</span>
+           <span class="n">hatch</span><span class="o">=</span><span class="s1">&#39;///&#39;</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;C0&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span><span class="o">+</span><span class="mf">0.15</span><span class="p">,</span> <span class="n">tzones_fast</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;faster runs&#39;</span><span class="p">,</span>
+           <span class="n">hatch</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\\\\\\</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;C1&#39;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;duration (s)&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">([</span><span class="sa">f</span><span class="s1">&#39;zone </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">4</span><span class="p">)])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">out_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_dir</span><span class="p">,</span> <span class="s2">&quot;time_zones_comp.svg&quot;</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
