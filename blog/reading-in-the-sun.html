@@ -1,0 +1,202 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>blog - reading-in-the-sun</title>
+  <link rel="stylesheet" href="../css/main.css" />
+  <link rel="stylesheet" href="../css/codehilite.css" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap" rel="stylesheet">
+  <script type="text/javascript" async
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="../index.html">Home</a>
+  <a href="../blog.html">Blog</a>
+</nav>
+
+
+<section class="markdown-body">
+  <h1>When is it sunny on the terrace</h1>
+<p>January 4, 2025</p>
+<p>I'm visiting my parents this winter in the French Alps.
+I missed the mountains I grew up with, but I had forgotten how much sun they hide at this period of the year.
+I thought I'd use the cold and shady time to compute when it's going to be sunny at my parent's house, so that I can plan ahead for the optimal reading time (isn't it nicer to read in the sun?)</p>
+<p>This computation involves the following steps:</p>
+<ol>
+<li>Compute the horizon from the reading spot. This can be done with ray casting on an elevation map.</li>
+<li>Compute the trajectory of the sun in the sky, given the time of the year.</li>
+</ol>
+<p>It is sunny when the sun is above the horizon. The horizon is defined by the silhouette formed by mountains around me.</p>
+<p>I went ahead and downloaded the topographic map of the area from <a href="https://portal.opentopography.org/raster?opentopoID=OTSDEM.032021.4326.3">Copernicus GLO-30 Digital Elevation Model</a><sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup>.
+I have selected a region large enough to cover most visible mountains from here.</p>
+<div class="image-wrap image-center" style="width: 90%;">
+  <img src="../images/blog/reading-in-the-sun/elevation.svg" alt="Elevation map around my hometown (red dot). We can already guess that the mountains in the South hide the sun during winter.">
+  <p class="image-caption">Elevation map around my hometown (red dot). We can already guess that the mountains in the South hide the sun during winter.</p>
+</div>
+
+<p>Then, I computed the horizon from this map.
+This is computed as the maximum of 
+<script type="math/tex; mode=display">
+\theta = \arctan\left( \frac{z-z_0}{d}\right)
+</script>
+along a ray starting at my location.
+In the above equation, <script type="math/tex">z_0</script> is the elevation at the view point, <script type="math/tex">z</script> is that along the ray, and <script type="math/tex">d</script> is the distance from the view point.
+I have repeated this for any azimuth angle (this angle is 0 when pointing north, and 90 degrees when pointing east):</p>
+<div class="image-wrap image-center" style="width: 70%;">
+  <img src="../images/blog/reading-in-the-sun/horizon.svg" alt="Horizon from my parents' house, computed from the topographic data.">
+  <p class="image-caption">Horizon from my parents' house, computed from the topographic data.</p>
+</div>
+
+<p>I didn't look for horizon data to double check these results but I easily recognize many mountains, I've seen them so many times.
+There's the Mole at around 55 degrees, pointe d'Andey at around 110 degrees and the pointe de Cou in the South direction.
+This latter peak is the main culprit for hiding the sun during winter.</p>
+<p>The trajectory of the sun depends on the time of the year.
+I have used the following code to estimate its trajectory. This is a blind copy-paste from chatGPT.</p>
+<details class="code-block">
+<summary>Show code</summary>
+
+
+
+<div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">day_of_year</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">d</span><span class="o">.</span><span class="n">timetuple</span><span class="p">()</span><span class="o">.</span><span class="n">tm_yday</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">refraction_correction_deg</span><span class="p">(</span><span class="n">elevation_deg</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Atmospheric refraction correction in degrees.</span>
+<span class="sd">    Valid for elevations &gt; ~ -1 deg.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">elevation_deg</span>
+    <span class="k">if</span> <span class="n">h</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mf">1.02</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">h</span> <span class="o">+</span> <span class="mf">10.3</span> <span class="o">/</span> <span class="p">(</span><span class="n">h</span> <span class="o">+</span> <span class="mf">5.11</span><span class="p">))))</span> <span class="o">/</span> <span class="mf">60.0</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">solar_position_noaa</span><span class="p">(</span><span class="n">lat_deg</span><span class="p">,</span> <span class="n">lon_deg</span><span class="p">,</span> <span class="n">when_local</span><span class="p">,</span> <span class="n">tz_offset_hours</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Approx solar azimuth/elevation (degrees) using NOAA-style formulas.</span>
+<span class="sd">    lat_deg, lon_deg: observer location (deg), lon positive east.</span>
+<span class="sd">    when_local: naive datetime in LOCAL time (no tzinfo)</span>
+<span class="sd">    tz_offset_hours: e.g. +1 for CET, +2 for CEST</span>
+<span class="sd">    Returns: (azimuth_deg, elevation_deg)</span>
+<span class="sd">      azimuth: degrees clockwise from North (0=N, 90=E)</span>
+<span class="sd">      elevation: degrees above horizon</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># --- constants / conversions</span>
+    <span class="n">deg2rad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span>
+    <span class="n">rad2deg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span>
+
+    <span class="n">lat</span> <span class="o">=</span> <span class="n">deg2rad</span><span class="p">(</span><span class="n">lat_deg</span><span class="p">)</span>
+
+    <span class="c1"># Day of year</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">day_of_year</span><span class="p">(</span><span class="n">when_local</span><span class="o">.</span><span class="n">date</span><span class="p">())</span>
+
+    <span class="c1"># Fractional year (gamma) in radians</span>
+    <span class="c1"># hour in local time</span>
+    <span class="n">hour</span> <span class="o">=</span> <span class="n">when_local</span><span class="o">.</span><span class="n">hour</span> <span class="o">+</span> <span class="n">when_local</span><span class="o">.</span><span class="n">minute</span><span class="o">/</span><span class="mi">60</span> <span class="o">+</span> <span class="n">when_local</span><span class="o">.</span><span class="n">second</span><span class="o">/</span><span class="mi">3600</span>
+    <span class="n">gamma</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">365.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">hour</span> <span class="o">-</span> <span class="mi">12</span><span class="p">)</span><span class="o">/</span><span class="mf">24.0</span><span class="p">)</span>
+
+    <span class="c1"># Equation of time (minutes)</span>
+    <span class="n">eqtime</span> <span class="o">=</span> <span class="mf">229.18</span> <span class="o">*</span> <span class="p">(</span>
+        <span class="mf">0.000075</span>
+        <span class="o">+</span> <span class="mf">0.001868</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">gamma</span><span class="p">)</span>
+        <span class="o">-</span> <span class="mf">0.032077</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">gamma</span><span class="p">)</span>
+        <span class="o">-</span> <span class="mf">0.014615</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">gamma</span><span class="p">)</span>
+        <span class="o">-</span> <span class="mf">0.040849</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">gamma</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Solar declination (radians)</span>
+    <span class="n">decl</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="mf">0.006918</span>
+        <span class="o">-</span> <span class="mf">0.399912</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">gamma</span><span class="p">)</span>
+        <span class="o">+</span> <span class="mf">0.070257</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">gamma</span><span class="p">)</span>
+        <span class="o">-</span> <span class="mf">0.006758</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">gamma</span><span class="p">)</span>
+        <span class="o">+</span> <span class="mf">0.000907</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">gamma</span><span class="p">)</span>
+        <span class="o">-</span> <span class="mf">0.002697</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">3</span><span class="o">*</span><span class="n">gamma</span><span class="p">)</span>
+        <span class="o">+</span> <span class="mf">0.00148</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">3</span><span class="o">*</span><span class="n">gamma</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Time offset (minutes)</span>
+    <span class="c1"># lon_deg positive east; tz_offset_hours hours east of UTC</span>
+    <span class="n">time_offset</span> <span class="o">=</span> <span class="n">eqtime</span> <span class="o">+</span> <span class="mf">4.0</span><span class="o">*</span><span class="n">lon_deg</span> <span class="o">-</span> <span class="mf">60.0</span><span class="o">*</span><span class="n">tz_offset_hours</span>
+
+    <span class="c1"># True solar time (minutes)</span>
+    <span class="n">tst</span> <span class="o">=</span> <span class="p">(</span><span class="n">hour</span><span class="o">*</span><span class="mf">60.0</span> <span class="o">+</span> <span class="n">time_offset</span><span class="p">)</span> <span class="o">%</span> <span class="mf">1440.0</span>
+
+    <span class="c1"># Hour angle (degrees)</span>
+    <span class="n">ha_deg</span> <span class="o">=</span> <span class="n">tst</span><span class="o">/</span><span class="mf">4.0</span> <span class="o">-</span> <span class="mf">180.0</span>
+    <span class="n">ha</span> <span class="o">=</span> <span class="n">deg2rad</span><span class="p">(</span><span class="n">ha_deg</span><span class="p">)</span>
+
+    <span class="c1"># Solar zenith angle</span>
+    <span class="n">cos_zenith</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">decl</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">decl</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">ha</span><span class="p">)</span>
+    <span class="n">cos_zenith</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">cos_zenith</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">zenith</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">cos_zenith</span><span class="p">)</span>
+
+    <span class="n">elevation</span> <span class="o">=</span> <span class="mf">90.0</span> <span class="o">-</span> <span class="n">rad2deg</span><span class="p">(</span><span class="n">zenith</span><span class="p">)</span>
+
+    <span class="c1"># Solar azimuth (NOAA convention)</span>
+    <span class="c1"># Compute azimuth from north, clockwise</span>
+    <span class="n">sin_az</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">ha</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">decl</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">zenith</span><span class="p">)</span>
+    <span class="n">cos_az</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">decl</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">zenith</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">zenith</span><span class="p">))</span>
+    <span class="n">az</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">sin_az</span><span class="p">,</span> <span class="n">cos_az</span><span class="p">)</span>  <span class="c1"># radians, range [-pi, pi]</span>
+    <span class="n">az_deg</span> <span class="o">=</span> <span class="p">(</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">az</span><span class="p">)</span> <span class="o">+</span> <span class="mf">360.0</span><span class="p">)</span> <span class="o">%</span> <span class="mf">360.0</span>
+
+    <span class="k">return</span> <span class="n">az_deg</span><span class="p">,</span> <span class="n">elevation</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">solar_track</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">tz_offset_hours</span><span class="p">,</span> <span class="n">start_h</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">end_h</span><span class="o">=</span><span class="mi">22</span><span class="p">,</span> <span class="n">step_min</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="n">times</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">azs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">els</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">date</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">date</span><span class="o">.</span><span class="n">month</span><span class="p">,</span> <span class="n">date</span><span class="o">.</span><span class="n">day</span><span class="p">,</span> <span class="n">start_h</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">t_end</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">date</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">date</span><span class="o">.</span><span class="n">month</span><span class="p">,</span> <span class="n">date</span><span class="o">.</span><span class="n">day</span><span class="p">,</span> <span class="n">end_h</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">step</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="n">step_min</span><span class="p">)</span>
+    <span class="k">while</span> <span class="n">t</span> <span class="o">&lt;=</span> <span class="n">t_end</span><span class="p">:</span>
+        <span class="n">az</span><span class="p">,</span> <span class="n">el</span> <span class="o">=</span> <span class="n">solar_position_noaa</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">tz_offset_hours</span><span class="p">)</span>
+        <span class="n">times</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+        <span class="n">azs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">az</span><span class="p">)</span>
+        <span class="n">els</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">el</span><span class="p">)</span>
+        <span class="n">t</span> <span class="o">+=</span> <span class="n">step</span>
+
+    <span class="n">els</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+        <span class="n">el</span> <span class="o">+</span> <span class="n">refraction_correction_deg</span><span class="p">(</span><span class="n">el</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">els</span>
+    <span class="p">])</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">times</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">azs</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">els</span><span class="p">)</span>
+</code></pre></div>
+
+
+</details>
+
+<p>In summer, the sun is high up in the sky, and the mountains don't block the light.
+In winter, like today, the sun is very close and often below the horizon:</p>
+<div class="image-wrap image-center" style="width: 70%;">
+  <img src="../images/blog/reading-in-the-sun/horizon_and_sun.svg" alt="Horizon and trajectory of the sun at two different times of the year. The sun is often behind the mountains in winter.">
+  <p class="image-caption">Horizon and trajectory of the sun at two different times of the year. The sun is often behind the mountains in winter.</p>
+</div>
+
+<p>The following figure shows when the sun will be above the horizon today, according to my predictions:</p>
+<div class="image-wrap image-center" style="width: 70%;">
+  <img src="../images/blog/reading-in-the-sun/sun_times.svg" alt="Whether the sun will be above or below the horizon on January 5th of 2026.">
+  <p class="image-caption">Whether the sun will be above or below the horizon on January 5th of 2026.</p>
+</div>
+
+<p>There are many approximations here: I ignored trees, buildings, clouds, and could use a better model for the sun trajectory. Yet the results seem consistent with what I saw yesterday.
+Today, I'll be able to read in the sun from 9:27 to 13:52, and then from 14:51 to 15:45.
+Now I just hope that no cloud will disturb my plans!</p>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>European Space Agency (2024).  <em>Copernicus Global Digital Elevation Model</em>.  Distributed by OpenTopography.  <a href="https://doi.org/10.5069/G9028PQB">https://doi.org/10.5069/G9028PQB</a>. Accessed 2026-01-04.&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+</section>
+
+
+</body>
+</html>
