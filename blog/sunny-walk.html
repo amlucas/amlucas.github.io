@@ -1,0 +1,613 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>blog - sunny-walk</title>
+  <link rel="stylesheet" href="../css/main.css" />
+  <link rel="stylesheet" href="../css/codehilite.css" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap" rel="stylesheet">
+  <script type="text/javascript" async
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="../index.html">Home</a>
+  <a href="../blog.html">Blog</a>
+</nav>
+
+
+<section class="markdown-body">
+  <h1>Finding the sunniest time for a winter walk</h1>
+<p>January 6, 2026</p>
+<p>My parents live in the French Alps and go on their favorite walk around their village almost daily.
+During winter, the mountains hide a big part of the sun, as I explained in <a href="reading-in-the-sun.html">my previous post</a>.
+My mom doesn't like the cold and loves the sun.
+Let’s try to find the optimal time to maximize sun exposure during her walk.</p>
+<p>Conveniently, I already know how to import GPS traces from my Garmin watch (see previous posts like <a href="fetch-stadium-data.html">this one</a>).
+Yesterday I went on my parents' usual walk to record the trace:</p>
+<div class="image-wrap image-center" style="width: 70%;">
+  <img src="../images/blog/sunny-walk/walk_map.svg" alt="My parents' usual walk. In many places, the mountains block the sun.">
+  <p class="image-caption">My parents' usual walk. In many places, the mountains block the sun.</p>
+</div>
+
+<p>I also know how to <a href="reading-in-the-sun.html">compute the horizon using topographic data</a>.
+All I need to do is put it all together and compute, for a given start time, how much sun there will be on the walk.</p>
+<p>Computing the horizon from a given location is relatively expensive.
+Luckily, the horizon is time independent, it only depends on the location and the azimuth angle (unless a mountain suddenly starts moving, which is unlikely).
+We can thus precompute the horizon and store it on a grid parameterized by the azimuth angle and the walk duration from the start (the latter is a parameterization of the position along the walk).
+This is what I obtained:</p>
+<div class="image-wrap image-center" style="width: 70%;">
+  <img src="../images/blog/sunny-walk/horizon.svg" alt="Precomputed horizon against the azimuth angle (deg) and the position along the walk, parameterized by the walk duration from the start.">
+  <p class="image-caption">Precomputed horizon against the azimuth angle (deg) and the position along the walk, parameterized by the walk duration from the start.</p>
+</div>
+
+<p>Each horizontal slice corresponds to a position in the walk, and each vertical slice corresponds to a viewing direction.
+There are a few discontinuities at places, probably due to the discretization and finite step I use for the ray casting.
+These discontinuities should not alter the results too much, I just want an idea of the optimal walk time.</p>
+<p>Now that we have the horizon precomputed along the walk for many azimuth angles, we can evaluate this horizon in the direction of the sun at specific dates and times.
+The sun exposure time is then the amount of time when the sun is above the horizon.</p>
+<p>For example, this is what I obtain for today, assuming clear-sky conditions:</p>
+<div class="image-wrap image-center" style="width: 70%;">
+  <img src="../images/blog/sunny-walk/sun_time-today.svg" alt="Predicted sun exposure during the walk against the starting time.">
+  <p class="image-caption">Predicted sun exposure during the walk against the starting time.</p>
+</div>
+
+<p>Anytime between 10am and 12:30pm should provide more than 20 minutes of sun!
+After that it will feel colder.</p>
+<p>Below is what this model predicts for the upcoming weeks:</p>
+<div class="image-wrap image-center" style="width: 70%;">
+  <img src="../images/blog/sunny-walk/sun_time-nexts.svg" alt="Predicted sun exposure during the walk in the next few weeks.">
+  <p class="image-caption">Predicted sun exposure during the walk in the next few weeks.</p>
+</div>
+
+<p>Days are getting longer, so is sun exposure!
+It seems like the walk will be fully in the sun (ignoring trees and buildings and clouds) starting the end of this month, if one starts around noon.
+On Valentine's day, there will be no need to organize for the perfect sunny walk, since the model suggests that the sun exposure will be maximized whether starting at 10am or 4pm, or anytime between these times.
+I hope they will go!</p>
+<p>The plots have been produced with the following code.</p>
+<ul>
+<li>Plotting the trace:</li>
+</ul>
+<details class="code-block">
+<summary>Show code</summary>
+
+
+
+<div class="codehilite"><pre><span></span><code><span class="ch">#!/usr/bin/env python</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyproj</span><span class="w"> </span><span class="kn">import</span> <span class="n">Transformer</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">rasterio</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;data_walk&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;dem_path&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--out&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">data_walk</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">walk</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+    <span class="n">lat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">walk</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">])</span>
+    <span class="n">lon</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">walk</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">])</span>
+
+    <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">dem_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">ds</span><span class="p">:</span>
+        <span class="n">elevation</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">transform</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">transform</span>
+        <span class="n">crs</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">crs</span>
+        <span class="n">bounds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">bounds</span>
+
+        <span class="k">if</span> <span class="n">crs</span> <span class="o">!=</span> <span class="s1">&#39;EPSG:32632&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Expected UTM format.&#39;</span><span class="p">)</span>
+
+    <span class="n">tf</span> <span class="o">=</span> <span class="n">Transformer</span><span class="o">.</span><span class="n">from_crs</span><span class="p">(</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">,</span> <span class="n">crs</span><span class="p">,</span> <span class="n">always_xy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">)</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mf">3.2</span><span class="p">))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+    <span class="n">extent</span> <span class="o">=</span> <span class="p">[</span><span class="n">bounds</span><span class="o">.</span><span class="n">left</span><span class="p">,</span> <span class="n">bounds</span><span class="o">.</span><span class="n">right</span><span class="p">,</span> <span class="n">bounds</span><span class="o">.</span><span class="n">bottom</span><span class="p">,</span> <span class="n">bounds</span><span class="o">.</span><span class="n">top</span><span class="p">]</span>
+    <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">elevation</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;terrain&#39;</span><span class="p">,</span> <span class="n">extent</span><span class="o">=</span><span class="n">extent</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;upper&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="mi">292509</span><span class="p">,</span> <span class="mi">300226</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">5098571</span><span class="p">,</span> <span class="mi">5104322</span><span class="p">)</span>
+    <span class="n">cbar</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">fraction</span><span class="o">=</span><span class="mf">0.04</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.02</span><span class="p">)</span>
+    <span class="n">cbar</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="s2">&quot;elevation (m)&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">out</span><span class="p">)</span>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</code></pre></div>
+
+
+</details>
+
+<ul>
+<li>Precomputing the horizon:</li>
+</ul>
+<details class="code-block">
+<summary>Show code</summary>
+
+
+
+<div class="codehilite"><pre><span></span><code><span class="ch">#!/usr/bin/env python</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyproj</span><span class="w"> </span><span class="kn">import</span> <span class="n">Transformer</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">rasterio</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">find_horizon</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">elevation</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">az_deg</span><span class="p">):</span>
+    <span class="n">max_d</span> <span class="o">=</span> <span class="mi">50_000</span> <span class="c1"># m</span>
+    <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">res</span>
+    <span class="n">step</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span> <span class="c1"># m</span>
+    <span class="n">max_steps</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">max_d</span> <span class="o">/</span> <span class="n">step</span><span class="p">)</span>
+
+    <span class="n">theta_max</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+    <span class="n">az</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">az_deg</span><span class="p">)</span>
+
+    <span class="n">ux</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">az</span><span class="p">)</span>
+    <span class="n">uy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">az</span><span class="p">)</span>
+
+    <span class="n">row</span><span class="p">,</span> <span class="n">col</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">)</span>
+    <span class="n">z0</span> <span class="o">=</span> <span class="n">elevation</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span>
+
+    <span class="c1"># shoot a ray.</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_steps</span><span class="p">):</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">j</span> <span class="o">*</span> <span class="n">step</span>
+        <span class="k">if</span> <span class="n">d</span> <span class="o">&gt;=</span> <span class="n">max_d</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x0</span> <span class="o">+</span> <span class="n">ux</span> <span class="o">*</span> <span class="n">d</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">y0</span> <span class="o">+</span> <span class="n">uy</span> <span class="o">*</span> <span class="n">d</span>
+        <span class="n">row</span><span class="p">,</span> <span class="n">col</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">row</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">row</span> <span class="o">&gt;=</span> <span class="n">elevation</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="k">break</span>
+        <span class="k">if</span> <span class="n">col</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">col</span> <span class="o">&gt;=</span> <span class="n">elevation</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">break</span>
+
+        <span class="n">z</span> <span class="o">=</span> <span class="n">elevation</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span>
+
+        <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">z</span> <span class="o">-</span> <span class="n">z0</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+        <span class="n">theta_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">theta_max</span><span class="p">,</span> <span class="n">theta</span><span class="p">)</span>
+
+    <span class="n">horizon_deg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">theta_max</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">horizon_deg</span>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;data_walk&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;dem_path&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--out&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;horizons.pickle&#39;</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">data_walk</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">walk</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+    <span class="n">lats</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">lons</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">durs</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># cleanup</span>
+    <span class="k">for</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">dur</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">walk</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">],</span>
+                             <span class="n">walk</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">],</span>
+                             <span class="n">walk</span><span class="p">[</span><span class="s1">&#39;duration&#39;</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="n">lat</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">lon</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">dur</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">lats</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span>
+        <span class="n">lons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lon</span><span class="p">)</span>
+        <span class="n">durs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dur</span><span class="p">)</span>
+
+    <span class="n">lats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lats</span><span class="p">)</span>
+    <span class="n">lons</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lons</span><span class="p">)</span>
+    <span class="n">durs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">durs</span><span class="p">)</span>
+
+    <span class="c1"># remove duplicates (pauses)</span>
+    <span class="n">durs_u</span><span class="p">,</span> <span class="n">idx_u</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">durs</span><span class="p">,</span> <span class="n">return_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">durs</span><span class="p">,</span> <span class="n">lats</span><span class="p">,</span> <span class="n">lons</span> <span class="o">=</span> <span class="n">durs_u</span><span class="p">,</span> <span class="n">lats</span><span class="p">[</span><span class="n">idx_u</span><span class="p">],</span> <span class="n">lons</span><span class="p">[</span><span class="n">idx_u</span><span class="p">]</span>
+
+    <span class="c1"># resample every 20s to reduce the number of raycasts</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="mi">20</span>
+    <span class="n">T</span> <span class="o">=</span> <span class="n">durs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">T</span><span class="o">/</span><span class="n">dt</span><span class="p">))</span>
+    <span class="n">lats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">durs</span><span class="p">,</span> <span class="n">lats</span><span class="p">)</span>
+    <span class="n">lons</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">durs</span><span class="p">,</span> <span class="n">lons</span><span class="p">)</span>
+
+    <span class="c1"># compute horizons for azimuth from 45 to 315 degrees</span>
+    <span class="c1"># this should cover the whole year in this region</span>
+    <span class="n">azimuths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">45</span><span class="p">,</span> <span class="mi">316</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">horizons</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">azimuths</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">rasterio</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">dem_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">ds</span><span class="p">:</span>
+        <span class="n">crs</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">crs</span>
+        <span class="k">if</span> <span class="n">crs</span> <span class="o">!=</span> <span class="s1">&#39;EPSG:32632&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Expected UTM format.&#39;</span><span class="p">)</span>
+
+        <span class="n">tf</span> <span class="o">=</span> <span class="n">Transformer</span><span class="o">.</span><span class="n">from_crs</span><span class="p">(</span><span class="s2">&quot;EPSG:4326&quot;</span><span class="p">,</span> <span class="n">ds</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> <span class="n">always_xy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">elevation</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">iwalk</span><span class="p">,</span> <span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">)</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">lats</span><span class="p">,</span> <span class="n">lons</span><span class="p">)),</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">lats</span><span class="p">)):</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">iaz</span><span class="p">,</span> <span class="n">az</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">azimuths</span><span class="p">):</span>
+                <span class="n">h</span> <span class="o">=</span> <span class="n">find_horizon</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">elevation</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">az</span><span class="p">)</span>
+                <span class="n">horizons</span><span class="p">[</span><span class="n">iwalk</span><span class="p">,</span> <span class="n">iaz</span><span class="p">]</span> <span class="o">=</span> <span class="n">h</span>
+
+
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;t&#39;</span><span class="p">:</span> <span class="n">t</span><span class="p">,</span>
+        <span class="s1">&#39;lat&#39;</span><span class="p">:</span> <span class="n">lats</span><span class="p">,</span>
+        <span class="s1">&#39;lon&#39;</span><span class="p">:</span> <span class="n">lons</span><span class="p">,</span>
+        <span class="s1">&#39;az&#39;</span><span class="p">:</span> <span class="n">azimuths</span><span class="p">,</span>
+        <span class="s1">&#39;horizons&#39;</span><span class="p">:</span> <span class="n">horizons</span>
+    <span class="p">}</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">out</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="n">pickle</span><span class="o">.</span><span class="n">HIGHEST_PROTOCOL</span><span class="p">)</span>
+
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</code></pre></div>
+
+
+</details>
+
+<ul>
+<li>Plot the horizon on grid:</li>
+</ul>
+<details class="code-block">
+<summary>Show code</summary>
+
+
+
+<div class="codehilite"><pre><span></span><code><span class="ch">#!/usr/bin/env python</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--out&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+    <span class="n">horizons</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;horizons&#39;</span><span class="p">]</span>
+    <span class="n">lats</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span>
+    <span class="n">lons</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">]</span>
+    <span class="n">azimuths</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;az&#39;</span><span class="p">]</span>
+    <span class="n">durs</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;t&#39;</span><span class="p">]</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+    <span class="n">im</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">horizons</span><span class="p">,</span>
+                   <span class="n">extent</span><span class="o">=</span><span class="p">[</span><span class="n">azimuths</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">azimuths</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                           <span class="n">durs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="mi">60</span><span class="p">,</span> <span class="n">durs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="mi">60</span><span class="p">],</span>
+                   <span class="n">origin</span><span class="o">=</span><span class="s1">&#39;lower&#39;</span><span class="p">,</span>
+                   <span class="n">aspect</span><span class="o">=</span><span class="s1">&#39;auto&#39;</span><span class="p">)</span>
+    <span class="n">cbar</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">fraction</span><span class="o">=</span><span class="mf">0.04</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.02</span><span class="p">)</span>
+    <span class="n">cbar</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="s2">&quot;horizon (deg)&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;azimuth (deg)&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;walk duration (min)&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">out</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</code></pre></div>
+
+
+</details>
+
+<ul>
+<li>Compute the sun exposure along the walk:</li>
+</ul>
+<details class="code-block">
+<summary>Show code</summary>
+
+
+
+<div class="codehilite"><pre><span></span><code><span class="ch">#!/usr/bin/env python</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.dates</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mdates</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
+
+<span class="n">sun_radius</span> <span class="o">=</span> <span class="mf">0.266</span> <span class="c1"># degrees</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">day_of_year</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">d</span><span class="o">.</span><span class="n">timetuple</span><span class="p">()</span><span class="o">.</span><span class="n">tm_yday</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">refraction_correction_deg</span><span class="p">(</span><span class="n">elevation_deg</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Atmospheric refraction correction in degrees.</span>
+<span class="sd">    Valid for elevations &gt; ~ -1 deg.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">elevation_deg</span>
+    <span class="k">if</span> <span class="n">h</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mf">1.02</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">h</span> <span class="o">+</span> <span class="mf">10.3</span> <span class="o">/</span> <span class="p">(</span><span class="n">h</span> <span class="o">+</span> <span class="mf">5.11</span><span class="p">))))</span> <span class="o">/</span> <span class="mf">60.0</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">solar_position_noaa</span><span class="p">(</span><span class="n">lat_deg</span><span class="p">,</span> <span class="n">lon_deg</span><span class="p">,</span> <span class="n">when_local</span><span class="p">,</span> <span class="n">tz_offset_hours</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Approx solar azimuth/elevation (degrees) using NOAA-style formulas.</span>
+<span class="sd">    lat_deg, lon_deg: observer location (deg), lon positive east.</span>
+<span class="sd">    when_local: naive datetime in LOCAL time (no tzinfo)</span>
+<span class="sd">    tz_offset_hours: e.g. +1 for CET, +2 for CEST</span>
+<span class="sd">    Returns: (azimuth_deg, elevation_deg)</span>
+<span class="sd">      azimuth: degrees clockwise from North (0=N, 90=E)</span>
+<span class="sd">      elevation: degrees above horizon</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># --- constants / conversions</span>
+    <span class="n">deg2rad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span>
+    <span class="n">rad2deg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span>
+
+    <span class="n">lat</span> <span class="o">=</span> <span class="n">deg2rad</span><span class="p">(</span><span class="n">lat_deg</span><span class="p">)</span>
+
+    <span class="c1"># Day of year</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">day_of_year</span><span class="p">(</span><span class="n">when_local</span><span class="o">.</span><span class="n">date</span><span class="p">())</span>
+
+    <span class="c1"># Fractional year (gamma) in radians</span>
+    <span class="c1"># hour in local time</span>
+    <span class="n">hour</span> <span class="o">=</span> <span class="n">when_local</span><span class="o">.</span><span class="n">hour</span> <span class="o">+</span> <span class="n">when_local</span><span class="o">.</span><span class="n">minute</span><span class="o">/</span><span class="mi">60</span> <span class="o">+</span> <span class="n">when_local</span><span class="o">.</span><span class="n">second</span><span class="o">/</span><span class="mi">3600</span>
+    <span class="n">gamma</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">365.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">hour</span> <span class="o">-</span> <span class="mi">12</span><span class="p">)</span><span class="o">/</span><span class="mf">24.0</span><span class="p">)</span>
+
+    <span class="c1"># Equation of time (minutes)</span>
+    <span class="n">eqtime</span> <span class="o">=</span> <span class="mf">229.18</span> <span class="o">*</span> <span class="p">(</span>
+        <span class="mf">0.000075</span>
+        <span class="o">+</span> <span class="mf">0.001868</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">gamma</span><span class="p">)</span>
+        <span class="o">-</span> <span class="mf">0.032077</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">gamma</span><span class="p">)</span>
+        <span class="o">-</span> <span class="mf">0.014615</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">gamma</span><span class="p">)</span>
+        <span class="o">-</span> <span class="mf">0.040849</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">gamma</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Solar declination (radians)</span>
+    <span class="n">decl</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="mf">0.006918</span>
+        <span class="o">-</span> <span class="mf">0.399912</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">gamma</span><span class="p">)</span>
+        <span class="o">+</span> <span class="mf">0.070257</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">gamma</span><span class="p">)</span>
+        <span class="o">-</span> <span class="mf">0.006758</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">gamma</span><span class="p">)</span>
+        <span class="o">+</span> <span class="mf">0.000907</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">gamma</span><span class="p">)</span>
+        <span class="o">-</span> <span class="mf">0.002697</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="mi">3</span><span class="o">*</span><span class="n">gamma</span><span class="p">)</span>
+        <span class="o">+</span> <span class="mf">0.00148</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">3</span><span class="o">*</span><span class="n">gamma</span><span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Time offset (minutes)</span>
+    <span class="c1"># lon_deg positive east; tz_offset_hours hours east of UTC</span>
+    <span class="n">time_offset</span> <span class="o">=</span> <span class="n">eqtime</span> <span class="o">+</span> <span class="mf">4.0</span><span class="o">*</span><span class="n">lon_deg</span> <span class="o">-</span> <span class="mf">60.0</span><span class="o">*</span><span class="n">tz_offset_hours</span>
+
+    <span class="c1"># True solar time (minutes)</span>
+    <span class="n">tst</span> <span class="o">=</span> <span class="p">(</span><span class="n">hour</span><span class="o">*</span><span class="mf">60.0</span> <span class="o">+</span> <span class="n">time_offset</span><span class="p">)</span> <span class="o">%</span> <span class="mf">1440.0</span>
+
+    <span class="c1"># Hour angle (degrees)</span>
+    <span class="n">ha_deg</span> <span class="o">=</span> <span class="n">tst</span><span class="o">/</span><span class="mf">4.0</span> <span class="o">-</span> <span class="mf">180.0</span>
+    <span class="n">ha</span> <span class="o">=</span> <span class="n">deg2rad</span><span class="p">(</span><span class="n">ha_deg</span><span class="p">)</span>
+
+    <span class="c1"># Solar zenith angle</span>
+    <span class="n">cos_zenith</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">decl</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">decl</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">ha</span><span class="p">)</span>
+    <span class="n">cos_zenith</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">cos_zenith</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">zenith</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">cos_zenith</span><span class="p">)</span>
+
+    <span class="n">elevation</span> <span class="o">=</span> <span class="mf">90.0</span> <span class="o">-</span> <span class="n">rad2deg</span><span class="p">(</span><span class="n">zenith</span><span class="p">)</span>
+
+    <span class="c1"># Solar azimuth (NOAA convention)</span>
+    <span class="c1"># Compute azimuth from north, clockwise</span>
+    <span class="n">sin_az</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">ha</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">decl</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">zenith</span><span class="p">)</span>
+    <span class="n">cos_az</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">decl</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">zenith</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">zenith</span><span class="p">))</span>
+    <span class="n">az</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">sin_az</span><span class="p">,</span> <span class="n">cos_az</span><span class="p">)</span>  <span class="c1"># radians, range [-pi, pi]</span>
+    <span class="n">az_deg</span> <span class="o">=</span> <span class="p">(</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">az</span><span class="p">)</span> <span class="o">+</span> <span class="mf">360.0</span><span class="p">)</span> <span class="o">%</span> <span class="mf">360.0</span>
+
+    <span class="k">return</span> <span class="n">az_deg</span><span class="p">,</span> <span class="n">elevation</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">find_horizon</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">elevation</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">az_deg</span><span class="p">):</span>
+    <span class="n">max_d</span> <span class="o">=</span> <span class="mi">20_000</span> <span class="c1"># m</span>
+    <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">res</span>
+    <span class="n">step</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span> <span class="c1"># m</span>
+    <span class="n">max_steps</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">max_d</span> <span class="o">/</span> <span class="n">step</span><span class="p">)</span>
+
+    <span class="n">theta_max</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+    <span class="n">az</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">az_deg</span><span class="p">)</span>
+
+    <span class="n">ux</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">az</span><span class="p">)</span>
+    <span class="n">uy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">az</span><span class="p">)</span>
+
+    <span class="n">row</span><span class="p">,</span> <span class="n">col</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">)</span>
+    <span class="n">z0</span> <span class="o">=</span> <span class="n">elevation</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span>
+
+    <span class="c1"># shoot a ray.</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_steps</span><span class="p">):</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">j</span> <span class="o">*</span> <span class="n">step</span>
+        <span class="k">if</span> <span class="n">d</span> <span class="o">&gt;=</span> <span class="n">max_d</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x0</span> <span class="o">+</span> <span class="n">ux</span> <span class="o">*</span> <span class="n">d</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">y0</span> <span class="o">+</span> <span class="n">uy</span> <span class="o">*</span> <span class="n">d</span>
+        <span class="n">row</span><span class="p">,</span> <span class="n">col</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">row</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">row</span> <span class="o">&gt;=</span> <span class="n">elevation</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="k">break</span>
+        <span class="k">if</span> <span class="n">col</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">col</span> <span class="o">&gt;=</span> <span class="n">elevation</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="k">break</span>
+
+        <span class="n">z</span> <span class="o">=</span> <span class="n">elevation</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span>
+
+        <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atan2</span><span class="p">(</span><span class="n">z</span> <span class="o">-</span> <span class="n">z0</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+        <span class="n">theta_max</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">theta_max</span><span class="p">,</span> <span class="n">theta</span><span class="p">)</span>
+
+    <span class="n">horizon_deg</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">theta_max</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">horizon_deg</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_solar_time</span><span class="p">(</span><span class="n">w_lat</span><span class="p">,</span> <span class="n">w_lon</span><span class="p">,</span> <span class="n">w_duration</span><span class="p">,</span> <span class="n">horizon</span><span class="p">,</span> <span class="n">tstart</span><span class="p">,</span> <span class="n">tz_offset_hours</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+
+    <span class="n">time_sun</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">time_tot</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">for</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">dur</span><span class="p">,</span> <span class="n">dtsec</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">w_lat</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
+                                    <span class="n">w_lon</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
+                                    <span class="n">w_duration</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
+                                    <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">w_duration</span><span class="p">)):</span>
+        <span class="c1"># get the sun position</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">tstart</span> <span class="o">+</span> <span class="n">datetime</span><span class="o">.</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=</span><span class="n">dur</span><span class="p">)</span>
+        <span class="n">az</span><span class="p">,</span> <span class="n">el</span> <span class="o">=</span> <span class="n">solar_position_noaa</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">t</span><span class="p">,</span> <span class="n">tz_offset_hours</span><span class="p">)</span>
+        <span class="n">el</span> <span class="o">+=</span> <span class="n">refraction_correction_deg</span><span class="p">(</span><span class="n">el</span><span class="p">)</span>
+
+        <span class="c1"># get horizon</span>
+        <span class="n">hor</span> <span class="o">=</span> <span class="n">horizon</span><span class="p">(</span><span class="n">az</span><span class="p">,</span> <span class="n">dur</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">el</span> <span class="o">+</span> <span class="n">sun_radius</span> <span class="o">&gt;=</span> <span class="n">hor</span><span class="p">:</span>
+            <span class="n">time_sun</span> <span class="o">+=</span> <span class="n">dtsec</span>
+
+        <span class="n">time_tot</span> <span class="o">+=</span> <span class="n">dtsec</span>
+
+    <span class="k">return</span> <span class="n">time_sun</span><span class="p">,</span> <span class="n">time_tot</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_date</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">:</span>
+    <span class="c1"># accept YYYY-MM-DD</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentTypeError</span><span class="p">(</span><span class="s2">&quot;Expected --date in YYYY-MM-DD format&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--date&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">parse_date</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;2026-01-06&quot;</span><span class="p">],</span>
+                        <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Local date in YYYY-MM-DD&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--start&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;08:00&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Start time (HH:MM) local time&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--end&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;18:00&quot;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;End time (HH:MM) local time&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--tz&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Timezone offset hours (e.g. 1 for CET, 2 for CEST)&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--out&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+    <span class="n">horizons</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;horizons&#39;</span><span class="p">]</span>
+    <span class="n">lats</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span>
+    <span class="n">lons</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">]</span>
+    <span class="n">azimuths</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;az&#39;</span><span class="p">]</span>
+    <span class="n">durs</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;t&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">horizon</span><span class="p">(</span><span class="n">az</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+        <span class="n">az</span> <span class="o">-=</span> <span class="n">azimuths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">t</span> <span class="o">-=</span> <span class="n">durs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">daz</span> <span class="o">=</span> <span class="n">azimuths</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">azimuths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">ddur</span> <span class="o">=</span> <span class="n">durs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">durs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">im</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">t</span> <span class="o">/</span> <span class="n">ddur</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">durs</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">jm</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">az</span> <span class="o">/</span> <span class="n">daz</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">azimuths</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">ip</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">im</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">durs</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">jp</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">jm</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">azimuths</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">h00</span> <span class="o">=</span> <span class="n">horizons</span><span class="p">[</span><span class="n">im</span><span class="p">,</span><span class="n">jm</span><span class="p">]</span>
+        <span class="n">h01</span> <span class="o">=</span> <span class="n">horizons</span><span class="p">[</span><span class="n">im</span><span class="p">,</span><span class="n">jp</span><span class="p">]</span>
+        <span class="n">h10</span> <span class="o">=</span> <span class="n">horizons</span><span class="p">[</span><span class="n">ip</span><span class="p">,</span><span class="n">jm</span><span class="p">]</span>
+        <span class="n">h11</span> <span class="o">=</span> <span class="n">horizons</span><span class="p">[</span><span class="n">ip</span><span class="p">,</span><span class="n">jp</span><span class="p">]</span>
+
+        <span class="n">l0</span> <span class="o">=</span> <span class="p">(</span><span class="n">t</span>  <span class="o">-</span> <span class="n">im</span> <span class="o">*</span> <span class="n">ddur</span><span class="p">)</span> <span class="o">/</span> <span class="n">ddur</span>
+        <span class="n">l1</span> <span class="o">=</span> <span class="p">(</span><span class="n">az</span> <span class="o">-</span> <span class="n">jm</span> <span class="o">*</span> <span class="n">daz</span><span class="p">)</span> <span class="o">/</span> <span class="n">daz</span>
+        <span class="n">l0</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">l0</span>
+        <span class="n">l1</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">l1</span>
+
+        <span class="n">h0</span> <span class="o">=</span> <span class="n">h00</span> <span class="o">*</span> <span class="n">l0</span> <span class="o">+</span> <span class="n">h10</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">l0</span><span class="p">)</span>
+        <span class="n">h1</span> <span class="o">=</span> <span class="n">h01</span> <span class="o">*</span> <span class="n">l0</span> <span class="o">+</span> <span class="n">h11</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">l0</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">h0</span> <span class="o">*</span> <span class="n">l1</span> <span class="o">+</span> <span class="n">h1</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">l1</span><span class="p">)</span>
+
+
+    <span class="n">dates</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">date</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">parse_hhmm</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">hh</span><span class="p">,</span> <span class="n">mm</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">hh</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">mm</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentTypeError</span><span class="p">(</span><span class="s2">&quot;Expected HH:MM&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+
+    <span class="n">sh</span><span class="p">,</span> <span class="n">sm</span> <span class="o">=</span> <span class="n">parse_hhmm</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
+    <span class="n">eh</span><span class="p">,</span> <span class="n">em</span> <span class="o">=</span> <span class="n">parse_hhmm</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">end</span><span class="p">)</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">date</span> <span class="ow">in</span> <span class="n">dates</span><span class="p">:</span>
+        <span class="n">start_time</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">sun_duration_min</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+        <span class="n">tstart</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">date</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">date</span><span class="o">.</span><span class="n">month</span><span class="p">,</span> <span class="n">date</span><span class="o">.</span><span class="n">day</span><span class="p">,</span> <span class="n">sh</span><span class="p">,</span> <span class="n">sm</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">tend</span>   <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="n">date</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">date</span><span class="o">.</span><span class="n">month</span><span class="p">,</span> <span class="n">date</span><span class="o">.</span><span class="n">day</span><span class="p">,</span> <span class="n">eh</span><span class="p">,</span> <span class="n">em</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">steps</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">tend</span> <span class="o">-</span> <span class="n">tstart</span><span class="p">)</span><span class="o">.</span><span class="n">total_seconds</span><span class="p">()</span> <span class="o">/</span> <span class="mi">300</span><span class="p">)</span>  <span class="c1"># every 5 min</span>
+        <span class="n">dt</span> <span class="o">=</span> <span class="p">(</span><span class="n">tend</span> <span class="o">-</span> <span class="n">tstart</span><span class="p">)</span> <span class="o">/</span> <span class="n">steps</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">steps</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">tstart</span> <span class="o">+</span> <span class="n">i</span> <span class="o">*</span> <span class="n">dt</span>
+            <span class="n">tsun</span><span class="p">,</span> <span class="n">ttot</span> <span class="o">=</span> <span class="n">compute_solar_time</span><span class="p">(</span><span class="n">lats</span><span class="p">,</span> <span class="n">lons</span><span class="p">,</span> <span class="n">durs</span><span class="p">,</span> <span class="n">horizon</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+            <span class="n">start_time</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+            <span class="n">sun_duration_min</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tsun</span><span class="o">/</span><span class="mi">60</span><span class="p">)</span>
+
+        <span class="c1"># minutes since midnight</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">hour</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">+</span> <span class="n">t</span><span class="o">.</span><span class="n">minute</span> <span class="o">+</span> <span class="n">t</span><span class="o">.</span><span class="n">second</span> <span class="o">/</span> <span class="mi">60</span>
+            <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">start_time</span>
+        <span class="p">])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">sun_duration_min</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">tstart</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%B </span><span class="si">%d</span><span class="s2">, %Y&quot;</span><span class="p">))</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Time of day&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">sh</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span> <span class="n">eh</span><span class="o">*</span><span class="mi">60</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">60</span><span class="p">))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">([</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">h</span><span class="si">:</span><span class="s2">02d</span><span class="si">}</span><span class="s2">:00&quot;</span> <span class="k">for</span> <span class="n">h</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sh</span><span class="p">,</span> <span class="n">eh</span><span class="o">+</span><span class="mi">1</span><span class="p">)])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;sun duration (min)&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">sh</span><span class="o">*</span><span class="mi">60</span><span class="p">,</span> <span class="n">eh</span><span class="o">*</span><span class="mi">60</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">out</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</code></pre></div>
+
+
+</details>
+</section>
+
+
+</body>
+</html>
