@@ -251,3 +251,18 @@ hr {
   background: #ccc;          /* light gray line */
   opacity: 0.4;              /* softer appearance */
 }
+
+
+.cv-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+}
+.cv-line span:first-child {
+  font-weight: 500;
+}
+.cv-line span:last-child {
+  white-space: nowrap;
+  color: #666; /* optional: lighter date */
+}
