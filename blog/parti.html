@@ -1,0 +1,101 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>blog - parti</title>
+  <link rel="stylesheet" href="../css/main.css" />
+  <link rel="stylesheet" href="../css/codehilite.css" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif&family=JetBrains+Mono&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap" rel="stylesheet">
+  <script type="text/javascript" async
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+  </script>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="../index.html">Home</a>
+  <a href="../blog.html">Blog</a>
+</nav>
+
+
+<section class="markdown-body">
+  <h1>Vibe-coding a particle solver</h1>
+<p>April 2026</p>
+<p>The other day, a postdoctoral fellow presented her work on sedimenting particles in the Stokes regime <sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup>.
+If this doesn't make sense to you, think of tiny objects like sand falling in a very viscous liquid.
+The video was beautiful, a round cloud transforming into a torus, before it breaks due to instabilities.
+I thought I would code this up and see if whether I could reproduce the same behavior with more particles.</p>
+<p>The physics is relatively simple.
+The fluid is so viscous that inertia is negligible, and we end up with the Stokes equations,
+<script type="math/tex; mode=display">
+\mu \Delta \mathbf u - \nabla p = -\mathbf{f}, \\
+\nabla \cdot \mathbf{u} = 0,
+</script>
+where <script type="math/tex">\mu</script> is the fluid viscosity, <script type="math/tex">\mathbf{u}</script> its velocity, <script type="math/tex">\mathbf{f}</script> the local force acting on the fluid, and <script type="math/tex">p</script> the pressure.
+Usually the force <script type="math/tex">\mathbf{f}</script> is the "input" that creates motion in the fluid, and boundary conditions (on solid walls, deforming biological cells, arteries, or sand particles) can also be represented through <script type="math/tex">\mathbf{f}</script>.
+Since the Stokes equation is linear, the solution corresponding to the sum of two force fields is simply the sum of their individual solutions. 
+So this means that all we need, in theory, is to know the <em>fundamental solution</em> of the Stokes equation,
+<script type="math/tex; mode=display">
+\mu \Delta \mathbf u - \nabla p = -\mathbf{f} \delta(\mathbf{r}), \\
+\nabla \cdot \mathbf{u} = 0,
+</script>
+where <script type="math/tex">\mathbf{f}</script> is now a point force and <script type="math/tex">\delta</script> is the Dirac distribution.
+The solution of this equation is given by <script type="math/tex">\mathbf{u}(\mathbf{r}) = S(\mathbf{r}) \mathbf{f}</script>, where <script type="math/tex">S</script> is a tensor called <em>Stokeslet</em>:
+<script type="math/tex; mode=display">
+S_{ij}(\mathbf{r}) = \frac{1}{8\pi\mu} \left(\frac{\delta_{ij}}{r} + \frac{r_i r_j}{r^3}\right).
+</script>
+</p>
+<p>Long story short, the Stokeslet is a Green function that allows to compute a velocity field caused by a sum of point forces. 
+Exactly what is needed for the sedimenting particles: each particle exerts a point force on the fluid, due to gravity (and buoyancy).
+The contribution of all particles create a flow field.
+In turn, the particles are advected according to this flow field.</p>
+<p>It now becomes a computational problem. 
+For <script type="math/tex">N</script> particles, there are <script type="math/tex">\mathcal{O}(N^2)</script> pairwise interactions. 
+This quickly becomes expensive, but there are methods (using octrees) to reduce the complexity to <script type="math/tex">N \log N</script>, and I have never done it before for this type of systems.</p>
+<p>Since I do it for fun, I thought it would be the perfect occasion to test chatGPT's ability to create some C++ code.
+I have rather strong opinions on the design of computational programs; here are a few requirements:  </p>
+<ul>
+<li>there should be as few dependencies as possible to avoid <em>spaghetti code</em>.  </li>
+<li>test driven development. Every critical functions should be tested whenever possible.  </li>
+<li>functions should have a clear interface that shows what is input/output.  </li>
+<li>computational functions should not allocate memory if it can be preallocated, for performance reasons.  </li>
+<li>the above point means I prefer to pass <code>std::span</code> as much as possible rather than <code>std::vector</code>; this also allows to pass subarrays.  </li>
+<li>separation of concern: independent code for time integration, kernels, initialization, rendering, I/O.</li>
+</ul>
+<p>I described all this to chatGPT and started with a rendering module to visualize particles.
+It is very simple, each particle is rendered as a disc on the screen with some shader that mimics light.
+Here is the result for a few particles organized on a lattice:</p>
+<div class="image-wrap image-center" style="width: 90%;">
+  <img src="../images/blog/parti/lattice_rendering.png" alt="Vibe-coded particles renderer. 262144 particles on a white background.">
+  <p class="image-caption">Vibe-coded particles renderer. 262144 particles on a white background.</p>
+</div>
+
+<p>I'm happy with this, it will allow me to do <em>in-situ</em> visualization, no need for an external program to view the particles' trajectories.</p>
+<p>First I wanted to reproduce the case I saw in the talk: 2000 particles grouped in a small region.
+The direct approach (<script type="math/tex">\mathcal{O}(N^2)</script>) is enough for that case, so I just vibe-coded a very simple interaction kernel, as well as a Runge Kutta time integration of order 2.
+After adjusting a few parameters and the camera position (I had to fight a lot with chatGPT to make it look realistic), I obtain the following dynamics:</p>
+<div class="video-wrap">
+  <video controls autoplay loop muted playsinline>
+    <source src="../images/blog/parti/sediment_breakup_2000.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+</div>
+
+<p>The cloud first transforms into a torus, and then breaks up.</p>
+<h2>References</h2>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>Khain, T., Scheibner, C., Fruchart, M. and Vitelli, V., 2022. Stokes flows in three-dimensional fluids with odd and parity-violating viscosities. Journal of Fluid Mechanics, 934, p.A23. <a href="https://doi.org/10.1017/jfm.2021.1079">DOI</a>&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+</section>
+
+
+</body>
+</html>
