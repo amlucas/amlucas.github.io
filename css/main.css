@@ -290,3 +290,13 @@ hr {
 .video-row .video-wrap {
   width: 49%;
 }
+
+@media (max-width: 700px) {
+  .video-row {
+    flex-direction: column;
+  }
+
+  .video-row .video-wrap {
+    width: 100%;
+  }
+}
