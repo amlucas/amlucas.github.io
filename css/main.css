@@ -267,13 +267,16 @@ hr {
   color: #666; /* optional: lighter date */
 }
 
+.video-wrap {
+  margin: 1.5rem auto;
+  text-align: center;
+}
+
 .video-wrap video {
   max-width: 100%;
   height: auto;
   display: block;
   border-radius: 8px;
-  margin: 1.5rem auto;
-  text-align: center;
 }
 
 .video-row {
