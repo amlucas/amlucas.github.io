@@ -30,11 +30,11 @@ In the classical Newton's cradle, a series of pendulums are positioned next to e
 Pull the first bead apart from the train, release it, and it'll come back and collide into the second bead.
 During the collision, the energy is transferred across the train since all beads are in contact, all the way to the last bead. 
 Thanks to its new kinetic energy, the last bead leaves the train, drawing the trajectory of a pendulum until it collides again into the train.
-This process repeats periodically and gives a very satisfying motion, where only the two beads at the extremities of the train follow the dynamics of a pendulum for half a period  at a time.</p>
+This process repeats periodically and gives a very satisfying motion, where only the two beads at the extremities of the train follow the dynamics of a pendulum for half a period at a time.</p>
 <p>In the magnetic case, we have magnets instead of beads, attached to rigid (massless) arms.
 We can model each magnet as a magnetic dipole, and the interaction between magnets is now smooth over a distance, and decreases as <script type="math/tex">r^{-4}</script>.
-This means that non-neighbouring pendulumss also interact, although this interaction is small.</p>
-<p>I wanted to know whether these additional interactions dramatically change the dynamics or if I could see similar patterns to the classical case.
+This means that non-neighbouring pendulums also interact, although these interactions are small.</p>
+<p>I wanted to know whether these additional interactions dramatically change the dynamics or whether similar patterns emerge as in the classical case.
 We can write an ODE for the evolution of the system of pendulums (they are all identical, with length <script type="math/tex">L</script> and mass <script type="math/tex">M</script>):
 <script type="math/tex; mode=display">
 J \ddot{\theta}_i = T_g(\theta_i) + T_f(\dot\theta_i) + \sum\limits_{j\neq i} T_m(\theta_i, \theta_j),
@@ -99,7 +99,7 @@ We can choose symmetric initial conditions (<script type="math/tex">\theta_1 = -
   </div>
 </div>
 
-<p>At a first glance, the second case has much more interesting dynamics. It looks like the energy is passed from one pendulum to the other, progressively, back and forth:</p>
+<p>At first glance, the second case has much more interesting dynamics. It looks like the energy is passed from one pendulum to the other, progressively, back and forth:</p>
 <div class="image-row">
 
 <div class="image-wrap" style="width: 49%;">
@@ -114,10 +114,10 @@ We can choose symmetric initial conditions (<script type="math/tex">\theta_1 = -
 </div>
 
 <p>We already see a clear similarity with the classical Newton's cradle: energy moves from one pendulum to another over time.
-However this exchange takes a lot longer, due to the soft interactions between the magnets.</p>
+However, this exchange takes a lot longer, due to the soft interactions between the magnets.</p>
 <p>So far there is only one interacting pair. 
-Do we still observe the same transfer of energy with more magnets?
-Here is a simulation with 5 pendulums:</p>
+Do we still observe the same transfer of energy with more pendulums?
+Here is a simulation with five pendulums:</p>
 <div class="video-wrap">
   <video controls autoplay loop muted playsinline>
     <source src="../images/blog/newton-cradle-magnets/n_5_one/animation.mp4" type="video/mp4">
@@ -132,7 +132,7 @@ Here is a simulation with 5 pendulums:</p>
 
 <p>As we can see, at the beginning, the energy moves from one pendulum to the next. 
 However, after <script type="math/tex">t=250</script>s, this pattern breaks: two pendulums (indexed 2 and 3) exchange energy back and forth.</p>
-<p>I suspect that this change in patterns is due to the long range interactions between non neighbouring pendulums.
+<p>I suspect that this change in pattern is due to the long-range interactions between non-neighbouring pendulums.
 They are small, but do have an effect.
 Let's add dissipation to the system so that these small effects get smaller:</p>
 <div class="video-wrap">
@@ -143,14 +143,14 @@ Let's add dissipation to the system so that these small effects get smaller:</p>
 </div>
 
 <div class="image-wrap image-center" style="width: 70%;">
-  <img src="../images/blog/newton-cradle-magnets/n_5_one_diss/energy_path.svg" alt="Energy of each pendulum against time. This time, we have added dissipation (\(\gamma=1\)mmN/s) to the system.">
-  <p class="image-caption">Energy of each pendulum against time. This time, we have added dissipation (\(\gamma=1\)mmN/s) to the system.</p>
+  <img src="../images/blog/newton-cradle-magnets/n_5_one_diss/energy_path.svg" alt="Energy of each pendulum against time. This time, we have added dissipation (\(\gamma=0.001\)Nm/s) to the system.">
+  <p class="image-caption">Energy of each pendulum against time. This time, we have added dissipation (\(\gamma=0.001\)Nm/s) to the system.</p>
 </div>
 
 <p>The pattern is now much closer to energy transfer between the extremities of the chain, we have suppressed the small dynamics due to long-range interactions.
 Of course the dissipation makes the total energy of the system decrease over time, as the figure above shows (colors fade over time).</p>
 <p>This simple experiment made me understand why Newton's cradle is so clean: energy travels between pendulums through <em>local interactions</em>, while in the magnetic case energy is also transferred to all other pendulums. 
-This makes the pattern less clean when there are more than 2 pendulums (but more fun and unpredictable).</p>
+This makes the pattern less clean when there are more than two pendulums (but more fun and unpredictable).</p>
 <p>All figures were generated with this script:</p>
 <details class="code-block">
 <summary>Show code</summary>
