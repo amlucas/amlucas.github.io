@@ -23,11 +23,11 @@
 
 <section class="markdown-body">
   <h1>Vibe-coding a particle solver</h1>
-<p>April 2026</p>
+<p>May 6, 2026</p>
 <p>The other day, a postdoctoral fellow presented her work on sedimenting particles in the Stokes regime <sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup>.
 If this doesn't make sense to you, think of tiny objects like sand falling in a very viscous liquid.
 The video was beautiful, a round cloud transforming into a torus, before it breaks due to instabilities.
-I thought I would code this up and see if whether I could reproduce the same behavior with more particles.</p>
+I thought I would code this up and see whether I could reproduce the same behavior with more particles.</p>
 <p>The physics is relatively simple.
 The fluid is so viscous that inertia is negligible, and we end up with the Stokes equations,
 <script type="math/tex; mode=display">
@@ -50,23 +50,23 @@ S_{ij}(\mathbf{r}) = \frac{1}{8\pi\mu} \left(\frac{\delta_{ij}}{r} + \frac{r_i r
 </p>
 <p>Long story short, the Stokeslet is a Green function that allows to compute a velocity field caused by a sum of point forces. 
 Exactly what is needed for the sedimenting particles: each particle exerts a point force on the fluid, due to gravity (and buoyancy).
-The contribution of all particles create a flow field.
+The contribution of all particles creates a flow field.
 In turn, the particles are advected according to this flow field.</p>
 <p>It now becomes a computational problem. 
 For <script type="math/tex">N</script> particles, there are <script type="math/tex">\mathcal{O}(N^2)</script> pairwise interactions. 
-This quickly becomes expensive, but there are methods (using octrees) to reduce the complexity to <script type="math/tex">N \log N</script>, and I have never done it before for this type of systems.</p>
-<p>Since I do it for fun, I thought it would be the perfect occasion to test chatGPT's ability to create some C++ code.
+This quickly becomes expensive, but there are methods (using octrees) to reduce the complexity to <script type="math/tex">N \log N</script>, and I have never done it for this type of system before.</p>
+<p>Since I do it for fun, I thought it would be the perfect occasion to test ChatGPT's ability to create some C++ code.
 I have rather strong opinions on the design of computational programs; here are a few requirements:  </p>
 <ul>
 <li>there should be as few dependencies as possible to avoid <em>spaghetti code</em>.  </li>
-<li>test driven development. Every critical functions should be tested whenever possible.  </li>
+<li>test-driven development. Every critical function should be tested whenever possible.  </li>
 <li>functions should have a clear interface that shows what is input/output.  </li>
 <li>computational functions should not allocate memory if it can be preallocated, for performance reasons.  </li>
 <li>the above point means I prefer to pass <code>std::span</code> as much as possible rather than <code>std::vector</code>; this also allows to pass subarrays.  </li>
 <li>separation of concern: independent code for time integration, kernels, initialization, rendering, I/O.</li>
 </ul>
-<p>I described all this to chatGPT and started with a rendering module to visualize particles.
-It is very simple, each particle is rendered as a disc on the screen with some shader that mimics light.
+<p>I described all this to ChatGPT and started with a rendering module to visualize particles.
+It is very simple: each particle is rendered as a disc on the screen with some shader that mimics light.
 Here is the result for a few particles organized on a lattice:</p>
 <div class="image-wrap image-center" style="width: 90%;">
   <img src="../images/blog/parti/lattice_rendering.png" alt="Vibe-coded particles renderer. 262144 particles on a white background.">
@@ -74,9 +74,9 @@ Here is the result for a few particles organized on a lattice:</p>
 </div>
 
 <p>I'm happy with this, it will allow me to do <em>in-situ</em> visualization, no need for an external program to view the particles' trajectories.</p>
-<p>First I wanted to reproduce the case I saw in the talk: 2000 particles grouped in a small region.
-The direct approach (<script type="math/tex">\mathcal{O}(N^2)</script>) is enough for that case, so I just vibe-coded a very simple interaction kernel, as well as a Runge Kutta time integration of order 2.
-After adjusting a few parameters and the camera position (I had to fight a lot with chatGPT to make it look realistic), I obtain the following dynamics:</p>
+<p>First I wanted to reproduce the case I saw in the talk: 2,000 particles grouped in a small region.
+The direct approach (<script type="math/tex">\mathcal{O}(N^2)</script>) is enough for that case, so I just vibe-coded a very simple interaction kernel, as well as a second-order Runge-Kutta time integration.
+After adjusting a few parameters and the camera position (I had to fight a lot with ChatGPT to make it look realistic), I obtained the following dynamics:</p>
 <div class="video-wrap">
   <video controls autoplay loop muted playsinline>
     <source src="../images/blog/parti/sediment_breakup_2000.mp4" type="video/mp4">
@@ -84,7 +84,28 @@ After adjusting a few parameters and the camera position (I had to fight a lot w
   </video>
 </div>
 
-<p>The cloud first transforms into a torus, and then breaks up.</p>
+<p>The cloud first transforms into a torus, and then breaks up.
+Does this instability persist for larger numbers of particles?</p>
+<p>I decided to run the same case at a larger scale (let's do 50,000 particles, because why not) but still on my laptop.
+Since the direct, quadratic method doesn't scale, I asked ChatGPT to code up the Barnes-Hut method.
+The first iteration didn't work at all, it took several iterations using unit tests and benchmarks to obtain something acceptable.
+The code now had an octree-building part followed by a Stokeslet evaluation using a dipole approximation for nodes of the trees that are far enough.
+The complexity of the computation went down to <script type="math/tex">N \log N</script>, which now allows to simulate this 50,000-body problem.
+After tweaking a few parameters, this is what I ended up with:</p>
+<div class="video-wrap">
+  <video controls autoplay loop muted playsinline>
+    <source src="../images/blog/parti/sediment_breakup_50000.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+</div>
+
+<p>This took only a couple hours on my laptop. 
+We still observe the same behavior: an initial transition to a torus, until the torus breaks up.
+But now, after the breakup, the newly formed droplets undergo the same process again, transforming into smaller toruses.
+My guess is that this process would keep going recursively if we had a high enough resolution.
+Maybe it is even scale-invariant.
+But I would need to use more cores to simulate such systems, and given how difficult it was for the LLM to code this small tree-based program I doubt that I can properly vibe-code this.
+We'll either wait for a rainy weekend or the next version of LLMs.</p>
 <h2>References</h2>
 <div class="footnote">
 <hr />
