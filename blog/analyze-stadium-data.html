@@ -224,7 +224,7 @@ Here is what I got when varying the temperature, sleep score, and dew point:</p>
 </div>
 </div>
 
-<p>According to this simple model, the best temperature to run the stadium would be around 15 Celcius degrees, with a dewpoint at 3 Celcius degrees and after a relatively good night of sleep (score of 80).
+<p>According to this simple model, the best temperature to run the stadium would be around 15 Celsius degrees, with a dewpoint at 3 Celsius degrees and after a relatively good night of sleep (score of 80).
 Obviously this analysis relies on crude assumptions, such as the form of this simple model, but we still obtain reasonable values.
 This certainly won't limit my stadium runs to these "optimal" conditions, I'm sure that the main factor is more training!</p>
 <p>The results were produced with the following code:</p>
@@ -235,13 +235,13 @@ This certainly won't limit my stadium runs to these "optimal" conditions, I'm su
 
 <div class="codehilite"><pre><span></span><code><span class="ch">#!/usr/bin/env python</span>
 
-<span class="kn">import</span> <span class="nn">argparse</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;csv_data&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Path to csv file&#39;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--skip&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">int</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;number of first points to skip for the analysis&#39;</span><span class="p">)</span>
