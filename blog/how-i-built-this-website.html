@@ -203,13 +203,15 @@ This function handles parsing custom image blocks and turns them into proper HTM
 
 
 <div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">embed_image_float</span><span class="p">(</span><span class="n">md_text</span><span class="p">):</span>
-    <span class="n">pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\{\{\s*image\(&quot;([^&quot;]+)&quot;,\s*&quot;([^&quot;]*)&quot;,\s*&quot;([^&quot;]+)&quot;,\s*(\d+)\)\s*\}\}&#39;</span>
+    <span class="n">pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\{\{\s*image\(&quot;([^&quot;]+)&quot;,\s*&quot;([^&quot;]*)&quot;,\s*&quot;([^&quot;]+)&quot;,\s*(\d+)(?:,\s*&quot;([^&quot;]*)&quot;)?\s*\)\s*\}\}&#39;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">replacer</span><span class="p">(</span><span class="n">match</span><span class="p">):</span>
         <span class="n">src</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">caption</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="n">float_dir</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
         <span class="n">width</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>
+        <span class="c1"># Optional 5th arg overrides alt text; otherwise alt falls back to caption.</span>
+        <span class="n">alt</span> <span class="o">=</span> <span class="n">caption</span> <span class="k">if</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">float_dir</span> <span class="o">==</span> <span class="s2">&quot;center&quot;</span><span class="p">:</span>
             <span class="n">float_class</span> <span class="o">=</span> <span class="s2">&quot;image-center&quot;</span>
@@ -223,7 +225,7 @@ This function handles parsing custom image blocks and turns them into proper HTM
 
         <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;&#39;&#39;</span>
 <span class="s1">&lt;figure class=&quot;image-wrap </span><span class="si">{</span><span class="n">float_class</span><span class="si">}</span><span class="s1">&quot; </span><span class="si">{</span><span class="n">style</span><span class="si">}</span><span class="s1">&gt;</span>
-<span class="s1">  &lt;img src=&quot;</span><span class="si">{</span><span class="n">src</span><span class="si">}</span><span class="s1">&quot; alt=&quot;</span><span class="si">{</span><span class="n">caption</span><span class="si">}</span><span class="s1">&quot;&gt;</span>
+<span class="s1">  &lt;img src=&quot;</span><span class="si">{</span><span class="n">src</span><span class="si">}</span><span class="s1">&quot; alt=&quot;</span><span class="si">{</span><span class="n">alt</span><span class="si">}</span><span class="s1">&quot;&gt;</span>
 <span class="s1">  </span><span class="si">{</span><span class="n">caption_html</span><span class="si">}</span>
 <span class="s1">&lt;/figure&gt;</span>
 <span class="s1">        &#39;&#39;&#39;</span>
