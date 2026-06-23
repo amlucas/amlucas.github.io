@@ -77,11 +77,12 @@ Here is the result for a few particles organized on a lattice:</p>
 <p>First I wanted to reproduce the case I saw in the talk: 2,000 particles grouped in a small region.
 The direct approach (<script type="math/tex">\mathcal{O}(N^2)</script>) is enough for that case, so I just vibe-coded a very simple interaction kernel, as well as a second-order Runge-Kutta time integration.
 After adjusting a few parameters and the camera position (I had to fight a lot with ChatGPT to make it look realistic), I obtained the following dynamics:</p>
-<div class="video-wrap">
+<div class="video-wrap" style="width: 70%;">
   <video controls autoplay loop muted playsinline>
     <source src="../images/blog/parti/sediment_breakup_2000.mp4" type="video/mp4">
     Your browser does not support the video tag.
   </video>
+
 </div>
 
 <p>The cloud first transforms into a torus, and then breaks up.
@@ -92,11 +93,12 @@ The first iteration didn't work at all, it took several iterations using unit te
 The code now had an octree-building part followed by a Stokeslet evaluation using a dipole approximation for nodes of the trees that are far enough.
 The complexity of the computation went down to <script type="math/tex">N \log N</script>, which now allows to simulate this 50,000-body problem.
 After tweaking a few parameters, this is what I ended up with:</p>
-<div class="video-wrap">
+<div class="video-wrap" style="width: 70%;">
   <video controls autoplay loop muted playsinline>
     <source src="../images/blog/parti/sediment_breakup_50000.mp4" type="video/mp4">
     Your browser does not support the video tag.
   </video>
+
 </div>
 
 <p>This took only a couple hours on my laptop. 
