@@ -4,7 +4,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>blog - tossing-potatoes</title>
+  <title>Tossing potatoes – Lucas Amoudruz</title>
+  <link rel="icon" href="../favicon.ico" sizes="any" />
+  <meta name="description" content="A probability model for how many times you need to toss potatoes in a pan so each side gets cooked. Inclusion-exclusion in the kitchen." />
+  <meta property="og:site_name" content="Lucas Amoudruz" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Tossing potatoes" />
+  <meta property="og:description" content="A probability model for how many times you need to toss potatoes in a pan so each side gets cooked. Inclusion-exclusion in the kitchen." />
+  <meta property="og:url" content="https://amlucas.github.io/blog/tossing-potatoes.html" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Tossing potatoes" />
+  <meta name="twitter:description" content="A probability model for how many times you need to toss potatoes in a pan so each side gets cooked. Inclusion-exclusion in the kitchen." />
   <link rel="stylesheet" href="../css/main.css" />
   <link rel="stylesheet" href="../css/codehilite.css" />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif&family=JetBrains+Mono&display=swap" rel="stylesheet">
@@ -94,7 +104,7 @@ P_m(t) = \sum\limits_{k=0}^m (-1)^k {m \choose k} \left( \frac{m-k}{m} \right)^t
 </p>
 <p>The probability <script type="math/tex">P_m(t)</script> tends exponentially to 1 as <script type="math/tex">t</script> increases, as illustrated in the following figure:</p>
 <figure class="image-wrap image-center" style="width: 70%;">
-  <img loading="lazy" src="../images/blog/tossing-potatoes/Pt.svg" alt="Probability that a potato has touched all 6 sides after t tosses.">
+  <img width="560" height="416" loading="lazy" src="../images/blog/tossing-potatoes/Pt.svg" alt="Probability that a potato has touched all 6 sides after t tosses.">
   <figcaption class="image-caption">Probability that a potato has touched all 6 sides after t tosses.</figcaption>
 </figure>
 
@@ -103,7 +113,7 @@ The figure shows that after 27 tosses, there is already more than 95% probabilit
 I don't have only one potato piece, but <script type="math/tex">N</script> of them (say 40).
 The number of well cooked potatoes follows a binomial distribution, with success probability <script type="math/tex">P_6(t)</script>.</p>
 <figure class="image-wrap image-center" style="width: 70%;">
-  <img loading="lazy" src="../images/blog/tossing-potatoes/binomial.svg" alt="Median number of well cooked potatoes out of $N=40$, against the number of tosses. Error bars indicate the 5 to 95% quantiles.">
+  <img width="560" height="416" loading="lazy" src="../images/blog/tossing-potatoes/binomial.svg" alt="Median number of well cooked potatoes out of $N=40$, against the number of tosses. Error bars indicate the 5 to 95% quantiles.">
   <figcaption class="image-caption">Median number of well cooked potatoes out of $N=40$, against the number of tosses. Error bars indicate the 5 to 95% quantiles.</figcaption>
 </figure>
 
@@ -119,12 +129,12 @@ But this little exercise made me discover the inclusion-exclusion principle, and
 
 <div class="codehilite"><pre><span></span><code><span class="ch">#!/usr/bin/env python</span>
 
-<span class="kn">import</span> <span class="nn">argparse</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--out&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;output plot&#39;</span><span class="p">)</span>
     <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
@@ -167,13 +177,13 @@ But this little exercise made me discover the inclusion-exclusion principle, and
 
 <div class="codehilite"><pre><span></span><code><span class="ch">#!/usr/bin/env python</span>
 
-<span class="kn">import</span> <span class="nn">argparse</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">binom</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">binom</span>
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--out&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;output plot&#39;</span><span class="p">)</span>
     <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>

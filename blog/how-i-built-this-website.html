@@ -4,7 +4,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>blog - how-i-built-this-website</title>
+  <title>How I built this website with Python and Markdown – Lucas Amoudruz</title>
+  <link rel="icon" href="../favicon.ico" sizes="any" />
+  <meta name="description" content="How I built a custom site with code snippets, citations, and full control." />
+  <meta property="og:site_name" content="Lucas Amoudruz" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="How I built this website with Python and Markdown" />
+  <meta property="og:description" content="How I built a custom site with code snippets, citations, and full control." />
+  <meta property="og:url" content="https://amlucas.github.io/blog/how-i-built-this-website.html" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="How I built this website with Python and Markdown" />
+  <meta name="twitter:description" content="How I built a custom site with code snippets, citations, and full control." />
   <link rel="stylesheet" href="../css/main.css" />
   <link rel="stylesheet" href="../css/codehilite.css" />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif&family=JetBrains+Mono&display=swap" rel="stylesheet">
@@ -76,13 +86,13 @@ Below, I describe the structure of the code in more detail.</p>
 
 <div class="codehilite"><pre><span></span><code><span class="ch">#!/usr/bin/env python</span>
 
-<span class="kn">import</span> <span class="nn">argparse</span>
-<span class="kn">import</span> <span class="nn">markdown</span>
-<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">markdown</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
-<span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">embed_image_float</span><span class="p">,</span> <span class="n">get_ga4_tag</span><span class="p">,</span> <span class="n">get_active_nav_script</span><span class="p">,</span> <span class="n">get_rss_link</span><span class="p">,</span> <span class="n">get_footer</span><span class="p">,</span> <span class="n">add_lazy_loading</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">embed_image_float</span><span class="p">,</span> <span class="n">get_ga4_tag</span><span class="p">,</span> <span class="n">get_active_nav_script</span><span class="p">,</span> <span class="n">get_rss_link</span><span class="p">,</span> <span class="n">get_footer</span><span class="p">,</span> <span class="n">enhance_images</span><span class="p">,</span> <span class="n">get_meta_tags</span><span class="p">,</span> <span class="n">get_favicon_link</span>
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;md_path&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Directory containing md files.&quot;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--out-html&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to output html file.&quot;</span><span class="p">)</span>
@@ -105,7 +115,7 @@ Below, I describe the structure of the code in more detail.</p>
             <span class="n">raw_md</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
         <span class="n">processed_md</span> <span class="o">=</span> <span class="n">embed_image_float</span><span class="p">(</span><span class="n">raw_md</span><span class="p">)</span>
         <span class="n">html_content</span> <span class="o">=</span> <span class="n">markdown</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span><span class="n">processed_md</span><span class="p">)</span>
-        <span class="n">html_content</span> <span class="o">=</span> <span class="n">add_lazy_loading</span><span class="p">(</span><span class="n">html_content</span><span class="p">)</span>
+        <span class="n">html_content</span> <span class="o">=</span> <span class="n">enhance_images</span><span class="p">(</span><span class="n">html_content</span><span class="p">)</span>
         <span class="n">html_sections</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;&#39;&#39;&lt;section id=&quot;</span><span class="si">{</span><span class="n">section_id</span><span class="si">}</span><span class="s1">&quot;&gt;</span>
 <span class="s1">  &lt;div class=&quot;markdown-body main-body&quot;&gt;</span>
 <span class="s1">    </span><span class="si">{</span><span class="n">html_content</span><span class="si">}</span>
@@ -124,6 +134,11 @@ Below, I describe the structure of the code in more detail.</p>
 
     <span class="n">ga4_tag</span> <span class="o">=</span> <span class="n">get_ga4_tag</span><span class="p">()</span>
     <span class="n">active_nav_script</span> <span class="o">=</span> <span class="n">get_active_nav_script</span><span class="p">()</span>
+    <span class="n">meta_tags</span> <span class="o">=</span> <span class="n">get_meta_tags</span><span class="p">(</span>
+        <span class="s2">&quot;Lucas Amoudruz&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Lucas Amoudruz, research associate at Harvard, working on simulation and control of microscale systems: microfluidics, blood flow, and artificial microswimmers.&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
 
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_html</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
@@ -133,6 +148,8 @@ Below, I describe the structure of the code in more detail.</p>
 <span class="s2">  &lt;meta charset=&quot;UTF-8&quot; /&gt;</span>
 <span class="s2">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot; /&gt;</span>
 <span class="s2">  &lt;title&gt;Lucas Amoudruz&lt;/title&gt;</span>
+<span class="si">{</span><span class="n">get_favicon_link</span><span class="p">()</span><span class="si">}</span>
+<span class="si">{</span><span class="n">meta_tags</span><span class="si">}</span>
 <span class="s2">  &lt;link rel=&quot;stylesheet&quot; href=&quot;css/main.css&quot; /&gt;</span>
 <span class="s2">  &lt;link href=&quot;https://fonts.googleapis.com/css2?family=IBM+Plex+Serif&amp;family=JetBrains+Mono&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;</span>
 <span class="s2">  &lt;link href=&quot;https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;</span>
@@ -173,10 +190,10 @@ This function handles parsing custom image blocks and turns them into proper HTM
 
 
 
-<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">embed_image_float</span><span class="p">(</span><span class="n">md_text</span><span class="p">):</span>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">embed_image_float</span><span class="p">(</span><span class="n">md_text</span><span class="p">):</span>
     <span class="n">pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\{\{\s*image\(&quot;([^&quot;]+)&quot;,\s*&quot;([^&quot;]*)&quot;,\s*&quot;([^&quot;]+)&quot;,\s*(\d+)\)\s*\}\}&#39;</span>
 
-    <span class="k">def</span> <span class="nf">replacer</span><span class="p">(</span><span class="n">match</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">replacer</span><span class="p">(</span><span class="n">match</span><span class="p">):</span>
         <span class="n">src</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">caption</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="n">float_dir</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
@@ -216,14 +233,14 @@ This function handles parsing custom image blocks and turns them into proper HTM
 
 <div class="codehilite"><pre><span></span><code><span class="ch">#!/usr/bin/env python</span>
 
-<span class="kn">import</span> <span class="nn">argparse</span>
-<span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">import</span> <span class="nn">markdown</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">markdown</span>
 
-<span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">get_ga4_tag</span><span class="p">,</span> <span class="n">get_rss_link</span><span class="p">,</span> <span class="n">get_footer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_ga4_tag</span><span class="p">,</span> <span class="n">get_rss_link</span><span class="p">,</span> <span class="n">get_footer</span><span class="p">,</span> <span class="n">get_meta_tags</span><span class="p">,</span> <span class="n">get_favicon_link</span>
 
 
-<span class="k">def</span> <span class="nf">parse_blog</span><span class="p">(</span><span class="n">md_text</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_blog</span><span class="p">(</span><span class="n">md_text</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Parse blog.md into (intro_markdown, list_of_entries).</span>
 
 <span class="sd">    Each entry is built from consecutive lines after a `### [title](link)` line:</span>
@@ -274,7 +291,7 @@ This function handles parsing custom image blocks and turns them into proper HTM
     <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">intro_lines</span><span class="p">),</span> <span class="n">entries</span>
 
 
-<span class="k">def</span> <span class="nf">build_blog_html</span><span class="p">(</span><span class="n">intro_md</span><span class="p">,</span> <span class="n">entries</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_blog_html</span><span class="p">(</span><span class="n">intro_md</span><span class="p">,</span> <span class="n">entries</span><span class="p">):</span>
     <span class="n">intro_html</span> <span class="o">=</span> <span class="n">markdown</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span><span class="n">intro_md</span><span class="p">)</span>
 
     <span class="n">all_tags</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">({</span><span class="n">t</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">entries</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;tags&#39;</span><span class="p">]})</span>
@@ -303,7 +320,7 @@ This function handles parsing custom image blocks and turns them into proper HTM
     <span class="k">return</span> <span class="n">intro_html</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">filter_html</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">entries_html</span>
 
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;md_path&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;path to blog.md&quot;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--out-html&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to output html file.&quot;</span><span class="p">)</span>
@@ -327,6 +344,11 @@ This function handles parsing custom image blocks and turns them into proper HTM
 <span class="s2">&quot;&quot;&quot;</span>
 
     <span class="n">ga4_tag</span> <span class="o">=</span> <span class="n">get_ga4_tag</span><span class="p">()</span>
+    <span class="n">meta_tags</span> <span class="o">=</span> <span class="n">get_meta_tags</span><span class="p">(</span>
+        <span class="s2">&quot;Blog – Lucas Amoudruz&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Short writeups, experiments, and stories from projects by Lucas Amoudruz.&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;blog.html&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="n">blog_scripts</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;  &lt;script&gt;</span>
 <span class="s1">    document.querySelectorAll(&#39;.top-nav a[href=&quot;./blog.html&quot;]&#39;).forEach(a =&gt; {</span>
 <span class="s1">      a.classList.add(&#39;active&#39;);</span>
@@ -360,6 +382,8 @@ This function handles parsing custom image blocks and turns them into proper HTM
 <span class="s2">  &lt;meta charset=&quot;UTF-8&quot; /&gt;</span>
 <span class="s2">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot; /&gt;</span>
 <span class="s2">  &lt;title&gt;Blog – Lucas Amoudruz&lt;/title&gt;</span>
+<span class="si">{</span><span class="n">get_favicon_link</span><span class="p">()</span><span class="si">}</span>
+<span class="si">{</span><span class="n">meta_tags</span><span class="si">}</span>
 <span class="s2">  &lt;link rel=&quot;stylesheet&quot; href=&quot;css/main.css&quot; /&gt;</span>
 <span class="s2">  &lt;link href=&quot;https://fonts.googleapis.com/css2?family=IBM+Plex+Serif&amp;family=JetBrains+Mono&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;</span>
 <span class="s2">  &lt;link href=&quot;https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;</span>
@@ -399,16 +423,38 @@ This function handles parsing custom image blocks and turns them into proper HTM
 
 <div class="codehilite"><pre><span></span><code><span class="ch">#!/usr/bin/env python</span>
 
-<span class="kn">import</span> <span class="nn">argparse</span>
-<span class="kn">import</span> <span class="nn">markdown</span>
-<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">markdown</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 
-<span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">embed_image_float</span><span class="p">,</span> <span class="n">embed_image_row</span><span class="p">,</span> <span class="n">embed_video</span><span class="p">,</span> <span class="n">embed_video_row</span><span class="p">,</span> <span class="n">embed_code_from_files</span><span class="p">,</span> <span class="n">get_ga4_tag</span><span class="p">,</span> <span class="n">get_rss_link</span><span class="p">,</span> <span class="n">get_footer</span><span class="p">,</span> <span class="n">add_lazy_loading</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">embed_image_float</span><span class="p">,</span> <span class="n">embed_image_row</span><span class="p">,</span> <span class="n">embed_video</span><span class="p">,</span> <span class="n">embed_video_row</span><span class="p">,</span> <span class="n">embed_code_from_files</span><span class="p">,</span> <span class="n">get_ga4_tag</span><span class="p">,</span> <span class="n">get_rss_link</span><span class="p">,</span> <span class="n">get_footer</span><span class="p">,</span> <span class="n">enhance_images</span><span class="p">,</span> <span class="n">get_meta_tags</span><span class="p">,</span> <span class="n">first_raster_image</span><span class="p">,</span> <span class="n">get_favicon_link</span>
 
-<span class="k">def</span> <span class="nf">md_path_to_title</span><span class="p">(</span><span class="n">md_path</span><span class="p">):</span>
-    <span class="k">return</span> <span class="s2">&quot;blog - &quot;</span> <span class="o">+</span> <span class="n">md_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.md&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_blog_description</span><span class="p">(</span><span class="n">slug</span><span class="p">,</span> <span class="n">blog_md</span><span class="o">=</span><span class="s1">&#39;source/blog.md&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Look up a post&#39;s hand-written description from blog.md by slug.&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">blog_md</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">lines</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">target</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;blog/</span><span class="si">{</span><span class="n">slug</span><span class="si">}</span><span class="s1">.html&#39;</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lines</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">target</span> <span class="ow">in</span> <span class="n">line</span> <span class="ow">and</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;###&#39;</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">6</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">lines</span><span class="p">))):</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="n">lines</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">s</span> <span class="ow">or</span> <span class="n">s</span> <span class="o">==</span> <span class="s1">&#39;---&#39;</span> <span class="ow">or</span> <span class="n">s</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">s</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;tags:&#39;</span><span class="p">):</span>
+                    <span class="k">continue</span>
+                <span class="k">return</span> <span class="n">s</span>
+    <span class="k">return</span> <span class="s1">&#39;&#39;</span>
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">extract_title</span><span class="p">(</span><span class="n">raw_md</span><span class="p">,</span> <span class="n">md_path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Use the post&#39;s first `# Heading` as its title; fall back to the slug.&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">raw_md</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
+        <span class="n">stripped</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">stripped</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;# &#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">stripped</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">md_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.md&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;md_path&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;path to md file&quot;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--out-html&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to output html file.&quot;</span><span class="p">)</span>
@@ -435,7 +481,7 @@ This function handles parsing custom image blocks and turns them into proper HTM
                                          <span class="s1">&#39;mdx_math&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;enable_dollar_delimiter&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
                                      <span class="p">})</span>
 
-    <span class="n">html_content</span> <span class="o">=</span> <span class="n">add_lazy_loading</span><span class="p">(</span><span class="n">html_content</span><span class="p">)</span>
+    <span class="n">html_content</span> <span class="o">=</span> <span class="n">enhance_images</span><span class="p">(</span><span class="n">html_content</span><span class="p">)</span>
 
     <span class="n">html_section</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">&lt;main&gt;</span>
@@ -445,7 +491,16 @@ This function handles parsing custom image blocks and turns them into proper HTM
 <span class="s2">&lt;/main&gt;</span>
 <span class="s2">&quot;&quot;&quot;</span>
 
-    <span class="n">title</span> <span class="o">=</span> <span class="n">md_path_to_title</span><span class="p">(</span><span class="n">md_path</span><span class="p">)</span>
+    <span class="n">bare_title</span> <span class="o">=</span> <span class="n">extract_title</span><span class="p">(</span><span class="n">raw_md</span><span class="p">,</span> <span class="n">md_path</span><span class="p">)</span>
+    <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bare_title</span><span class="si">}</span><span class="s2"> – Lucas Amoudruz&quot;</span>
+
+    <span class="n">slug</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">md_path</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="n">get_blog_description</span><span class="p">(</span><span class="n">slug</span><span class="p">)</span>
+    <span class="n">meta_tags</span> <span class="o">=</span> <span class="n">get_meta_tags</span><span class="p">(</span>
+        <span class="n">bare_title</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;blog/</span><span class="si">{</span><span class="n">slug</span><span class="si">}</span><span class="s2">.html&quot;</span><span class="p">,</span>
+        <span class="n">image</span><span class="o">=</span><span class="n">first_raster_image</span><span class="p">(</span><span class="n">html_content</span><span class="p">),</span> <span class="n">og_type</span><span class="o">=</span><span class="s2">&quot;article&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
     <span class="n">ga4_tag</span> <span class="o">=</span> <span class="n">get_ga4_tag</span><span class="p">()</span>
     <span class="n">blog_nav_script</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;  &lt;script&gt;</span>
 <span class="s1">    document.querySelectorAll(&#39;.top-nav a[href=&quot;../blog.html&quot;]&#39;).forEach(a =&gt; {</span>
@@ -462,6 +517,8 @@ This function handles parsing custom image blocks and turns them into proper HTM
 <span class="s2">  &lt;meta charset=&quot;UTF-8&quot; /&gt;</span>
 <span class="s2">  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot; /&gt;</span>
 <span class="s2">  &lt;title&gt;</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s2">&lt;/title&gt;</span>
+<span class="si">{</span><span class="n">get_favicon_link</span><span class="p">(</span><span class="s1">&#39;../&#39;</span><span class="p">)</span><span class="si">}</span>
+<span class="si">{</span><span class="n">meta_tags</span><span class="si">}</span>
 <span class="s2">  &lt;link rel=&quot;stylesheet&quot; href=&quot;../css/main.css&quot; /&gt;</span>
 <span class="s2">  &lt;link rel=&quot;stylesheet&quot; href=&quot;../css/codehilite.css&quot; /&gt;</span>
 <span class="s2">  &lt;link href=&quot;https://fonts.googleapis.com/css2?family=IBM+Plex+Serif&amp;family=JetBrains+Mono&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;</span>
@@ -527,11 +584,11 @@ Code and equations are not needed in the main page.</p>
 
 
 
-<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">embed_code_from_files</span><span class="p">(</span><span class="n">md_text</span><span class="p">):</span>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">embed_code_from_files</span><span class="p">(</span><span class="n">md_text</span><span class="p">):</span>
     <span class="n">full_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\{\{\s*file_full,\s*&quot;([^&quot;]+)&quot;,\s*&quot;([^&quot;]+)&quot;(?:,\s*&quot;([^&quot;]+)&quot;)?\s*\}\}&#39;</span>
     <span class="n">partial_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\{\{\s*file_partial,\s*&quot;([^&quot;]+)&quot;,\s*&quot;([^&quot;]+)&quot;,\s*&quot;([^&quot;]+)&quot;(?:,\s*&quot;([^&quot;]+)&quot;)?\s*\}\}&#39;</span>
 
-    <span class="k">def</span> <span class="nf">full_replacer</span><span class="p">(</span><span class="n">match</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">full_replacer</span><span class="p">(</span><span class="n">match</span><span class="p">):</span>
         <span class="n">path</span><span class="p">,</span> <span class="n">lang</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
         <span class="n">spoiler</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;spoiler&quot;</span>
         <span class="k">try</span><span class="p">:</span>
@@ -545,7 +602,7 @@ Code and equations are not needed in the main page.</p>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;**Error including file: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">)**&quot;</span>
 
-    <span class="k">def</span> <span class="nf">partial_replacer</span><span class="p">(</span><span class="n">match</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">partial_replacer</span><span class="p">(</span><span class="n">match</span><span class="p">):</span>
         <span class="n">path</span><span class="p">,</span> <span class="n">lang</span><span class="p">,</span> <span class="n">marker</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
         <span class="n">spoiler</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;spoiler&quot;</span>
         <span class="n">start_tag</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;# START_</span><span class="si">{</span><span class="n">marker</span><span class="si">}</span><span class="s2">&quot;</span>

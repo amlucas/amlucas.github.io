@@ -4,7 +4,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>blog - reading-in-the-sun</title>
+  <title>When is the sun blocked by the mountains? – Lucas Amoudruz</title>
+  <link rel="icon" href="../favicon.ico" sizes="any" />
+  <meta name="description" content="From topographic data and solar geometry to the optimal reading time on my parent&#x27;s terrace." />
+  <meta property="og:site_name" content="Lucas Amoudruz" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="When is the sun blocked by the mountains?" />
+  <meta property="og:description" content="From topographic data and solar geometry to the optimal reading time on my parent&#x27;s terrace." />
+  <meta property="og:url" content="https://amlucas.github.io/blog/reading-in-the-sun.html" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="When is the sun blocked by the mountains?" />
+  <meta name="twitter:description" content="From topographic data and solar geometry to the optimal reading time on my parent&#x27;s terrace." />
   <link rel="stylesheet" href="../css/main.css" />
   <link rel="stylesheet" href="../css/codehilite.css" />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif&family=JetBrains+Mono&display=swap" rel="stylesheet">
@@ -64,7 +74,7 @@ I thought I'd use the cold and shady time to compute when it's going to be sunny
 <p>I went ahead and downloaded the topographic map of the area from <a href="https://portal.opentopography.org/raster?opentopoID=OTSDEM.032021.4326.3">Copernicus GLO-30 Digital Elevation Model</a><sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup>.
 I have selected a region large enough to cover most visible mountains from here.</p>
 <figure class="image-wrap image-center" style="width: 90%;">
-  <img loading="lazy" src="../images/blog/reading-in-the-sun/elevation.svg" alt="Elevation map around my hometown (red dot). We can already guess that the mountains in the South hide the sun during winter.">
+  <img width="560" height="227" loading="lazy" src="../images/blog/reading-in-the-sun/elevation.svg" alt="Elevation map around my hometown (red dot). We can already guess that the mountains in the South hide the sun during winter.">
   <figcaption class="image-caption">Elevation map around my hometown (red dot). We can already guess that the mountains in the South hide the sun during winter.</figcaption>
 </figure>
 
@@ -77,7 +87,7 @@ along a ray starting at my location.
 In the above equation, <script type="math/tex">z_0</script> is the elevation at the view point, <script type="math/tex">z</script> is that along the ray, and <script type="math/tex">d</script> is the distance from the view point.
 I have repeated this for any azimuth angle (this angle is 0 when pointing north, and 90 degrees when pointing east):</p>
 <figure class="image-wrap image-center" style="width: 70%;">
-  <img loading="lazy" src="../images/blog/reading-in-the-sun/horizon.svg" alt="Horizon from my parents' house, computed from the topographic data.">
+  <img width="560" height="416" loading="lazy" src="../images/blog/reading-in-the-sun/horizon.svg" alt="Horizon from my parents' house, computed from the topographic data.">
   <figcaption class="image-caption">Horizon from my parents' house, computed from the topographic data.</figcaption>
 </figure>
 
@@ -91,10 +101,10 @@ I have used the following code to estimate its trajectory. This is a blind copy-
 
 
 
-<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">day_of_year</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">day_of_year</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">d</span><span class="o">.</span><span class="n">timetuple</span><span class="p">()</span><span class="o">.</span><span class="n">tm_yday</span>
 
-<span class="k">def</span> <span class="nf">refraction_correction_deg</span><span class="p">(</span><span class="n">elevation_deg</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">refraction_correction_deg</span><span class="p">(</span><span class="n">elevation_deg</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Atmospheric refraction correction in degrees.</span>
 <span class="sd">    Valid for elevations &gt; ~ -1 deg.</span>
@@ -104,7 +114,7 @@ I have used the following code to estimate its trajectory. This is a blind copy-
         <span class="k">return</span> <span class="mf">0.0</span>
     <span class="k">return</span> <span class="p">(</span><span class="mf">1.02</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">h</span> <span class="o">+</span> <span class="mf">10.3</span> <span class="o">/</span> <span class="p">(</span><span class="n">h</span> <span class="o">+</span> <span class="mf">5.11</span><span class="p">))))</span> <span class="o">/</span> <span class="mf">60.0</span>
 
-<span class="k">def</span> <span class="nf">solar_position_noaa</span><span class="p">(</span><span class="n">lat_deg</span><span class="p">,</span> <span class="n">lon_deg</span><span class="p">,</span> <span class="n">when_local</span><span class="p">,</span> <span class="n">tz_offset_hours</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">solar_position_noaa</span><span class="p">(</span><span class="n">lat_deg</span><span class="p">,</span> <span class="n">lon_deg</span><span class="p">,</span> <span class="n">when_local</span><span class="p">,</span> <span class="n">tz_offset_hours</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Approx solar azimuth/elevation (degrees) using NOAA-style formulas.</span>
 <span class="sd">    lat_deg, lon_deg: observer location (deg), lon positive east.</span>
@@ -175,7 +185,7 @@ I have used the following code to estimate its trajectory. This is a blind copy-
 
     <span class="k">return</span> <span class="n">az_deg</span><span class="p">,</span> <span class="n">elevation</span>
 
-<span class="k">def</span> <span class="nf">solar_track</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">tz_offset_hours</span><span class="p">,</span> <span class="n">start_h</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">end_h</span><span class="o">=</span><span class="mi">22</span><span class="p">,</span> <span class="n">step_min</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">solar_track</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">tz_offset_hours</span><span class="p">,</span> <span class="n">start_h</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">end_h</span><span class="o">=</span><span class="mi">22</span><span class="p">,</span> <span class="n">step_min</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="n">times</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">azs</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">els</span> <span class="o">=</span> <span class="p">[]</span>
@@ -202,13 +212,13 @@ I have used the following code to estimate its trajectory. This is a blind copy-
 <p>In summer, the sun is high up in the sky, and the mountains don't block the light.
 In winter, like today, the sun is very close and often below the horizon:</p>
 <figure class="image-wrap image-center" style="width: 70%;">
-  <img loading="lazy" src="../images/blog/reading-in-the-sun/horizon_and_sun.svg" alt="Horizon and trajectory of the sun at two different times of the year. The sun is often behind the mountains in winter.">
+  <img width="560" height="416" loading="lazy" src="../images/blog/reading-in-the-sun/horizon_and_sun.svg" alt="Horizon and trajectory of the sun at two different times of the year. The sun is often behind the mountains in winter.">
   <figcaption class="image-caption">Horizon and trajectory of the sun at two different times of the year. The sun is often behind the mountains in winter.</figcaption>
 </figure>
 
 <p>The following figure shows when the sun will be above the horizon today, based on the model above:</p>
 <figure class="image-wrap image-center" style="width: 70%;">
-  <img loading="lazy" src="../images/blog/reading-in-the-sun/sun_times.svg" alt="Whether the sun will be above or below the horizon on January 5th of 2026.">
+  <img width="560" height="416" loading="lazy" src="../images/blog/reading-in-the-sun/sun_times.svg" alt="Whether the sun will be above or below the horizon on January 5th of 2026.">
   <figcaption class="image-caption">Whether the sun will be above or below the horizon on January 5th of 2026.</figcaption>
 </figure>
 

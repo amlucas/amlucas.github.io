@@ -4,7 +4,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>blog - parti</title>
+  <title>Vibe-coding a particle solver – Lucas Amoudruz</title>
+  <link rel="icon" href="../favicon.ico" sizes="any" />
+  <meta name="description" content="Simulating sedimenting particles in Stokes flow with Barnes–Hut." />
+  <meta property="og:site_name" content="Lucas Amoudruz" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Vibe-coding a particle solver" />
+  <meta property="og:description" content="Simulating sedimenting particles in Stokes flow with Barnes–Hut." />
+  <meta property="og:url" content="https://amlucas.github.io/blog/parti.html" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Vibe-coding a particle solver" />
+  <meta name="twitter:description" content="Simulating sedimenting particles in Stokes flow with Barnes–Hut." />
+  <meta property="og:image" content="https://amlucas.github.io/images/blog/parti/lattice_rendering.png" />
+  <meta name="twitter:image" content="https://amlucas.github.io/images/blog/parti/lattice_rendering.png" />
   <link rel="stylesheet" href="../css/main.css" />
   <link rel="stylesheet" href="../css/codehilite.css" />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif&family=JetBrains+Mono&display=swap" rel="stylesheet">
@@ -97,7 +109,7 @@ I have rather strong opinions on the design of computational programs; here are 
 It is very simple: each particle is rendered as a disc on the screen with some shader that mimics light.
 Here is the result for a few particles organized on a lattice:</p>
 <figure class="image-wrap image-center" style="width: 90%;">
-  <img loading="lazy" src="../images/blog/parti/lattice_rendering.png" alt="Vibe-coded particles renderer. 262144 particles on a white background.">
+  <img width="1600" height="900" loading="lazy" src="../images/blog/parti/lattice_rendering.png" alt="Vibe-coded particles renderer. 262144 particles on a white background.">
   <figcaption class="image-caption">Vibe-coded particles renderer. 262144 particles on a white background.</figcaption>
 </figure>
 

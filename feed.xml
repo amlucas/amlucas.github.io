@@ -5,7 +5,7 @@
     <link>https://amlucas.github.io</link>
     <description>Personal blog covering scientific computing, fluid dynamics, and more</description>
     <language>en-us</language>
-    <lastBuildDate>Tue, 23 Jun 2026 14:01:52 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 23 Jun 2026 14:23:18 +0000</lastBuildDate>
   <item>
     <title>Rhythms of a street</title>
     <link>https://amlucas.github.io/blog/raspberry-pi-listener.html</link>
@@ -17,49 +17,49 @@
     <title>Vibe-coding a particle solver</title>
     <link>https://amlucas.github.io/blog/parti.html</link>
     <guid>https://amlucas.github.io/blog/parti.html</guid>
-    <pubDate>Tue, 23 Jun 2026 00:00:00 +0000</pubDate>
+    <pubDate>Wed, 06 May 2026 00:00:00 +0000</pubDate>
     <description>Simulating sedimenting particles in Stokes flow with Barnes–Hut.</description>
   </item>
   <item>
     <title>Magnetic Newton&apos;s cradle</title>
     <link>https://amlucas.github.io/blog/newton-cradle-magnets.html</link>
     <guid>https://amlucas.github.io/blog/newton-cradle-magnets.html</guid>
-    <pubDate>Tue, 23 Jun 2026 00:00:00 +0000</pubDate>
+    <pubDate>Thu, 23 Apr 2026 00:00:00 +0000</pubDate>
     <description>Simulating a Newton’s cradle with magnetic interactions, and how long-range forces break the clean transfer of energy.</description>
   </item>
   <item>
     <title>Sunny walk in the French Alps</title>
     <link>https://amlucas.github.io/blog/sunny-walk.html</link>
     <guid>https://amlucas.github.io/blog/sunny-walk.html</guid>
-    <pubDate>Tue, 23 Jun 2026 00:00:00 +0000</pubDate>
+    <pubDate>Tue, 06 Jan 2026 00:00:00 +0000</pubDate>
     <description>Combining GPS and topographic data to find the perfect winter walk time for my parents.</description>
   </item>
   <item>
     <title>Predicting shades in the French Alps</title>
     <link>https://amlucas.github.io/blog/reading-in-the-sun.html</link>
     <guid>https://amlucas.github.io/blog/reading-in-the-sun.html</guid>
-    <pubDate>Tue, 23 Jun 2026 00:00:00 +0000</pubDate>
+    <pubDate>Mon, 05 Jan 2026 00:00:00 +0000</pubDate>
     <description>From topographic data and solar geometry to the optimal reading time on my parent&apos;s terrace.</description>
   </item>
   <item>
     <title>My pace during stadium runs</title>
     <link>https://amlucas.github.io/blog/stadium-pacing.html</link>
     <guid>https://amlucas.github.io/blog/stadium-pacing.html</guid>
-    <pubDate>Tue, 23 Jun 2026 00:00:00 +0000</pubDate>
+    <pubDate>Sun, 21 Dec 2025 00:00:00 +0000</pubDate>
     <description>Using elevation data from my watch to analyze pacing strategies at the Harvard Stadium, and finding out what my best runs have in common.</description>
   </item>
   <item>
     <title>Tossing potatoes</title>
     <link>https://amlucas.github.io/blog/tossing-potatoes.html</link>
     <guid>https://amlucas.github.io/blog/tossing-potatoes.html</guid>
-    <pubDate>Tue, 23 Jun 2026 00:00:00 +0000</pubDate>
+    <pubDate>Tue, 02 Dec 2025 00:00:00 +0000</pubDate>
     <description>A probability model for how many times you need to toss potatoes in a pan so each side gets cooked. Inclusion-exclusion in the kitchen.</description>
   </item>
   <item>
     <title>Analyze stadium run data</title>
     <link>https://amlucas.github.io/blog/analyze-stadium-data.html</link>
     <guid>https://amlucas.github.io/blog/analyze-stadium-data.html</guid>
-    <pubDate>Tue, 23 Jun 2026 00:00:00 +0000</pubDate>
+    <pubDate>Sat, 09 Aug 2025 00:00:00 +0000</pubDate>
     <description>Modeling run time using temperature, sleep, and training history, with linear regression and Sobol indices.</description>
   </item>
   <item>
@@ -73,7 +73,7 @@
     <title>Fetch stadium run data</title>
     <link>https://amlucas.github.io/blog/fetch-stadium-data.html</link>
     <guid>https://amlucas.github.io/blog/fetch-stadium-data.html</guid>
-    <pubDate>Tue, 23 Jun 2026 00:00:00 +0000</pubDate>
+    <pubDate>Sat, 12 Jul 2025 00:00:00 +0000</pubDate>
     <description>How I downloaded, cleaned, and merged my Garmin and weather data to build a useful personal dataset.</description>
   </item>
   <item>

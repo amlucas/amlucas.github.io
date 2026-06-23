@@ -4,7 +4,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>blog - sunny-walk</title>
+  <title>Finding the sunniest time for a winter walk – Lucas Amoudruz</title>
+  <link rel="icon" href="../favicon.ico" sizes="any" />
+  <meta name="description" content="Combining GPS and topographic data to find the perfect winter walk time for my parents." />
+  <meta property="og:site_name" content="Lucas Amoudruz" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Finding the sunniest time for a winter walk" />
+  <meta property="og:description" content="Combining GPS and topographic data to find the perfect winter walk time for my parents." />
+  <meta property="og:url" content="https://amlucas.github.io/blog/sunny-walk.html" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Finding the sunniest time for a winter walk" />
+  <meta name="twitter:description" content="Combining GPS and topographic data to find the perfect winter walk time for my parents." />
   <link rel="stylesheet" href="../css/main.css" />
   <link rel="stylesheet" href="../css/codehilite.css" />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif&family=JetBrains+Mono&display=swap" rel="stylesheet">
@@ -59,7 +69,7 @@ Let’s try to find the optimal time to maximize sun exposure during her walk.</
 <p>Conveniently, I already know how to import GPS traces from my Garmin watch (see previous posts like <a href="fetch-stadium-data.html">this one</a>).
 Yesterday I went on my parents' usual walk to record the trace:</p>
 <figure class="image-wrap image-center" style="width: 70%;">
-  <img loading="lazy" src="../images/blog/sunny-walk/walk_map.svg" alt="My parents' usual walk. In many places, the mountains block the sun.">
+  <img width="341" height="215" loading="lazy" src="../images/blog/sunny-walk/walk_map.svg" alt="My parents' usual walk. In many places, the mountains block the sun.">
   <figcaption class="image-caption">My parents' usual walk. In many places, the mountains block the sun.</figcaption>
 </figure>
 
@@ -70,7 +80,7 @@ Luckily, the horizon is time independent, it only depends on the location and th
 We can thus precompute the horizon and store it on a grid parameterized by the azimuth angle and the walk duration from the start (the latter is a parameterization of the position along the walk).
 This is what I obtained:</p>
 <figure class="image-wrap image-center" style="width: 70%;">
-  <img loading="lazy" src="../images/blog/sunny-walk/horizon.svg" alt="Precomputed horizon against the azimuth angle (deg) and the position along the walk, parameterized by the walk duration from the start.">
+  <img width="561" height="416" loading="lazy" src="../images/blog/sunny-walk/horizon.svg" alt="Precomputed horizon against the azimuth angle (deg) and the position along the walk, parameterized by the walk duration from the start.">
   <figcaption class="image-caption">Precomputed horizon against the azimuth angle (deg) and the position along the walk, parameterized by the walk duration from the start.</figcaption>
 </figure>
 
@@ -81,7 +91,7 @@ These discontinuities should not alter the results too much, I just want an idea
 The sun exposure time is then the amount of time when the sun is above the horizon.</p>
 <p>For example, this is what I obtain for today, assuming clear-sky conditions:</p>
 <figure class="image-wrap image-center" style="width: 70%;">
-  <img loading="lazy" src="../images/blog/sunny-walk/sun_time-today.svg" alt="Predicted sun exposure during the walk against the starting time.">
+  <img width="560" height="416" loading="lazy" src="../images/blog/sunny-walk/sun_time-today.svg" alt="Predicted sun exposure during the walk against the starting time.">
   <figcaption class="image-caption">Predicted sun exposure during the walk against the starting time.</figcaption>
 </figure>
 
@@ -89,7 +99,7 @@ The sun exposure time is then the amount of time when the sun is above the horiz
 After that it will feel colder.</p>
 <p>Below is what this model predicts for the upcoming weeks:</p>
 <figure class="image-wrap image-center" style="width: 70%;">
-  <img loading="lazy" src="../images/blog/sunny-walk/sun_time-nexts.svg" alt="Predicted sun exposure during the walk in the next few weeks.">
+  <img width="560" height="416" loading="lazy" src="../images/blog/sunny-walk/sun_time-nexts.svg" alt="Predicted sun exposure during the walk in the next few weeks.">
   <figcaption class="image-caption">Predicted sun exposure during the walk in the next few weeks.</figcaption>
 </figure>
 
@@ -108,14 +118,14 @@ I hope they will go!</p>
 
 <div class="codehilite"><pre><span></span><code><span class="ch">#!/usr/bin/env python</span>
 
-<span class="kn">import</span> <span class="nn">argparse</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">pyproj</span> <span class="kn">import</span> <span class="n">Transformer</span>
-<span class="kn">import</span> <span class="nn">rasterio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyproj</span><span class="w"> </span><span class="kn">import</span> <span class="n">Transformer</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">rasterio</span>
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;data_walk&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;dem_path&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
@@ -175,15 +185,15 @@ I hope they will go!</p>
 
 <div class="codehilite"><pre><span></span><code><span class="ch">#!/usr/bin/env python</span>
 
-<span class="kn">import</span> <span class="nn">argparse</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pickle</span>
-<span class="kn">from</span> <span class="nn">pyproj</span> <span class="kn">import</span> <span class="n">Transformer</span>
-<span class="kn">import</span> <span class="nn">rasterio</span>
-<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyproj</span><span class="w"> </span><span class="kn">import</span> <span class="n">Transformer</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">rasterio</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
 
-<span class="k">def</span> <span class="nf">find_horizon</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">elevation</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">az_deg</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">find_horizon</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">elevation</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">az_deg</span><span class="p">):</span>
     <span class="n">max_d</span> <span class="o">=</span> <span class="mi">50_000</span> <span class="c1"># m</span>
     <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">res</span>
     <span class="n">step</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span> <span class="c1"># m</span>
@@ -221,7 +231,7 @@ I hope they will go!</p>
 
 
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;data_walk&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;dem_path&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
@@ -312,11 +322,11 @@ I hope they will go!</p>
 
 <div class="codehilite"><pre><span></span><code><span class="ch">#!/usr/bin/env python</span>
 
-<span class="kn">import</span> <span class="nn">argparse</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--out&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
@@ -365,19 +375,19 @@ I hope they will go!</p>
 
 <div class="codehilite"><pre><span></span><code><span class="ch">#!/usr/bin/env python</span>
 
-<span class="kn">import</span> <span class="nn">argparse</span>
-<span class="kn">import</span> <span class="nn">datetime</span>
-<span class="kn">import</span> <span class="nn">matplotlib.dates</span> <span class="k">as</span> <span class="nn">mdates</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">datetime</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.dates</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mdates</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pickle</span>
 
 <span class="n">sun_radius</span> <span class="o">=</span> <span class="mf">0.266</span> <span class="c1"># degrees</span>
 
-<span class="k">def</span> <span class="nf">day_of_year</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">day_of_year</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">d</span><span class="o">.</span><span class="n">timetuple</span><span class="p">()</span><span class="o">.</span><span class="n">tm_yday</span>
 
-<span class="k">def</span> <span class="nf">refraction_correction_deg</span><span class="p">(</span><span class="n">elevation_deg</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">refraction_correction_deg</span><span class="p">(</span><span class="n">elevation_deg</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Atmospheric refraction correction in degrees.</span>
 <span class="sd">    Valid for elevations &gt; ~ -1 deg.</span>
@@ -387,7 +397,7 @@ I hope they will go!</p>
         <span class="k">return</span> <span class="mf">0.0</span>
     <span class="k">return</span> <span class="p">(</span><span class="mf">1.02</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">h</span> <span class="o">+</span> <span class="mf">10.3</span> <span class="o">/</span> <span class="p">(</span><span class="n">h</span> <span class="o">+</span> <span class="mf">5.11</span><span class="p">))))</span> <span class="o">/</span> <span class="mf">60.0</span>
 
-<span class="k">def</span> <span class="nf">solar_position_noaa</span><span class="p">(</span><span class="n">lat_deg</span><span class="p">,</span> <span class="n">lon_deg</span><span class="p">,</span> <span class="n">when_local</span><span class="p">,</span> <span class="n">tz_offset_hours</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">solar_position_noaa</span><span class="p">(</span><span class="n">lat_deg</span><span class="p">,</span> <span class="n">lon_deg</span><span class="p">,</span> <span class="n">when_local</span><span class="p">,</span> <span class="n">tz_offset_hours</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Approx solar azimuth/elevation (degrees) using NOAA-style formulas.</span>
 <span class="sd">    lat_deg, lon_deg: observer location (deg), lon positive east.</span>
@@ -459,7 +469,7 @@ I hope they will go!</p>
     <span class="k">return</span> <span class="n">az_deg</span><span class="p">,</span> <span class="n">elevation</span>
 
 
-<span class="k">def</span> <span class="nf">find_horizon</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">elevation</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">az_deg</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">find_horizon</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">elevation</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">az_deg</span><span class="p">):</span>
     <span class="n">max_d</span> <span class="o">=</span> <span class="mi">20_000</span> <span class="c1"># m</span>
     <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">res</span>
     <span class="n">step</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span> <span class="c1"># m</span>
@@ -496,7 +506,7 @@ I hope they will go!</p>
     <span class="k">return</span> <span class="n">horizon_deg</span>
 
 
-<span class="k">def</span> <span class="nf">compute_solar_time</span><span class="p">(</span><span class="n">w_lat</span><span class="p">,</span> <span class="n">w_lon</span><span class="p">,</span> <span class="n">w_duration</span><span class="p">,</span> <span class="n">horizon</span><span class="p">,</span> <span class="n">tstart</span><span class="p">,</span> <span class="n">tz_offset_hours</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">compute_solar_time</span><span class="p">(</span><span class="n">w_lat</span><span class="p">,</span> <span class="n">w_lon</span><span class="p">,</span> <span class="n">w_duration</span><span class="p">,</span> <span class="n">horizon</span><span class="p">,</span> <span class="n">tstart</span><span class="p">,</span> <span class="n">tz_offset_hours</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
 
     <span class="n">time_sun</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">time_tot</span> <span class="o">=</span> <span class="mi">0</span>
@@ -521,15 +531,15 @@ I hope they will go!</p>
     <span class="k">return</span> <span class="n">time_sun</span><span class="p">,</span> <span class="n">time_tot</span>
 
 
-<span class="k">def</span> <span class="nf">parse_date</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_date</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">:</span>
     <span class="c1"># accept YYYY-MM-DD</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentTypeError</span><span class="p">(</span><span class="s2">&quot;Expected --date in YYYY-MM-DD format&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+        <span class="k">raise</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentTypeError</span><span class="p">(</span><span class="s2">&quot;Expected --date in YYYY-MM-DD format&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
 
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--date&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">parse_date</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;2026-01-06&quot;</span><span class="p">],</span>
@@ -552,7 +562,7 @@ I hope they will go!</p>
     <span class="n">azimuths</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;az&#39;</span><span class="p">]</span>
     <span class="n">durs</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;t&#39;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">horizon</span><span class="p">(</span><span class="n">az</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">horizon</span><span class="p">(</span><span class="n">az</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
         <span class="n">az</span> <span class="o">-=</span> <span class="n">azimuths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">t</span> <span class="o">-=</span> <span class="n">durs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">daz</span> <span class="o">=</span> <span class="n">azimuths</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">azimuths</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
@@ -580,12 +590,12 @@ I hope they will go!</p>
 
     <span class="n">dates</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">date</span>
 
-    <span class="k">def</span> <span class="nf">parse_hhmm</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parse_hhmm</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">hh</span><span class="p">,</span> <span class="n">mm</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">hh</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">mm</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentTypeError</span><span class="p">(</span><span class="s2">&quot;Expected HH:MM&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+            <span class="k">raise</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentTypeError</span><span class="p">(</span><span class="s2">&quot;Expected HH:MM&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
 
     <span class="n">sh</span><span class="p">,</span> <span class="n">sm</span> <span class="o">=</span> <span class="n">parse_hhmm</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">start</span><span class="p">)</span>
     <span class="n">eh</span><span class="p">,</span> <span class="n">em</span> <span class="o">=</span> <span class="n">parse_hhmm</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">end</span><span class="p">)</span>
