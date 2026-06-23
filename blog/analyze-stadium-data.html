@@ -42,13 +42,14 @@
 </head>
 <body>
 
-<nav class="top-nav">
+<nav class="top-nav" aria-label="Main navigation">
   <a href="../index.html">Home</a>
   <a href="../blog.html">Blog</a>
 </nav>
 
 
-<section class="markdown-body blog-body">
+<main>
+<article class="markdown-body blog-body">
   <h1>Running the Harvard stadium: what makes me run faster?</h1>
 <p>August 9, 2025</p>
 <p>Running the stairs at the Harvard stadium always feels rough (and yet I keep doing it because it's really fun to do with friends).
@@ -92,10 +93,10 @@ Here is the list of features I have used:</p>
 </ul>
 <p>The program is very simple and only requires solving a linear system with the size of the number of features.
 Below are the results of the predictions:</p>
-<div class="image-wrap image-center" style="width: 75%;">
+<figure class="image-wrap image-center" style="width: 75%;">
   <img src="../images/blog/analyze-stadium-data/predictions.svg" alt="Predictions of the model against the real values used to calibrate this model. Error bars correspond to 1 $\sigma$.">
-  <p class="image-caption">Predictions of the model against the real values used to calibrate this model. Error bars correspond to 1 $\sigma$.</p>
-</div>
+  <figcaption class="image-caption">Predictions of the model against the real values used to calibrate this model. Error bars correspond to 1 $\sigma$.</figcaption>
+</figure>
 
 <p>The model seems to do reasonably well, at least in capturing the general trends.
 The important question now is the following: what are the important variables to predict the run time?</p>
@@ -235,20 +236,20 @@ To answer this, I varied one quantity of interest at a time in the feature vecto
 Here is what I got when varying the temperature, sleep score, and dew point:</p>
 <div class="image-row">
 
-<div class="image-wrap" style="width: 32%;">
+<figure class="image-wrap" style="width: 32%;">
   <img src="../images/blog/analyze-stadium-data/optimal_temp.svg" alt="">
-  <p class="image-caption"></p>
-</div>
+  <figcaption class="image-caption"></figcaption>
+</figure>
 
-<div class="image-wrap" style="width: 32%;">
+<figure class="image-wrap" style="width: 32%;">
   <img src="../images/blog/analyze-stadium-data/optimal_sleep_score.svg" alt="">
-  <p class="image-caption"></p>
-</div>
+  <figcaption class="image-caption"></figcaption>
+</figure>
 
-<div class="image-wrap" style="width: 32%;">
+<figure class="image-wrap" style="width: 32%;">
   <img src="../images/blog/analyze-stadium-data/optimal_dewpoint.svg" alt="">
-  <p class="image-caption"></p>
-</div>
+  <figcaption class="image-caption"></figcaption>
+</figure>
 </div>
 
 <p>According to this simple model, the best temperature to run the stadium would be around 15 Celsius degrees, with a dewpoint at 3 Celsius degrees and after a relatively good night of sleep (score of 80).
@@ -485,7 +486,8 @@ This certainly won't limit my stadium runs to these "optimal" conditions, I'm su
 
 
 </details>
-</section>
+</article>
+</main>
 
 
 <footer class="site-footer">
@@ -493,7 +495,10 @@ This certainly won't limit my stadium runs to these "optimal" conditions, I'm su
 </footer>
 
   <script>
-    document.querySelectorAll('.top-nav a[href="../blog.html"]').forEach(a => a.classList.add('active'));
+    document.querySelectorAll('.top-nav a[href="../blog.html"]').forEach(a => {
+      a.classList.add('active');
+      a.setAttribute('aria-current', 'page');
+    });
   </script>
 
 </body>

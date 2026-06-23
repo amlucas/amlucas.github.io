@@ -42,13 +42,14 @@
 </head>
 <body>
 
-<nav class="top-nav">
+<nav class="top-nav" aria-label="Main navigation">
   <a href="../index.html">Home</a>
   <a href="../blog.html">Blog</a>
 </nav>
 
 
-<section class="markdown-body blog-body">
+<main>
+<article class="markdown-body blog-body">
   <h1>Magnetic Newton's cradle</h1>
 <p>April 23, 2026</p>
 <p>I have learned about a physics competition for high-school students in Switzerland; the subject was about <a href="https://en.wikipedia.org/wiki/Newton%27s_cradle">Newton's cradle</a>, but with magnets. 
@@ -114,35 +115,35 @@ First we consider the simpler yet interesting case: two pendulums.
 We can choose symmetric initial conditions (<script type="math/tex">\theta_1 = -\theta_2</script>) or asymmetric with <script type="math/tex">\theta_1=-20^\circ</script> and <script type="math/tex">\theta_2=0</script>:</p>
 <div class="video-row">
 
-<div class="video-wrap" style="width: 49%;">
+<figure class="video-wrap" style="width: 49%;">
   <video controls autoplay loop muted playsinline>
     <source src="../images/blog/newton-cradle-magnets/n_2_sym/animation.mp4" type="video/mp4">
     Your browser does not support the video tag.
   </video>
 
-</div>
+</figure>
 
-<div class="video-wrap" style="width: 49%;">
+<figure class="video-wrap" style="width: 49%;">
   <video controls autoplay loop muted playsinline>
     <source src="../images/blog/newton-cradle-magnets/n_2_one/animation.mp4" type="video/mp4">
     Your browser does not support the video tag.
   </video>
 
-</div>
+</figure>
 </div>
 
 <p>At first glance, the second case has much more interesting dynamics. It looks like the energy is passed from one pendulum to the other, progressively, back and forth:</p>
 <div class="image-row">
 
-<div class="image-wrap" style="width: 49%;">
+<figure class="image-wrap" style="width: 49%;">
   <img src="../images/blog/newton-cradle-magnets/n_2_sym/energy.svg" alt="Energy of each magnet against time, symmetric case...">
-  <p class="image-caption">Energy of each magnet against time, symmetric case...</p>
-</div>
+  <figcaption class="image-caption">Energy of each magnet against time, symmetric case...</figcaption>
+</figure>
 
-<div class="image-wrap" style="width: 49%;">
+<figure class="image-wrap" style="width: 49%;">
   <img src="../images/blog/newton-cradle-magnets/n_2_one/energy.svg" alt="... and non-symmetric case.">
-  <p class="image-caption">... and non-symmetric case.</p>
-</div>
+  <figcaption class="image-caption">... and non-symmetric case.</figcaption>
+</figure>
 </div>
 
 <p>We already see a clear similarity with the classical Newton's cradle: energy moves from one pendulum to another over time.
@@ -150,36 +151,36 @@ However, this exchange takes a lot longer, due to the soft interactions between 
 <p>So far there is only one interacting pair. 
 Do we still observe the same transfer of energy with more pendulums?
 Here is a simulation with five pendulums:</p>
-<div class="video-wrap" style="width: 70%;">
+<figure class="video-wrap" style="width: 70%;">
   <video controls autoplay loop muted playsinline>
     <source src="../images/blog/newton-cradle-magnets/n_5_one/animation.mp4" type="video/mp4">
     Your browser does not support the video tag.
   </video>
 
-</div>
+</figure>
 
-<div class="image-wrap image-center" style="width: 70%;">
+<figure class="image-wrap image-center" style="width: 70%;">
   <img src="../images/blog/newton-cradle-magnets/n_5_one/energy_path.svg" alt="Energy of each pendulum against time. Darker regions correspond to higher energy.">
-  <p class="image-caption">Energy of each pendulum against time. Darker regions correspond to higher energy.</p>
-</div>
+  <figcaption class="image-caption">Energy of each pendulum against time. Darker regions correspond to higher energy.</figcaption>
+</figure>
 
 <p>As we can see, at the beginning, the energy moves from one pendulum to the next. 
 However, after <script type="math/tex">t=250</script>s, this pattern breaks: two pendulums (indexed 2 and 3) exchange energy back and forth.</p>
 <p>I suspect that this change in pattern is due to the long-range interactions between non-neighbouring pendulums.
 They are small, but do have an effect.
 Let's add dissipation to the system so that these small effects get smaller:</p>
-<div class="video-wrap" style="width: 70%;">
+<figure class="video-wrap" style="width: 70%;">
   <video controls autoplay loop muted playsinline>
     <source src="../images/blog/newton-cradle-magnets/n_5_one_diss/animation.mp4" type="video/mp4">
     Your browser does not support the video tag.
   </video>
 
-</div>
+</figure>
 
-<div class="image-wrap image-center" style="width: 70%;">
+<figure class="image-wrap image-center" style="width: 70%;">
   <img src="../images/blog/newton-cradle-magnets/n_5_one_diss/energy_path.svg" alt="Energy of each pendulum against time. This time, we have added dissipation ($\gamma=0.001$Nm/s) to the system.">
-  <p class="image-caption">Energy of each pendulum against time. This time, we have added dissipation ($\gamma=0.001$Nm/s) to the system.</p>
-</div>
+  <figcaption class="image-caption">Energy of each pendulum against time. This time, we have added dissipation ($\gamma=0.001$Nm/s) to the system.</figcaption>
+</figure>
 
 <p>The pattern is now much closer to energy transfer between the extremities of the chain, we have suppressed the small dynamics due to long-range interactions.
 Of course the dissipation makes the total energy of the system decrease over time, as the figure above shows (colors fade over time).</p>
@@ -464,7 +465,8 @@ This makes the pattern less clean when there are more than two pendulums (but mo
 
 
 </details>
-</section>
+</article>
+</main>
 
 
 <footer class="site-footer">
@@ -472,7 +474,10 @@ This makes the pattern less clean when there are more than two pendulums (but mo
 </footer>
 
   <script>
-    document.querySelectorAll('.top-nav a[href="../blog.html"]').forEach(a => a.classList.add('active'));
+    document.querySelectorAll('.top-nav a[href="../blog.html"]').forEach(a => {
+      a.classList.add('active');
+      a.setAttribute('aria-current', 'page');
+    });
   </script>
 
 </body>

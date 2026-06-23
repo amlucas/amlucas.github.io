@@ -21,60 +21,99 @@
 </head>
 <body>
 
-<nav class="top-nav">
+<nav class="top-nav" aria-label="Main navigation">
   <a href="./index.html">Home</a>
   <a href="./blog.html">Blog</a>
 </nav>
 
 
+<main>
 <section class="markdown-body blog-body">
   <h1>Blog</h1>
 <p>Short writeups, experiments, and stories from projects.</p>
 <hr />
-<h3><a href="blog/raspberry-pi-listener.html">Rhythms of a street</a></h3>
-<p><em>June 23, 2026</em><br />
-A two week experiment with my new Raspberry Pi.</p>
-<hr />
-<h3><a href="blog/parti.html">Vibe-coding a particle solver</a></h3>
-<p><em>May 6, 2026</em><br />
-Simulating sedimenting particles in Stokes flow with Barnes–Hut.</p>
-<hr />
-<h3><a href="blog/newton-cradle-magnets.html">Magnetic Newton's cradle</a></h3>
-<p><em>April 23, 2026</em><br />
-Simulating a Newton’s cradle with magnetic interactions, and how long-range forces break the clean transfer of energy.</p>
-<hr />
-<h3><a href="blog/sunny-walk.html">Sunny walk in the French Alps</a></h3>
-<p><em>January 6, 2026</em><br />
-Combining GPS and topographic data to find the perfect winter walk time for my parents.</p>
-<hr />
-<h3><a href="blog/reading-in-the-sun.html">Predicting shades in the French Alps</a></h3>
-<p><em>January 5, 2026</em><br />
-From topographic data and solar geometry to the optimal reading time on my parent's terrace.</p>
-<hr />
-<h3><a href="blog/stadium-pacing.html">My pace during stadium runs</a></h3>
-<p><em>December 21, 2025</em><br />
-Using elevation data from my watch to analyze pacing strategies at the Harvard Stadium, and finding out what my best runs have in common.</p>
-<hr />
-<h3><a href="blog/tossing-potatoes.html">Tossing potatoes</a></h3>
-<p><em>December 2, 2025</em><br />
-A probability model for how many times you need to toss potatoes in a pan so each side gets cooked. Inclusion-exclusion in the kitchen.</p>
-<hr />
-<h3><a href="blog/analyze-stadium-data.html">Analyze stadium run data</a></h3>
-<p><em>August 9, 2025</em><br />
-Modeling run time using temperature, sleep, and training history, with linear regression and Sobol indices.</p>
-<hr />
-<h3><a href="blog/hydrocube.html">The Hydrocube</a></h3>
-<p><em>August 3 2025</em><br />
-A 3D-printed robot for testing learned fluid controllers: from simulations to a robotics prize.</p>
-<hr />
-<h3><a href="blog/fetch-stadium-data.html">Fetch stadium run data</a></h3>
-<p><em>July 12, 2025</em><br />
-How I downloaded, cleaned, and merged my Garmin and weather data to build a useful personal dataset.</p>
-<hr />
-<h3><a href="blog/how-i-built-this-website.html">How I built this website</a></h3>
-<p><em>July 12 2025</em><br />
-How I built a custom site with code snippets, citations, and full control.</p>
+  <div class="blog-filter" role="group" aria-label="Filter posts by tag">
+    <button class="filter-btn active" data-tag="all" aria-pressed="true">All</button>
+    <button class="filter-btn" data-tag="code" aria-pressed="false">code</button>
+    <button class="filter-btn" data-tag="data analysis" aria-pressed="false">data analysis</button>
+    <button class="filter-btn" data-tag="math" aria-pressed="false">math</button>
+    <button class="filter-btn" data-tag="physics" aria-pressed="false">physics</button>
+    <button class="filter-btn" data-tag="robotics" aria-pressed="false">robotics</button>
+    <button class="filter-btn" data-tag="running" aria-pressed="false">running</button>
+    <button class="filter-btn" data-tag="simulation" aria-pressed="false">simulation</button>
+  </div>
+
+  <div class="blog-list">
+    <article class="blog-entry" data-tags="data analysis">
+      <h3><a href="blog/raspberry-pi-listener.html">Rhythms of a street</a></h3>
+      <p class="blog-date">June 23, 2026</p>
+      <p class="blog-desc">A two week experiment with my new Raspberry Pi.</p>
+      <div class="blog-tags"><button class="tag-pill" data-tag="data analysis">data analysis</button></div>
+    </article>
+    <article class="blog-entry" data-tags="simulation,physics,code">
+      <h3><a href="blog/parti.html">Vibe-coding a particle solver</a></h3>
+      <p class="blog-date">May 6, 2026</p>
+      <p class="blog-desc">Simulating sedimenting particles in Stokes flow with Barnes–Hut.</p>
+      <div class="blog-tags"><button class="tag-pill" data-tag="simulation">simulation</button><button class="tag-pill" data-tag="physics">physics</button><button class="tag-pill" data-tag="code">code</button></div>
+    </article>
+    <article class="blog-entry" data-tags="simulation,physics">
+      <h3><a href="blog/newton-cradle-magnets.html">Magnetic Newton's cradle</a></h3>
+      <p class="blog-date">April 23, 2026</p>
+      <p class="blog-desc">Simulating a Newton’s cradle with magnetic interactions, and how long-range forces break the clean transfer of energy.</p>
+      <div class="blog-tags"><button class="tag-pill" data-tag="simulation">simulation</button><button class="tag-pill" data-tag="physics">physics</button></div>
+    </article>
+    <article class="blog-entry" data-tags="data analysis">
+      <h3><a href="blog/sunny-walk.html">Sunny walk in the French Alps</a></h3>
+      <p class="blog-date">January 6, 2026</p>
+      <p class="blog-desc">Combining GPS and topographic data to find the perfect winter walk time for my parents.</p>
+      <div class="blog-tags"><button class="tag-pill" data-tag="data analysis">data analysis</button></div>
+    </article>
+    <article class="blog-entry" data-tags="data analysis">
+      <h3><a href="blog/reading-in-the-sun.html">Predicting shades in the French Alps</a></h3>
+      <p class="blog-date">January 5, 2026</p>
+      <p class="blog-desc">From topographic data and solar geometry to the optimal reading time on my parent's terrace.</p>
+      <div class="blog-tags"><button class="tag-pill" data-tag="data analysis">data analysis</button></div>
+    </article>
+    <article class="blog-entry" data-tags="data analysis,running">
+      <h3><a href="blog/stadium-pacing.html">My pace during stadium runs</a></h3>
+      <p class="blog-date">December 21, 2025</p>
+      <p class="blog-desc">Using elevation data from my watch to analyze pacing strategies at the Harvard Stadium, and finding out what my best runs have in common.</p>
+      <div class="blog-tags"><button class="tag-pill" data-tag="data analysis">data analysis</button><button class="tag-pill" data-tag="running">running</button></div>
+    </article>
+    <article class="blog-entry" data-tags="math">
+      <h3><a href="blog/tossing-potatoes.html">Tossing potatoes</a></h3>
+      <p class="blog-date">December 2, 2025</p>
+      <p class="blog-desc">A probability model for how many times you need to toss potatoes in a pan so each side gets cooked. Inclusion-exclusion in the kitchen.</p>
+      <div class="blog-tags"><button class="tag-pill" data-tag="math">math</button></div>
+    </article>
+    <article class="blog-entry" data-tags="data analysis,running">
+      <h3><a href="blog/analyze-stadium-data.html">Analyze stadium run data</a></h3>
+      <p class="blog-date">August 9, 2025</p>
+      <p class="blog-desc">Modeling run time using temperature, sleep, and training history, with linear regression and Sobol indices.</p>
+      <div class="blog-tags"><button class="tag-pill" data-tag="data analysis">data analysis</button><button class="tag-pill" data-tag="running">running</button></div>
+    </article>
+    <article class="blog-entry" data-tags="simulation,robotics">
+      <h3><a href="blog/hydrocube.html">The Hydrocube</a></h3>
+      <p class="blog-date">August 3 2025</p>
+      <p class="blog-desc">A 3D-printed robot for testing learned fluid controllers: from simulations to a robotics prize.</p>
+      <div class="blog-tags"><button class="tag-pill" data-tag="simulation">simulation</button><button class="tag-pill" data-tag="robotics">robotics</button></div>
+    </article>
+    <article class="blog-entry" data-tags="data analysis,running">
+      <h3><a href="blog/fetch-stadium-data.html">Fetch stadium run data</a></h3>
+      <p class="blog-date">July 12, 2025</p>
+      <p class="blog-desc">How I downloaded, cleaned, and merged my Garmin and weather data to build a useful personal dataset.</p>
+      <div class="blog-tags"><button class="tag-pill" data-tag="data analysis">data analysis</button><button class="tag-pill" data-tag="running">running</button></div>
+    </article>
+    <article class="blog-entry" data-tags="code">
+      <h3><a href="blog/how-i-built-this-website.html">How I built this website</a></h3>
+      <p class="blog-date">July 12 2025</p>
+      <p class="blog-desc">How I built a custom site with code snippets, citations, and full control.</p>
+      <div class="blog-tags"><button class="tag-pill" data-tag="code">code</button></div>
+    </article>
+  </div>
+
 </section>
+</main>
 
 
 <footer class="site-footer">
@@ -82,7 +121,28 @@ How I built a custom site with code snippets, citations, and full control.</p>
 </footer>
 
   <script>
-    document.querySelectorAll('.top-nav a[href="./blog.html"]').forEach(a => a.classList.add('active'));
+    document.querySelectorAll('.top-nav a[href="./blog.html"]').forEach(a => {
+      a.classList.add('active');
+      a.setAttribute('aria-current', 'page');
+    });
+
+    (function() {
+      const entries = document.querySelectorAll('.blog-entry');
+      function applyFilter(tag) {
+        entries.forEach(e => {
+          const tags = (e.dataset.tags || '').split(',').map(t => t.trim());
+          e.style.display = (tag === 'all' || tags.includes(tag)) ? '' : 'none';
+        });
+        document.querySelectorAll('.filter-btn').forEach(b => {
+          const on = b.dataset.tag === tag;
+          b.classList.toggle('active', on);
+          b.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+      }
+      document.querySelectorAll('.filter-btn, .tag-pill').forEach(btn => {
+        btn.addEventListener('click', () => applyFilter(btn.dataset.tag));
+      });
+    })();
   </script>
 
 </body>

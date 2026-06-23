@@ -42,13 +42,14 @@
 </head>
 <body>
 
-<nav class="top-nav">
+<nav class="top-nav" aria-label="Main navigation">
   <a href="../index.html">Home</a>
   <a href="../blog.html">Blog</a>
 </nav>
 
 
-<section class="markdown-body blog-body">
+<main>
+<article class="markdown-body blog-body">
   <h1>Finding the sunniest time for a winter walk</h1>
 <p>January 6, 2026</p>
 <p>My parents live in the French Alps and go on their favorite walk around their village almost daily.
@@ -57,10 +58,10 @@ My mom doesn't like the cold and loves the sun.
 Let’s try to find the optimal time to maximize sun exposure during her walk.</p>
 <p>Conveniently, I already know how to import GPS traces from my Garmin watch (see previous posts like <a href="fetch-stadium-data.html">this one</a>).
 Yesterday I went on my parents' usual walk to record the trace:</p>
-<div class="image-wrap image-center" style="width: 70%;">
+<figure class="image-wrap image-center" style="width: 70%;">
   <img src="../images/blog/sunny-walk/walk_map.svg" alt="My parents' usual walk. In many places, the mountains block the sun.">
-  <p class="image-caption">My parents' usual walk. In many places, the mountains block the sun.</p>
-</div>
+  <figcaption class="image-caption">My parents' usual walk. In many places, the mountains block the sun.</figcaption>
+</figure>
 
 <p>I also know how to <a href="reading-in-the-sun.html">compute the horizon using topographic data</a>.
 All I need to do is put it all together and compute, for a given start time, how much sun there will be on the walk.</p>
@@ -68,10 +69,10 @@ All I need to do is put it all together and compute, for a given start time, how
 Luckily, the horizon is time independent, it only depends on the location and the azimuth angle (unless a mountain suddenly starts moving, which is unlikely).
 We can thus precompute the horizon and store it on a grid parameterized by the azimuth angle and the walk duration from the start (the latter is a parameterization of the position along the walk).
 This is what I obtained:</p>
-<div class="image-wrap image-center" style="width: 70%;">
+<figure class="image-wrap image-center" style="width: 70%;">
   <img src="../images/blog/sunny-walk/horizon.svg" alt="Precomputed horizon against the azimuth angle (deg) and the position along the walk, parameterized by the walk duration from the start.">
-  <p class="image-caption">Precomputed horizon against the azimuth angle (deg) and the position along the walk, parameterized by the walk duration from the start.</p>
-</div>
+  <figcaption class="image-caption">Precomputed horizon against the azimuth angle (deg) and the position along the walk, parameterized by the walk duration from the start.</figcaption>
+</figure>
 
 <p>Each horizontal slice corresponds to a position in the walk, and each vertical slice corresponds to a viewing direction.
 There are a few discontinuities at places, probably due to the discretization and finite step I use for the ray casting.
@@ -79,18 +80,18 @@ These discontinuities should not alter the results too much, I just want an idea
 <p>Now that we have the horizon precomputed along the walk for many azimuth angles, we can evaluate this horizon in the direction of the sun at specific dates and times.
 The sun exposure time is then the amount of time when the sun is above the horizon.</p>
 <p>For example, this is what I obtain for today, assuming clear-sky conditions:</p>
-<div class="image-wrap image-center" style="width: 70%;">
+<figure class="image-wrap image-center" style="width: 70%;">
   <img src="../images/blog/sunny-walk/sun_time-today.svg" alt="Predicted sun exposure during the walk against the starting time.">
-  <p class="image-caption">Predicted sun exposure during the walk against the starting time.</p>
-</div>
+  <figcaption class="image-caption">Predicted sun exposure during the walk against the starting time.</figcaption>
+</figure>
 
 <p>Anytime between 10am and 12:30pm should provide more than 20 minutes of sun!
 After that it will feel colder.</p>
 <p>Below is what this model predicts for the upcoming weeks:</p>
-<div class="image-wrap image-center" style="width: 70%;">
+<figure class="image-wrap image-center" style="width: 70%;">
   <img src="../images/blog/sunny-walk/sun_time-nexts.svg" alt="Predicted sun exposure during the walk in the next few weeks.">
-  <p class="image-caption">Predicted sun exposure during the walk in the next few weeks.</p>
-</div>
+  <figcaption class="image-caption">Predicted sun exposure during the walk in the next few weeks.</figcaption>
+</figure>
 
 <p>Days are getting longer, so is sun exposure!
 It seems like the walk will be fully in the sun (ignoring trees and buildings and clouds) starting at the end of this month, if one starts around noon.
@@ -633,7 +634,8 @@ I hope they will go!</p>
 
 
 </details>
-</section>
+</article>
+</main>
 
 
 <footer class="site-footer">
@@ -641,7 +643,10 @@ I hope they will go!</p>
 </footer>
 
   <script>
-    document.querySelectorAll('.top-nav a[href="../blog.html"]').forEach(a => a.classList.add('active'));
+    document.querySelectorAll('.top-nav a[href="../blog.html"]').forEach(a => {
+      a.classList.add('active');
+      a.setAttribute('aria-current', 'page');
+    });
   </script>
 
 </body>

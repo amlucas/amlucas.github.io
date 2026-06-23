@@ -21,7 +21,7 @@
 </head>
 <body>
 
-<nav class="top-nav">
+<nav class="top-nav" aria-label="Main navigation">
   <a href="#about">About</a>
   <a href="#research">Research</a>
   <a href="#publications">Publications</a>
@@ -29,14 +29,15 @@
 
 </nav>
 
+<main>
 <section id="about">
   <div class="markdown-body main-body">
     <h1>About</h1>
 <p>Welcome to my personal website!</p>
-<div class="image-wrap float-img-right" style="width: 20%;">
+<figure class="image-wrap float-img-right" style="width: 20%;">
   <img src="images/misc/portrait.png" alt="">
 
-</div>
+</figure>
 
 <p>My name is Lucas Amoudruz, I'm currently a research associate at Harvard University in the <a href="https://cse-lab.seas.harvard.edu/">CSE laboratory</a>.
 My research interests include numerical simulations of microfluidics, red blood cells modeling, blood flow simulations, artificial microswimmers, reinforcement learning, high performance computing, cloud computing, Bayesian inference, tumor growth in the brain and in the prostate, and the prediction of pyrocumulonimbus from weather and wildfire data.
@@ -90,10 +91,10 @@ Since September 2025, I am also a lecturer at Harvard university for the class "
 <p>I develop computational methods and software to simulate and control microscale systems, including blood flow and artificial microswimmers.
 My work combines high-performance computing, fluid dynamics, Bayesian inference, and artificial intelligence to enable biomedical applications such as targeted drug delivery and flow manipulation in microfluidics.</p>
 <h2>High performance computing for simulating blood...</h2>
-<div class="image-wrap float-img-right" style="width: 40%;">
+<figure class="image-wrap float-img-right" style="width: 40%;">
   <img src="images/research/rbc_tube.png" alt="">
 
-</div>
+</figure>
 
 <p>Simulating blood at the cellular resolution is a complex task, as it involves resolving hydrodynamics between deforming cells.
 Blood is mainly composed of red blood cells (RBCs), and one of the contributions during my PhD was to accurately model these cells and their interactions at large scale.
@@ -108,10 +109,10 @@ For example, we have used Mirheo to partly answer the question: <em>Are RBCs opt
 Numerical simulations suggest that their shape, and in particular their area-to-volume ratio, maximizes oxygen transport in geometries similar to arterioles (more details in our <a href="https://doi.org/10.1016/j.bpj.2024.04.015">2024 publication in <em>Biophysical Journal</em></a>).
 Similarly, in our <a href="https://doi.org/10.1103/PhysRevFluids.10.054202">2025 publication in <em>Physical Review Fluids</em></a>, Mirheo was used to study the effect of objects rotation in inertial focusing microfluidics. </p>
 <h2>...and artificial microswimmers</h2>
-<div class="image-wrap float-img-left" style="width: 40%;">
+<figure class="image-wrap float-img-left" style="width: 40%;">
   <img src="images/research/ABF_single_tube.png" alt="">
 
-</div>
+</figure>
 
 <p>Artificial bacterial flagella (ABFs) are micron-sized devices equiped with a magnetic head and a corkscrew shaped body, which makes them able to propel when they are immersed in a rotating magnetic field.
 They are great candidates to reach specific regions in the body in a non-invasive way by swimming through the circulatory system of the body.
@@ -119,10 +120,10 @@ Applications are numerous: targeted drug delivery, microsurgery, remote sensing,
 I have extended our custom software Mirheo to simulate ABFs in blood.
 Here is a video of an <a href="https://www.youtube.com/embed/pwEyiedh-Fg?si=ws153uPWyM9Y4fFl">ABF swimming in blood</a> and another one <a href="https://www.youtube.com/embed/u-5yVLkBUdU?si=lef5Tuvq9pDQxAy7">of many ABFs in a bifurcation</a>.
 One particular focus of my research tries to answer the following question: <em>how to control the external magnetic field to guide ABFs to a target?</em></p>
-<div class="image-wrap float-img-right" style="width: 50%;">
+<figure class="image-wrap float-img-right" style="width: 50%;">
   <img src="images/research/ABF_retina_RL.png" alt="">
 
-</div>
+</figure>
 
 <p>One possible approach is to use reinforcement learning (RL).
 RL learns a control policy by interacting with an environment.
@@ -134,10 +135,10 @@ Check out the <a href="https://www.youtube.com/embed/sCirMyoGpUc?si=3sB9PzqTx-TW
 RL was also helpful to design policies that control multiple ABFs independently, a difficult task given that the magnetic field is essentially uniform at these scales.
 Additional details can be found in our <a href="https://doi.org/10.1002/aisy.202100183">2022 article in <em>Advanced Intelligence Systems</em></a>, where we have exploited the swimming properties of ABFs of different shapes.</p>
 <h2>ODIL: a method for control and path planning</h2>
-<div class="image-wrap float-img-right" style="width: 33%;">
+<figure class="image-wrap float-img-right" style="width: 33%;">
   <img src="images/research/hydrocube_picture.png" alt="">
 
-</div>
+</figure>
 
 <p>Reinforcement learning is a great tool for control, but does not always converge in the settings I am interesting in.
 Furthermore, I typically have a model of the systems I want to control. 
@@ -149,10 +150,10 @@ This approach is more efficient than RL in numerous benchmarks, summarized in ou
 Using the policy found by ODIL, the device can transport small beads to precise targets, as explained in our <a href="https://doi.org/10.1017/jfm.2025.10174">2025 publication in <em>Journal of Fluid Mechanics</em></a>.
 I have built this robot with <a href="https://pkarnakov.com/">Petr Karnakov</a> in less than two months to participate at the <a href="https://www.massrobotics.org/massrobotics-announces-form-function-challenge-winners-showcases-first-accelerator-cohort-at-the-robotics-summit-expo/">MassRobotics Form and Function Challenge</a> where we have placed second over more than 40 participants.</p>
 <h2>Hierarchical Bayesian inference for red blood cells models</h2>
-<div class="image-wrap float-img-left" style="width: 40%;">
+<figure class="image-wrap float-img-left" style="width: 40%;">
   <img src="images/research/DAG_RBC_UQ.png" alt="">
 
-</div>
+</figure>
 
 <p>Calibrating the red blood cell (RBC) membrane model is crucial to predict blood flows. 
 Prior work has been fitting the membrane parameters to experimental datasets, but we found that this approach leads to a poor transferability of the model.
@@ -457,6 +458,7 @@ More details are available in our <a href="https://doi.org/10.1103/PhysRevApplie
   </div>
 </section>
 
+</main>
 
 <footer class="site-footer">
   <p>&copy; 2026 Lucas Amoudruz &nbsp;&nbsp;|&nbsp;&nbsp; <a href="feed.xml">Subscribe (RSS)</a></p>
@@ -470,8 +472,12 @@ More details are available in our <a href="https://doi.org/10.1103/PhysRevApplie
         if (!navLink) return;
 
         if (entry.isIntersecting) {
-          document.querySelectorAll('.top-nav a.active').forEach(a => a.classList.remove('active'));
+          document.querySelectorAll('.top-nav a.active').forEach(a => {
+            a.classList.remove('active');
+            a.removeAttribute('aria-current');
+          });
           navLink.classList.add('active');
+          navLink.setAttribute('aria-current', 'true');
         }
       });
     }, { threshold: 0.3 });

@@ -42,13 +42,14 @@
 </head>
 <body>
 
-<nav class="top-nav">
+<nav class="top-nav" aria-label="Main navigation">
   <a href="../index.html">Home</a>
   <a href="../blog.html">Blog</a>
 </nav>
 
 
-<section class="markdown-body blog-body">
+<main>
+<article class="markdown-body blog-body">
   <h1>When is the sun blocked by the mountains?</h1>
 <p>January 5, 2026</p>
 <p>I'm visiting my parents this winter in the French Alps.
@@ -62,10 +63,10 @@ I thought I'd use the cold and shady time to compute when it's going to be sunny
 <p>It is sunny when the sun is above the horizon. The horizon is defined by the silhouette formed by mountains around me.</p>
 <p>I went ahead and downloaded the topographic map of the area from <a href="https://portal.opentopography.org/raster?opentopoID=OTSDEM.032021.4326.3">Copernicus GLO-30 Digital Elevation Model</a><sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup>.
 I have selected a region large enough to cover most visible mountains from here.</p>
-<div class="image-wrap image-center" style="width: 90%;">
+<figure class="image-wrap image-center" style="width: 90%;">
   <img src="../images/blog/reading-in-the-sun/elevation.svg" alt="Elevation map around my hometown (red dot). We can already guess that the mountains in the South hide the sun during winter.">
-  <p class="image-caption">Elevation map around my hometown (red dot). We can already guess that the mountains in the South hide the sun during winter.</p>
-</div>
+  <figcaption class="image-caption">Elevation map around my hometown (red dot). We can already guess that the mountains in the South hide the sun during winter.</figcaption>
+</figure>
 
 <p>Then, I computed the horizon from this map.
 This is computed as the maximum of 
@@ -75,10 +76,10 @@ This is computed as the maximum of
 along a ray starting at my location.
 In the above equation, <script type="math/tex">z_0</script> is the elevation at the view point, <script type="math/tex">z</script> is that along the ray, and <script type="math/tex">d</script> is the distance from the view point.
 I have repeated this for any azimuth angle (this angle is 0 when pointing north, and 90 degrees when pointing east):</p>
-<div class="image-wrap image-center" style="width: 70%;">
+<figure class="image-wrap image-center" style="width: 70%;">
   <img src="../images/blog/reading-in-the-sun/horizon.svg" alt="Horizon from my parents' house, computed from the topographic data.">
-  <p class="image-caption">Horizon from my parents' house, computed from the topographic data.</p>
-</div>
+  <figcaption class="image-caption">Horizon from my parents' house, computed from the topographic data.</figcaption>
+</figure>
 
 <p>I didn't look for horizon data to double check these results but I easily recognize many mountains, I've seen them so many times.
 There's the Mole at around 55 degrees, pointe d'Andey at around 110 degrees and the pointe de Cou in the South direction.
@@ -200,16 +201,16 @@ I have used the following code to estimate its trajectory. This is a blind copy-
 
 <p>In summer, the sun is high up in the sky, and the mountains don't block the light.
 In winter, like today, the sun is very close and often below the horizon:</p>
-<div class="image-wrap image-center" style="width: 70%;">
+<figure class="image-wrap image-center" style="width: 70%;">
   <img src="../images/blog/reading-in-the-sun/horizon_and_sun.svg" alt="Horizon and trajectory of the sun at two different times of the year. The sun is often behind the mountains in winter.">
-  <p class="image-caption">Horizon and trajectory of the sun at two different times of the year. The sun is often behind the mountains in winter.</p>
-</div>
+  <figcaption class="image-caption">Horizon and trajectory of the sun at two different times of the year. The sun is often behind the mountains in winter.</figcaption>
+</figure>
 
 <p>The following figure shows when the sun will be above the horizon today, based on the model above:</p>
-<div class="image-wrap image-center" style="width: 70%;">
+<figure class="image-wrap image-center" style="width: 70%;">
   <img src="../images/blog/reading-in-the-sun/sun_times.svg" alt="Whether the sun will be above or below the horizon on January 5th of 2026.">
-  <p class="image-caption">Whether the sun will be above or below the horizon on January 5th of 2026.</p>
-</div>
+  <figcaption class="image-caption">Whether the sun will be above or below the horizon on January 5th of 2026.</figcaption>
+</figure>
 
 <p>There are many approximations here: I ignored trees, buildings, clouds, and could use a better model for the sun trajectory. Yet the results seem consistent with what I saw yesterday.
 Today, I'll be able to read in the sun from 9:27 to 13:52, and then from 14:51 to 15:45.
@@ -222,7 +223,8 @@ Now I just hope that no cloud will disturb my plans!</p>
 </li>
 </ol>
 </div>
-</section>
+</article>
+</main>
 
 
 <footer class="site-footer">
@@ -230,7 +232,10 @@ Now I just hope that no cloud will disturb my plans!</p>
 </footer>
 
   <script>
-    document.querySelectorAll('.top-nav a[href="../blog.html"]').forEach(a => a.classList.add('active'));
+    document.querySelectorAll('.top-nav a[href="../blog.html"]').forEach(a => {
+      a.classList.add('active');
+      a.setAttribute('aria-current', 'page');
+    });
   </script>
 
 </body>

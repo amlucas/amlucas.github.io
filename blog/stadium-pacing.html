@@ -42,13 +42,14 @@
 </head>
 <body>
 
-<nav class="top-nav">
+<nav class="top-nav" aria-label="Main navigation">
   <a href="../index.html">Home</a>
   <a href="../blog.html">Blog</a>
 </nav>
 
 
-<section class="markdown-body blog-body">
+<main>
+<article class="markdown-body blog-body">
   <h1>My pace during stadium runs</h1>
 <p>December 21, 2025</p>
 <p>I often train by running up and down the rows of concrete stairs at the Harvard stadium near where I live.
@@ -160,20 +161,20 @@ Here is the code I have used:</p>
 <p>This gives time series of the elevation and the corresponding duration from the start of my run.
 The time series are remarkably smooth.
 We can easily distinguish the ups and downs of each row (recall: there is a total of 37 flights of stairs to run up.)</p>
-<div class="image-wrap image-center" style="width: 75%;">
+<figure class="image-wrap image-center" style="width: 75%;">
   <img src="../images/blog/stadium-pacing/peaks.svg" alt="The elevation against time of 4 of my runs. I only show the first five minutes for clarity.">
-  <p class="image-caption">The elevation against time of 4 of my runs. I only show the first five minutes for clarity.</p>
-</div>
+  <figcaption class="image-caption">The elevation against time of 4 of my runs. I only show the first five minutes for clarity.</figcaption>
+</figure>
 
 <p>In the above plot, I marked the location of the peaks, computed with the scipy function <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.find_peaks.html">find_peaks</a>.
 These peaks correspond to the highest point of each flight of stairs, and they mark a regular spacing of the total progress.
 This is a very robust way of keeping track of the progress of each run.
 Using GPS-computed distance would be a lot noisier, especially due to the sharp turns at the ends of each row.</p>
 <p>We can now look at the running time between consecutive rows:</p>
-<div class="image-wrap image-center" style="width: 75%;">
+<figure class="image-wrap image-center" style="width: 75%;">
   <img src="../images/blog/stadium-pacing/p2pdurations.svg" alt="Running time between consecutive rows against the index of the starting row. Symbols show the mean over all my recorded runs, and error bars indicate the 5th to 95th percentiles.">
-  <p class="image-caption">Running time between consecutive rows against the index of the starting row. Symbols show the mean over all my recorded runs, and error bars indicate the 5th to 95th percentiles.</p>
-</div>
+  <figcaption class="image-caption">Running time between consecutive rows against the index of the starting row. Symbols show the mean over all my recorded runs, and error bars indicate the 5th to 95th percentiles.</figcaption>
+</figure>
 
 <p>We can observe a few things.</p>
 <ol>
@@ -183,10 +184,10 @@ Using GPS-computed distance would be a lot noisier, especially due to the sharp 
 </ol>
 <p>All these observations make sense - although I had never noticed that steady decrease in pace before.</p>
 <p>Is there a better way to do this? Let's add the average of my 10 best runs on top of this data:</p>
-<div class="image-wrap image-center" style="width: 75%;">
+<figure class="image-wrap image-center" style="width: 75%;">
   <img src="../images/blog/stadium-pacing/p2pdurations_and_best.svg" alt="Same plot as before, with the mean coming from my best 10 runs of all times.">
-  <p class="image-caption">Same plot as before, with the mean coming from my best 10 runs of all times.</p>
-</div>
+  <figcaption class="image-caption">Same plot as before, with the mean coming from my best 10 runs of all times.</figcaption>
+</figure>
 
 <p>Well, it seems like I won't learn too much from the global progress alone: my best runs were just constantly faster than the average run.
 This can't be the whole story.
@@ -196,39 +197,39 @@ On each plot, there are thus 36 curves (I skip row 37 which is only up, no down)
 These are 3 of my best runs: </p>
 <div class="image-row">
 
-<div class="image-wrap" style="width: 32%;">
+<figure class="image-wrap" style="width: 32%;">
   <img src="../images/blog/stadium-pacing/best_profile_runs/000.svg" alt="">
-  <p class="image-caption"></p>
-</div>
+  <figcaption class="image-caption"></figcaption>
+</figure>
 
-<div class="image-wrap" style="width: 32%;">
+<figure class="image-wrap" style="width: 32%;">
   <img src="../images/blog/stadium-pacing/best_profile_runs/001.svg" alt="">
-  <p class="image-caption"></p>
-</div>
+  <figcaption class="image-caption"></figcaption>
+</figure>
 
-<div class="image-wrap" style="width: 32%;">
+<figure class="image-wrap" style="width: 32%;">
   <img src="../images/blog/stadium-pacing/best_profile_runs/002.svg" alt="">
-  <p class="image-caption"></p>
-</div>
+  <figcaption class="image-caption"></figcaption>
+</figure>
 </div>
 
 <p>And 3 slower runs:</p>
 <div class="image-row">
 
-<div class="image-wrap" style="width: 32%;">
+<figure class="image-wrap" style="width: 32%;">
   <img src="../images/blog/stadium-pacing/average_profile_runs/000.svg" alt="">
-  <p class="image-caption"></p>
-</div>
+  <figcaption class="image-caption"></figcaption>
+</figure>
 
-<div class="image-wrap" style="width: 32%;">
+<figure class="image-wrap" style="width: 32%;">
   <img src="../images/blog/stadium-pacing/average_profile_runs/001.svg" alt="">
-  <p class="image-caption"></p>
-</div>
+  <figcaption class="image-caption"></figcaption>
+</figure>
 
-<div class="image-wrap" style="width: 32%;">
+<figure class="image-wrap" style="width: 32%;">
   <img src="../images/blog/stadium-pacing/average_profile_runs/002.svg" alt="">
-  <p class="image-caption"></p>
-</div>
+  <figcaption class="image-caption"></figcaption>
+</figure>
 </div>
 
 <p>From these plots, we can see that my runs follow a three-phase structure for each up and down:</p>
@@ -245,29 +246,29 @@ This leads to a piecewise linear approximation of the elevation against time.
 A fit over all cycles is illustrated below for the three "fast" runs:</p>
 <div class="image-row">
 
-<div class="image-wrap" style="width: 32%;">
+<figure class="image-wrap" style="width: 32%;">
   <img src="../images/blog/stadium-pacing/detailed/000.svg" alt="">
-  <p class="image-caption"></p>
-</div>
+  <figcaption class="image-caption"></figcaption>
+</figure>
 
-<div class="image-wrap" style="width: 32%;">
+<figure class="image-wrap" style="width: 32%;">
   <img src="../images/blog/stadium-pacing/detailed/001.svg" alt="">
-  <p class="image-caption"></p>
-</div>
+  <figcaption class="image-caption"></figcaption>
+</figure>
 
-<div class="image-wrap" style="width: 32%;">
+<figure class="image-wrap" style="width: 32%;">
   <img src="../images/blog/stadium-pacing/detailed/002.svg" alt="">
-  <p class="image-caption"></p>
-</div>
+  <figcaption class="image-caption"></figcaption>
+</figure>
 </div>
 
 <p>The black dot indicates the transition from running to walking up.
 The average time spent in each zone can be extracted from this approximation.
 It is shown below for all runs and for my ten fastest runs:</p>
-<div class="image-wrap image-center" style="width: 75%;">
+<figure class="image-wrap image-center" style="width: 75%;">
   <img src="../images/blog/stadium-pacing/time_zones_comp.svg" alt="Average time spent in each zone. Zone 1: Run up; Zone 2: walk up; Zone 3: run down.">
-  <p class="image-caption">Average time spent in each zone. Zone 1: Run up; Zone 2: walk up; Zone 3: run down.</p>
-</div>
+  <figcaption class="image-caption">Average time spent in each zone. Zone 1: Run up; Zone 2: walk up; Zone 3: run down.</figcaption>
+</figure>
 
 <p>In my best 10 runs, I was faster in zone 1 (run up) and zone 3 (run down), but not in zone 2 (walk up).</p>
 <p>This was a fun deep dive in the elevation data recorded by my watch over the past 77 stadium runs.
@@ -718,7 +719,8 @@ All that repeated 36 times before running up the last flight of stairs as fast a
 
 
 </details>
-</section>
+</article>
+</main>
 
 
 <footer class="site-footer">
@@ -726,7 +728,10 @@ All that repeated 36 times before running up the last flight of stairs as fast a
 </footer>
 
   <script>
-    document.querySelectorAll('.top-nav a[href="../blog.html"]').forEach(a => a.classList.add('active'));
+    document.querySelectorAll('.top-nav a[href="../blog.html"]').forEach(a => {
+      a.classList.add('active');
+      a.setAttribute('aria-current', 'page');
+    });
   </script>
 
 </body>

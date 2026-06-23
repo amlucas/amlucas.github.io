@@ -42,13 +42,14 @@
 </head>
 <body>
 
-<nav class="top-nav">
+<nav class="top-nav" aria-label="Main navigation">
   <a href="../index.html">Home</a>
   <a href="../blog.html">Blog</a>
 </nav>
 
 
-<section class="markdown-body blog-body">
+<main>
+<article class="markdown-body blog-body">
   <h1>Rhythms of a street</h1>
 <p>June 23, 2026</p>
 <p>I bought a Raspberry Pi, a tiny computer that people have used for fun little robotic projects, house automation, game emulators or weather stations.
@@ -57,10 +58,10 @@ This isn't my first experience with this kind of device: in 2024 I used a toolki
 What attracted me here was a different use: turning a computer into an instrument that continuously observes the physical world.
 I also bought a USB microphone for a few dollars, and wrote a short program to record the noise intensity in my bedroom for about two weeks.
 Let's see if we find anything interesting.</p>
-<div class="image-wrap image-center" style="width: 70%;">
+<figure class="image-wrap image-center" style="width: 70%;">
   <img src="../images/blog/raspberry-pi-listener/raw_signal.svg" alt="The root-mean-square sound intensity over 10s and 1h intervals against time, in arbitrary units.">
-  <p class="image-caption">The root-mean-square sound intensity over 10s and 1h intervals against time, in arbitrary units.</p>
-</div>
+  <figcaption class="image-caption">The root-mean-square sound intensity over 10s and 1h intervals against time, in arbitrary units.</figcaption>
+</figure>
 
 <p>The signal is very noisy, partly because of the low-quality microphone, but mostly because the street under my window is a noisy place.
 Nevertheless, a simple moving average reveals some expected patterns.
@@ -68,19 +69,19 @@ There are clear peaks in the morning and evenings, corresponding to rush hours, 
 It is also easy to distinguish the nighttime, when it is a lot quieter.
 The large peak in the night of May 21st corresponds to my AC unit fighting the particular high heat of that day.</p>
 <p>We can observe this daily repetition when we look at the autocorrelation of the signal:</p>
-<div class="image-wrap image-center" style="width: 70%;">
+<figure class="image-wrap image-center" style="width: 70%;">
   <img src="../images/blog/raspberry-pi-listener/autocorrelation_long.svg" alt="">
 
-</div>
+</figure>
 
 <p>There is again a clear peak around 24 hours, although the correlation is relatively weak.
 (By the way, computing an autocorrelation is very similar to a convolution, which can be done efficiently using FFTs.)
 The autocorrelation still looks noisy. 
 Let's zoom in:</p>
-<div class="image-wrap image-center" style="width: 70%;">
+<figure class="image-wrap image-center" style="width: 70%;">
   <img src="../images/blog/raspberry-pi-listener/autocorrelation_short.svg" alt="">
 
-</div>
+</figure>
 
 <p>Surprisingly, among all the apparent noise, we see very clear oscillations.
 Their period is around 85 seconds. 
@@ -254,7 +255,8 @@ Right now my Raspberry Pi isn't listening anymore, but I might make it <em>watch
 
 
 </details>
-</section>
+</article>
+</main>
 
 
 <footer class="site-footer">
@@ -262,7 +264,10 @@ Right now my Raspberry Pi isn't listening anymore, but I might make it <em>watch
 </footer>
 
   <script>
-    document.querySelectorAll('.top-nav a[href="../blog.html"]').forEach(a => a.classList.add('active'));
+    document.querySelectorAll('.top-nav a[href="../blog.html"]').forEach(a => {
+      a.classList.add('active');
+      a.setAttribute('aria-current', 'page');
+    });
   </script>
 
 </body>

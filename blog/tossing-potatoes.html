@@ -42,13 +42,14 @@
 </head>
 <body>
 
-<nav class="top-nav">
+<nav class="top-nav" aria-label="Main navigation">
   <a href="../index.html">Home</a>
   <a href="../blog.html">Blog</a>
 </nav>
 
 
-<section class="markdown-body blog-body">
+<main>
+<article class="markdown-body blog-body">
   <h1>Tossing potatoes</h1>
 <p>December 2, 2025</p>
 <p>Tonight I have prepared sautéed potatoes.
@@ -92,19 +93,19 @@ P_m(t) = \sum\limits_{k=0}^m (-1)^k {m \choose k} \left( \frac{m-k}{m} \right)^t
 </script>
 </p>
 <p>The probability <script type="math/tex">P_m(t)</script> tends exponentially to 1 as <script type="math/tex">t</script> increases, as illustrated in the following figure:</p>
-<div class="image-wrap image-center" style="width: 70%;">
+<figure class="image-wrap image-center" style="width: 70%;">
   <img src="../images/blog/tossing-potatoes/Pt.svg" alt="Probability that a potato has touched all 6 sides after t tosses.">
-  <p class="image-caption">Probability that a potato has touched all 6 sides after t tosses.</p>
-</div>
+  <figcaption class="image-caption">Probability that a potato has touched all 6 sides after t tosses.</figcaption>
+</figure>
 
 <p>As expected, under 6 tosses, the probability that the potato is well cooked is zero, because it cannot have been on 6 faces.
 The figure shows that after 27 tosses, there is already more than 95% probability that the potato cube has visited all 6 faces.
 I don't have only one potato piece, but <script type="math/tex">N</script> of them (say 40).
 The number of well cooked potatoes follows a binomial distribution, with success probability <script type="math/tex">P_6(t)</script>.</p>
-<div class="image-wrap image-center" style="width: 70%;">
+<figure class="image-wrap image-center" style="width: 70%;">
   <img src="../images/blog/tossing-potatoes/binomial.svg" alt="Median number of well cooked potatoes out of $N=40$, against the number of tosses. Error bars indicate the 5 to 95% quantiles.">
-  <p class="image-caption">Median number of well cooked potatoes out of $N=40$, against the number of tosses. Error bars indicate the 5 to 95% quantiles.</p>
-</div>
+  <figcaption class="image-caption">Median number of well cooked potatoes out of $N=40$, against the number of tosses. Error bars indicate the 5 to 95% quantiles.</figcaption>
+</figure>
 
 <p>In my pan, most of the 40 potatoes will be well cooked after about 30 tosses.
 It's hard work, but totally worth it.</p>
@@ -210,7 +211,8 @@ But this little exercise made me discover the inclusion-exclusion principle, and
 
 
 </details>
-</section>
+</article>
+</main>
 
 
 <footer class="site-footer">
@@ -218,7 +220,10 @@ But this little exercise made me discover the inclusion-exclusion principle, and
 </footer>
 
   <script>
-    document.querySelectorAll('.top-nav a[href="../blog.html"]').forEach(a => a.classList.add('active'));
+    document.querySelectorAll('.top-nav a[href="../blog.html"]').forEach(a => {
+      a.classList.add('active');
+      a.setAttribute('aria-current', 'page');
+    });
   </script>
 
 </body>

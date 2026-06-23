@@ -42,13 +42,14 @@
 </head>
 <body>
 
-<nav class="top-nav">
+<nav class="top-nav" aria-label="Main navigation">
   <a href="../index.html">Home</a>
   <a href="../blog.html">Blog</a>
 </nav>
 
 
-<section class="markdown-body blog-body">
+<main>
+<article class="markdown-body blog-body">
   <h1>Running the Harvard stadium: automatically retrieve data</h1>
 <p>July 12, 2025</p>
 <p>My friends and I took up the habit of running the stairs at the Harvard stadium.
@@ -129,7 +130,8 @@ We are now ready to plot the durations and temperature of all my stadium runs!</
 <li>temperature seems to be a factor of performance.</li>
 </ul>
 <p>But much more analysis is needed - this will be the object of a future post.</p>
-</section>
+</article>
+</main>
 
 
 <footer class="site-footer">
@@ -137,7 +139,10 @@ We are now ready to plot the durations and temperature of all my stadium runs!</
 </footer>
 
   <script>
-    document.querySelectorAll('.top-nav a[href="../blog.html"]').forEach(a => a.classList.add('active'));
+    document.querySelectorAll('.top-nav a[href="../blog.html"]').forEach(a => {
+      a.classList.add('active');
+      a.setAttribute('aria-current', 'page');
+    });
   </script>
 
 </body>

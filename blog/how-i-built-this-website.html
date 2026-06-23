@@ -42,13 +42,14 @@
 </head>
 <body>
 
-<nav class="top-nav">
+<nav class="top-nav" aria-label="Main navigation">
   <a href="../index.html">Home</a>
   <a href="../blog.html">Blog</a>
 </nav>
 
 
-<section class="markdown-body blog-body">
+<main>
+<article class="markdown-body blog-body">
   <h1>How I built this website with Python and Markdown</h1>
 <p>July 12, 2025</p>
 <p>I have recently redesigned my website.
@@ -139,11 +140,13 @@ Below, I describe the structure of the code in more detail.</p>
 <span class="s2">&lt;/head&gt;</span>
 <span class="s2">&lt;body&gt;</span>
 
-<span class="s2">&lt;nav class=&quot;top-nav&quot;&gt;</span>
+<span class="s2">&lt;nav class=&quot;top-nav&quot; aria-label=&quot;Main navigation&quot;&gt;</span>
 <span class="si">{</span><span class="n">nav_bar</span><span class="si">}</span>
 <span class="s2">&lt;/nav&gt;</span>
 
+<span class="s2">&lt;main&gt;</span>
 <span class="si">{</span><span class="n">html_sections</span><span class="si">}</span>
+<span class="s2">&lt;/main&gt;</span>
 
 <span class="si">{</span><span class="n">get_footer</span><span class="p">()</span><span class="si">}</span>
 
@@ -186,13 +189,13 @@ This function handles parsing custom image blocks and turns them into proper HTM
             <span class="n">float_class</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
 
         <span class="n">style</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;style=&quot;width: </span><span class="si">{</span><span class="n">width</span><span class="si">}</span><span class="s1">%;&quot;&#39;</span>
-        <span class="n">caption_html</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&lt;p class=&quot;image-caption&quot;&gt;</span><span class="si">{</span><span class="n">caption</span><span class="si">}</span><span class="s1">&lt;/p&gt;&#39;</span> <span class="k">if</span> <span class="n">caption</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">caption_html</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;&lt;figcaption class=&quot;image-caption&quot;&gt;</span><span class="si">{</span><span class="n">caption</span><span class="si">}</span><span class="s1">&lt;/figcaption&gt;&#39;</span> <span class="k">if</span> <span class="n">caption</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
 
         <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;&#39;&#39;</span>
-<span class="s1">&lt;div class=&quot;image-wrap </span><span class="si">{</span><span class="n">float_class</span><span class="si">}</span><span class="s1">&quot; </span><span class="si">{</span><span class="n">style</span><span class="si">}</span><span class="s1">&gt;</span>
+<span class="s1">&lt;figure class=&quot;image-wrap </span><span class="si">{</span><span class="n">float_class</span><span class="si">}</span><span class="s1">&quot; </span><span class="si">{</span><span class="n">style</span><span class="si">}</span><span class="s1">&gt;</span>
 <span class="s1">  &lt;img src=&quot;</span><span class="si">{</span><span class="n">src</span><span class="si">}</span><span class="s1">&quot; alt=&quot;</span><span class="si">{</span><span class="n">caption</span><span class="si">}</span><span class="s1">&quot;&gt;</span>
 <span class="s1">  </span><span class="si">{</span><span class="n">caption_html</span><span class="si">}</span>
-<span class="s1">&lt;/div&gt;</span>
+<span class="s1">&lt;/figure&gt;</span>
 <span class="s1">        &#39;&#39;&#39;</span>
 
     <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">replacer</span><span class="p">,</span> <span class="n">md_text</span><span class="p">)</span>
@@ -213,10 +216,91 @@ This function handles parsing custom image blocks and turns them into proper HTM
 <div class="codehilite"><pre><span></span><code><span class="ch">#!/usr/bin/env python</span>
 
 <span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">markdown</span>
-<span class="kn">import</span> <span class="nn">os</span>
 
 <span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">get_ga4_tag</span><span class="p">,</span> <span class="n">get_rss_link</span><span class="p">,</span> <span class="n">get_footer</span>
+
+
+<span class="k">def</span> <span class="nf">parse_blog</span><span class="p">(</span><span class="n">md_text</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Parse blog.md into (intro_markdown, list_of_entries).</span>
+
+<span class="sd">    Each entry is built from consecutive lines after a `### [title](link)` line:</span>
+<span class="sd">    a `*date*` line, a description line, and an optional `Tags: a, b` line.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="n">md_text</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">intro_lines</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">entries</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">current</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">in_entries</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="n">link_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;###\s*\[([^\]]+)\]\(([^)]+)\)&#39;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+        <span class="n">stripped</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">link_re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">stripped</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+            <span class="n">in_entries</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="n">current</span><span class="p">:</span>
+                <span class="n">entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current</span><span class="p">)</span>
+            <span class="n">current</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;link&#39;</span><span class="p">:</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
+                       <span class="s1">&#39;date&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;tags&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+            <span class="k">continue</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">in_entries</span><span class="p">:</span>
+            <span class="n">intro_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+            <span class="k">continue</span>
+
+        <span class="k">if</span> <span class="n">stripped</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;---&#39;</span><span class="p">):</span>
+            <span class="k">continue</span>
+
+        <span class="n">date_m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\*([^*]+)\*&#39;</span><span class="p">,</span> <span class="n">stripped</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">date_m</span><span class="p">:</span>
+            <span class="n">current</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">date_m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="k">continue</span>
+
+        <span class="k">if</span> <span class="n">stripped</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;tags:&#39;</span><span class="p">):</span>
+            <span class="n">tag_str</span> <span class="o">=</span> <span class="n">stripped</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s1">&#39;tags:&#39;</span><span class="p">):]</span>
+            <span class="n">current</span><span class="p">[</span><span class="s1">&#39;tags&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tag_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span>
+            <span class="k">continue</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">current</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]:</span>
+            <span class="n">current</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stripped</span>
+
+    <span class="k">if</span> <span class="n">current</span><span class="p">:</span>
+        <span class="n">entries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">intro_lines</span><span class="p">),</span> <span class="n">entries</span>
+
+
+<span class="k">def</span> <span class="nf">build_blog_html</span><span class="p">(</span><span class="n">intro_md</span><span class="p">,</span> <span class="n">entries</span><span class="p">):</span>
+    <span class="n">intro_html</span> <span class="o">=</span> <span class="n">markdown</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span><span class="n">intro_md</span><span class="p">)</span>
+
+    <span class="n">all_tags</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">({</span><span class="n">t</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">entries</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;tags&#39;</span><span class="p">]})</span>
+
+    <span class="n">filter_html</span> <span class="o">=</span> <span class="s1">&#39;  &lt;div class=&quot;blog-filter&quot; role=&quot;group&quot; aria-label=&quot;Filter posts by tag&quot;&gt;</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">filter_html</span> <span class="o">+=</span> <span class="s1">&#39;    &lt;button class=&quot;filter-btn active&quot; data-tag=&quot;all&quot; aria-pressed=&quot;true&quot;&gt;All&lt;/button&gt;</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">all_tags</span><span class="p">:</span>
+        <span class="n">filter_html</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;    &lt;button class=&quot;filter-btn&quot; data-tag=&quot;</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s1">&quot; aria-pressed=&quot;false&quot;&gt;</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s1">&lt;/button&gt;</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="n">filter_html</span> <span class="o">+=</span> <span class="s1">&#39;  &lt;/div&gt;</span><span class="se">\n</span><span class="s1">&#39;</span>
+
+    <span class="n">entries_html</span> <span class="o">=</span> <span class="s1">&#39;  &lt;div class=&quot;blog-list&quot;&gt;</span><span class="se">\n</span><span class="s1">&#39;</span>
+    <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">entries</span><span class="p">:</span>
+        <span class="n">data_tags</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="s1">&#39;tags&#39;</span><span class="p">])</span>
+        <span class="n">pills</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;&lt;button class=&quot;tag-pill&quot; data-tag=&quot;</span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s1">&quot;&gt;</span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s1">&lt;/button&gt;&#39;</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">e</span><span class="p">[</span><span class="s1">&#39;tags&#39;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">entries_html</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;&#39;&#39;    &lt;article class=&quot;blog-entry&quot; data-tags=&quot;</span><span class="si">{</span><span class="n">data_tags</span><span class="si">}</span><span class="s1">&quot;&gt;</span>
+<span class="s1">      &lt;h3&gt;&lt;a href=&quot;</span><span class="si">{</span><span class="n">e</span><span class="p">[</span><span class="s1">&#39;link&#39;</span><span class="p">]</span><span class="si">}</span><span class="s1">&quot;&gt;</span><span class="si">{</span><span class="n">e</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span><span class="si">}</span><span class="s1">&lt;/a&gt;&lt;/h3&gt;</span>
+<span class="s1">      &lt;p class=&quot;blog-date&quot;&gt;</span><span class="si">{</span><span class="n">e</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span><span class="si">}</span><span class="s1">&lt;/p&gt;</span>
+<span class="s1">      &lt;p class=&quot;blog-desc&quot;&gt;</span><span class="si">{</span><span class="n">e</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span><span class="si">}</span><span class="s1">&lt;/p&gt;</span>
+<span class="s1">      &lt;div class=&quot;blog-tags&quot;&gt;</span><span class="si">{</span><span class="n">pills</span><span class="si">}</span><span class="s1">&lt;/div&gt;</span>
+<span class="s1">    &lt;/article&gt;</span>
+<span class="s1">&#39;&#39;&#39;</span>
+    <span class="n">entries_html</span> <span class="o">+=</span> <span class="s1">&#39;  &lt;/div&gt;</span><span class="se">\n</span><span class="s1">&#39;</span>
+
+    <span class="k">return</span> <span class="n">intro_html</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">filter_html</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">entries_html</span>
+
 
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
@@ -229,19 +313,42 @@ This function handles parsing custom image blocks and turns them into proper HTM
 
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">md_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">raw_md</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-    <span class="n">processed_md</span> <span class="o">=</span> <span class="n">raw_md</span>
 
-    <span class="n">html_content</span> <span class="o">=</span> <span class="n">markdown</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span><span class="n">processed_md</span><span class="p">)</span>
+    <span class="n">intro_md</span><span class="p">,</span> <span class="n">entries</span> <span class="o">=</span> <span class="n">parse_blog</span><span class="p">(</span><span class="n">raw_md</span><span class="p">)</span>
+    <span class="n">html_content</span> <span class="o">=</span> <span class="n">build_blog_html</span><span class="p">(</span><span class="n">intro_md</span><span class="p">,</span> <span class="n">entries</span><span class="p">)</span>
 
     <span class="n">html_section</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">&lt;main&gt;</span>
 <span class="s2">&lt;section class=&quot;markdown-body blog-body&quot;&gt;</span>
 <span class="s2">  </span><span class="si">{</span><span class="n">html_content</span><span class="si">}</span>
 <span class="s2">&lt;/section&gt;</span>
+<span class="s2">&lt;/main&gt;</span>
 <span class="s2">&quot;&quot;&quot;</span>
 
     <span class="n">ga4_tag</span> <span class="o">=</span> <span class="n">get_ga4_tag</span><span class="p">()</span>
-    <span class="n">blog_nav_script</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;  &lt;script&gt;</span>
-<span class="s1">    document.querySelectorAll(&#39;.top-nav a[href=&quot;./blog.html&quot;]&#39;).forEach(a =&gt; a.classList.add(&#39;active&#39;));</span>
+    <span class="n">blog_scripts</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;  &lt;script&gt;</span>
+<span class="s1">    document.querySelectorAll(&#39;.top-nav a[href=&quot;./blog.html&quot;]&#39;).forEach(a =&gt; {</span>
+<span class="s1">      a.classList.add(&#39;active&#39;);</span>
+<span class="s1">      a.setAttribute(&#39;aria-current&#39;, &#39;page&#39;);</span>
+<span class="s1">    });</span>
+
+<span class="s1">    (function() {</span>
+<span class="s1">      const entries = document.querySelectorAll(&#39;.blog-entry&#39;);</span>
+<span class="s1">      function applyFilter(tag) {</span>
+<span class="s1">        entries.forEach(e =&gt; {</span>
+<span class="s1">          const tags = (e.dataset.tags || &#39;&#39;).split(&#39;,&#39;).map(t =&gt; t.trim());</span>
+<span class="s1">          e.style.display = (tag === &#39;all&#39; || tags.includes(tag)) ? &#39;&#39; : &#39;none&#39;;</span>
+<span class="s1">        });</span>
+<span class="s1">        document.querySelectorAll(&#39;.filter-btn&#39;).forEach(b =&gt; {</span>
+<span class="s1">          const on = b.dataset.tag === tag;</span>
+<span class="s1">          b.classList.toggle(&#39;active&#39;, on);</span>
+<span class="s1">          b.setAttribute(&#39;aria-pressed&#39;, on ? &#39;true&#39; : &#39;false&#39;);</span>
+<span class="s1">        });</span>
+<span class="s1">      }</span>
+<span class="s1">      document.querySelectorAll(&#39;.filter-btn, .tag-pill&#39;).forEach(btn =&gt; {</span>
+<span class="s1">        btn.addEventListener(&#39;click&#39;, () =&gt; applyFilter(btn.dataset.tag));</span>
+<span class="s1">      });</span>
+<span class="s1">    })();</span>
 <span class="s1">  &lt;/script&gt;&#39;&#39;&#39;</span>
 
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_html</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -260,7 +367,7 @@ This function handles parsing custom image blocks and turns them into proper HTM
 <span class="s2">&lt;/head&gt;</span>
 <span class="s2">&lt;body&gt;</span>
 
-<span class="s2">&lt;nav class=&quot;top-nav&quot;&gt;</span>
+<span class="s2">&lt;nav class=&quot;top-nav&quot; aria-label=&quot;Main navigation&quot;&gt;</span>
 <span class="s2">  &lt;a href=&quot;./index.html&quot;&gt;Home&lt;/a&gt;</span>
 <span class="s2">  &lt;a href=&quot;./blog.html&quot;&gt;Blog&lt;/a&gt;</span>
 <span class="s2">&lt;/nav&gt;</span>
@@ -269,7 +376,7 @@ This function handles parsing custom image blocks and turns them into proper HTM
 
 <span class="si">{</span><span class="n">get_footer</span><span class="p">()</span><span class="si">}</span>
 
-<span class="si">{</span><span class="n">blog_nav_script</span><span class="si">}</span>
+<span class="si">{</span><span class="n">blog_scripts</span><span class="si">}</span>
 
 <span class="s2">&lt;/body&gt;</span>
 <span class="s2">&lt;/html&gt;</span>
@@ -329,15 +436,20 @@ This function handles parsing custom image blocks and turns them into proper HTM
 
 
     <span class="n">html_section</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">&lt;section class=&quot;markdown-body blog-body&quot;&gt;</span>
+<span class="s2">&lt;main&gt;</span>
+<span class="s2">&lt;article class=&quot;markdown-body blog-body&quot;&gt;</span>
 <span class="s2">  </span><span class="si">{</span><span class="n">html_content</span><span class="si">}</span>
-<span class="s2">&lt;/section&gt;</span>
+<span class="s2">&lt;/article&gt;</span>
+<span class="s2">&lt;/main&gt;</span>
 <span class="s2">&quot;&quot;&quot;</span>
 
     <span class="n">title</span> <span class="o">=</span> <span class="n">md_path_to_title</span><span class="p">(</span><span class="n">md_path</span><span class="p">)</span>
     <span class="n">ga4_tag</span> <span class="o">=</span> <span class="n">get_ga4_tag</span><span class="p">()</span>
     <span class="n">blog_nav_script</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;  &lt;script&gt;</span>
-<span class="s1">    document.querySelectorAll(&#39;.top-nav a[href=&quot;../blog.html&quot;]&#39;).forEach(a =&gt; a.classList.add(&#39;active&#39;));</span>
+<span class="s1">    document.querySelectorAll(&#39;.top-nav a[href=&quot;../blog.html&quot;]&#39;).forEach(a =&gt; {</span>
+<span class="s1">      a.classList.add(&#39;active&#39;);</span>
+<span class="s1">      a.setAttribute(&#39;aria-current&#39;, &#39;page&#39;);</span>
+<span class="s1">    });</span>
 <span class="s1">  &lt;/script&gt;&#39;&#39;&#39;</span>
 
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_html</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -377,7 +489,7 @@ This function handles parsing custom image blocks and turns them into proper HTM
 <span class="s2">&lt;/head&gt;</span>
 <span class="s2">&lt;body&gt;</span>
 
-<span class="s2">&lt;nav class=&quot;top-nav&quot;&gt;</span>
+<span class="s2">&lt;nav class=&quot;top-nav&quot; aria-label=&quot;Main navigation&quot;&gt;</span>
 <span class="s2">  &lt;a href=&quot;../index.html&quot;&gt;Home&lt;/a&gt;</span>
 <span class="s2">  &lt;a href=&quot;../blog.html&quot;&gt;Blog&lt;/a&gt;</span>
 <span class="s2">&lt;/nav&gt;</span>
@@ -555,7 +667,8 @@ Here I have two options:</p>
 
 <span class="c">/* --- Layout --- */</span>
 
-<span class="nt">section</span><span class="w"> </span><span class="p">{</span>
+<span class="nt">section</span><span class="o">,</span>
+<span class="nt">article</span><span class="p">.</span><span class="nc">markdown-body</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="k">scroll-margin-top</span><span class="p">:</span><span class="w"> </span><span class="mi">80</span><span class="kt">px</span><span class="p">;</span>
 <span class="w">  </span><span class="k">max-width</span><span class="p">:</span><span class="w"> </span><span class="mi">800</span><span class="kt">px</span><span class="p">;</span>
 <span class="w">  </span><span class="k">margin-left</span><span class="p">:</span><span class="w"> </span><span class="kc">auto</span><span class="p">;</span>
@@ -607,6 +720,10 @@ Here I have two options:</p>
 <span class="p">}</span>
 
 <span class="c">/* --- Images --- */</span>
+
+<span class="nt">figure</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">margin</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
 
 <span class="p">.</span><span class="nc">float-img-left</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="k">float</span><span class="p">:</span><span class="w"> </span><span class="kc">left</span><span class="p">;</span>
@@ -755,6 +872,79 @@ Here I have two options:</p>
 <span class="w">  </span><span class="k">font-weight</span><span class="p">:</span><span class="w"> </span><span class="mi">600</span><span class="p">;</span>
 <span class="p">}</span>
 
+<span class="c">/* --- Blog index --- */</span>
+
+<span class="p">.</span><span class="nc">blog-filter</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">display</span><span class="p">:</span><span class="w"> </span><span class="kc">flex</span><span class="p">;</span>
+<span class="w">  </span><span class="k">flex-wrap</span><span class="p">:</span><span class="w"> </span><span class="kc">wrap</span><span class="p">;</span>
+<span class="w">  </span><span class="k">gap</span><span class="p">:</span><span class="w"> </span><span class="mf">0.5</span><span class="kt">rem</span><span class="p">;</span>
+<span class="w">  </span><span class="k">margin</span><span class="p">:</span><span class="w"> </span><span class="mf">1.5</span><span class="kt">rem</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="mi">2</span><span class="kt">rem</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">.</span><span class="nc">filter-btn</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">font-family</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;IBM Plex Sans&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">sans-serif</span><span class="p">;</span>
+<span class="w">  </span><span class="k">font-size</span><span class="p">:</span><span class="w"> </span><span class="mf">0.85</span><span class="kt">rem</span><span class="p">;</span>
+<span class="w">  </span><span class="k">color</span><span class="p">:</span><span class="w"> </span><span class="nf">var</span><span class="p">(</span><span class="nv">--color-brand</span><span class="p">);</span>
+<span class="w">  </span><span class="k">background</span><span class="p">:</span><span class="w"> </span><span class="kc">none</span><span class="p">;</span>
+<span class="w">  </span><span class="k">border</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="kt">px</span><span class="w"> </span><span class="kc">solid</span><span class="w"> </span><span class="nf">var</span><span class="p">(</span><span class="nv">--color-brand</span><span class="p">);</span>
+<span class="w">  </span><span class="k">border-radius</span><span class="p">:</span><span class="w"> </span><span class="mi">999</span><span class="kt">px</span><span class="p">;</span>
+<span class="w">  </span><span class="k">padding</span><span class="p">:</span><span class="w"> </span><span class="mf">0.25</span><span class="kt">rem</span><span class="w"> </span><span class="mf">0.85</span><span class="kt">rem</span><span class="p">;</span>
+<span class="w">  </span><span class="k">cursor</span><span class="p">:</span><span class="w"> </span><span class="kc">pointer</span><span class="p">;</span>
+<span class="w">  </span><span class="k">transition</span><span class="p">:</span><span class="w"> </span><span class="k">background</span><span class="w"> </span><span class="mf">0.2</span><span class="kt">s</span><span class="w"> </span><span class="kc">ease</span><span class="p">,</span><span class="w"> </span><span class="kc">color</span><span class="w"> </span><span class="mf">0.2</span><span class="kt">s</span><span class="w"> </span><span class="kc">ease</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">.</span><span class="nc">filter-btn</span><span class="p">:</span><span class="nd">hover</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">background</span><span class="p">:</span><span class="w"> </span><span class="nb">rgba</span><span class="p">(</span><span class="mi">62</span><span class="p">,</span><span class="w"> </span><span class="mi">96</span><span class="p">,</span><span class="w"> </span><span class="mi">117</span><span class="p">,</span><span class="w"> </span><span class="mf">0.1</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="p">.</span><span class="nc">filter-btn</span><span class="p">.</span><span class="nc">active</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">background</span><span class="p">:</span><span class="w"> </span><span class="nf">var</span><span class="p">(</span><span class="nv">--color-brand</span><span class="p">);</span>
+<span class="w">  </span><span class="k">color</span><span class="p">:</span><span class="w"> </span><span class="kc">white</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">.</span><span class="nc">blog-entry</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">padding</span><span class="p">:</span><span class="w"> </span><span class="mf">1.1</span><span class="kt">rem</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">border-bottom</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="kt">px</span><span class="w"> </span><span class="kc">solid</span><span class="w"> </span><span class="mh">#eee</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">.</span><span class="nc">blog-entry</span><span class="w"> </span><span class="nt">h3</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">margin</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="mf">0.2</span><span class="kt">rem</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">.</span><span class="nc">blog-date</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">font-size</span><span class="p">:</span><span class="w"> </span><span class="mf">0.85</span><span class="kt">rem</span><span class="p">;</span>
+<span class="w">  </span><span class="k">font-style</span><span class="p">:</span><span class="w"> </span><span class="kc">italic</span><span class="p">;</span>
+<span class="w">  </span><span class="k">color</span><span class="p">:</span><span class="w"> </span><span class="mh">#666</span><span class="p">;</span>
+<span class="w">  </span><span class="k">margin</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="mf">0.4</span><span class="kt">rem</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">.</span><span class="nc">blog-desc</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">margin</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="mf">0.7</span><span class="kt">rem</span><span class="p">;</span>
+<span class="w">  </span><span class="k">text-align</span><span class="p">:</span><span class="w"> </span><span class="kc">left</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">.</span><span class="nc">blog-tags</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">display</span><span class="p">:</span><span class="w"> </span><span class="kc">flex</span><span class="p">;</span>
+<span class="w">  </span><span class="k">flex-wrap</span><span class="p">:</span><span class="w"> </span><span class="kc">wrap</span><span class="p">;</span>
+<span class="w">  </span><span class="k">gap</span><span class="p">:</span><span class="w"> </span><span class="mf">0.4</span><span class="kt">rem</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">.</span><span class="nc">tag-pill</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">font-family</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;IBM Plex Sans&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">sans-serif</span><span class="p">;</span>
+<span class="w">  </span><span class="k">font-size</span><span class="p">:</span><span class="w"> </span><span class="mf">0.75</span><span class="kt">rem</span><span class="p">;</span>
+<span class="w">  </span><span class="k">color</span><span class="p">:</span><span class="w"> </span><span class="mh">#555</span><span class="p">;</span>
+<span class="w">  </span><span class="k">background</span><span class="p">:</span><span class="w"> </span><span class="mh">#f0f0f0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">border</span><span class="p">:</span><span class="w"> </span><span class="kc">none</span><span class="p">;</span>
+<span class="w">  </span><span class="k">border-radius</span><span class="p">:</span><span class="w"> </span><span class="mi">999</span><span class="kt">px</span><span class="p">;</span>
+<span class="w">  </span><span class="k">padding</span><span class="p">:</span><span class="w"> </span><span class="mf">0.15</span><span class="kt">rem</span><span class="w"> </span><span class="mf">0.65</span><span class="kt">rem</span><span class="p">;</span>
+<span class="w">  </span><span class="k">cursor</span><span class="p">:</span><span class="w"> </span><span class="kc">pointer</span><span class="p">;</span>
+<span class="w">  </span><span class="k">transition</span><span class="p">:</span><span class="w"> </span><span class="k">background</span><span class="w"> </span><span class="mf">0.2</span><span class="kt">s</span><span class="w"> </span><span class="kc">ease</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">.</span><span class="nc">tag-pill</span><span class="p">:</span><span class="nd">hover</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">background</span><span class="p">:</span><span class="w"> </span><span class="mh">#e2e2e2</span><span class="p">;</span>
+<span class="p">}</span>
+
 <span class="c">/* --- Footer --- */</span>
 
 <span class="p">.</span><span class="nc">site-footer</span><span class="w"> </span><span class="p">{</span>
@@ -807,6 +997,17 @@ Here I have two options:</p>
 <span class="w">    </span><span class="k">padding</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="mi">1</span><span class="kt">rem</span><span class="p">;</span>
 <span class="w">  </span><span class="p">}</span>
 
+<span class="w">  </span><span class="p">.</span><span class="nc">top-nav</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">padding</span><span class="p">:</span><span class="w"> </span><span class="mf">0.6</span><span class="kt">rem</span><span class="w"> </span><span class="mf">0.5</span><span class="kt">rem</span><span class="p">;</span>
+<span class="w">    </span><span class="k">gap</span><span class="p">:</span><span class="w"> </span><span class="mf">0.5</span><span class="kt">rem</span><span class="p">;</span>
+<span class="w">    </span><span class="k">flex-wrap</span><span class="p">:</span><span class="w"> </span><span class="kc">wrap</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="p">.</span><span class="nc">top-nav</span><span class="w"> </span><span class="nt">a</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">font-size</span><span class="p">:</span><span class="w"> </span><span class="mf">0.95</span><span class="kt">rem</span><span class="p">;</span>
+<span class="w">    </span><span class="k">padding</span><span class="p">:</span><span class="w"> </span><span class="mf">0.3</span><span class="kt">rem</span><span class="w"> </span><span class="mf">0.4</span><span class="kt">rem</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+
 <span class="w">  </span><span class="p">.</span><span class="nc">image-row</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="k">flex-direction</span><span class="p">:</span><span class="w"> </span><span class="kc">column</span><span class="p">;</span>
 <span class="w">  </span><span class="p">}</span>
@@ -833,7 +1034,8 @@ Here I have two options:</p>
 Markdown is a great format to write content without needing to write any HTML, and the python code is useful to process these Markdown files automatically and convert them into HTML.
 I'll probably extend the tools to handle bibtex and other things that I can't think of as of now.
 Probably for a future blog post!</p>
-</section>
+</article>
+</main>
 
 
 <footer class="site-footer">
@@ -841,7 +1043,10 @@ Probably for a future blog post!</p>
 </footer>
 
   <script>
-    document.querySelectorAll('.top-nav a[href="../blog.html"]').forEach(a => a.classList.add('active'));
+    document.querySelectorAll('.top-nav a[href="../blog.html"]').forEach(a => {
+      a.classList.add('active');
+      a.setAttribute('aria-current', 'page');
+    });
   </script>
 
 </body>
