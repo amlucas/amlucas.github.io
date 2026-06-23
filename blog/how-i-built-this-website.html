@@ -78,7 +78,7 @@ Below, I describe the structure of the code in more detail.</p>
 <span class="kn">import</span> <span class="nn">markdown</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
-<span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">embed_image_float</span>
+<span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">embed_image_float</span><span class="p">,</span> <span class="n">get_ga4_tag</span>
 
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
@@ -119,6 +119,8 @@ Below, I describe the structure of the code in more detail.</p>
         <span class="n">nav_bar</span> <span class="o">+=</span> <span class="s1">&#39;  &lt;a href=&quot;./blog.html&quot;&gt;Blog&lt;/a&gt;</span><span class="se">\n</span><span class="s1">&#39;</span>
 
 
+    <span class="n">ga4_tag</span> <span class="o">=</span> <span class="n">get_ga4_tag</span><span class="p">()</span>
+
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_html</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">&lt;!DOCTYPE html&gt;</span>
@@ -130,15 +132,7 @@ Below, I describe the structure of the code in more detail.</p>
 <span class="s2">  &lt;link rel=&quot;stylesheet&quot; href=&quot;css/main.css&quot; /&gt;</span>
 <span class="s2">  &lt;link href=&quot;https://fonts.googleapis.com/css2?family=IBM+Plex+Serif&amp;family=JetBrains+Mono&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;</span>
 <span class="s2">  &lt;link href=&quot;https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;</span>
-<span class="s2">  &lt;!-- Google tag (gtag.js) --&gt;</span>
-<span class="s2">  &lt;script async src=&quot;https://www.googletagmanager.com/gtag/js?id=G-831T0SSK24&quot;&gt;&lt;/script&gt;</span>
-<span class="s2">  &lt;script&gt;</span>
-<span class="s2">    window.dataLayer = window.dataLayer || [];</span>
-<span class="s2">    function gtag()</span><span class="se">{{</span><span class="s2">dataLayer.push(arguments);</span><span class="se">}}</span>
-<span class="s2">    gtag(&#39;js&#39;, new Date());</span>
-
-<span class="s2">    gtag(&#39;config&#39;, &#39;G-831T0SSK24&#39;);</span>
-<span class="s2">  &lt;/script&gt;</span>
+<span class="si">{</span><span class="n">ga4_tag</span><span class="si">}</span>
 <span class="s2">&lt;/head&gt;</span>
 <span class="s2">&lt;body&gt;</span>
 
@@ -215,6 +209,8 @@ This function handles parsing custom image blocks and turns them into proper HTM
 <span class="kn">import</span> <span class="nn">markdown</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
+<span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">get_ga4_tag</span>
+
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;md_path&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;path to blog.md&quot;</span><span class="p">)</span>
@@ -236,6 +232,7 @@ This function handles parsing custom image blocks and turns them into proper HTM
 <span class="s2">&lt;/section&gt;</span>
 <span class="s2">&quot;&quot;&quot;</span>
 
+    <span class="n">ga4_tag</span> <span class="o">=</span> <span class="n">get_ga4_tag</span><span class="p">()</span>
 
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_html</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
@@ -248,15 +245,7 @@ This function handles parsing custom image blocks and turns them into proper HTM
 <span class="s2">  &lt;link rel=&quot;stylesheet&quot; href=&quot;css/main.css&quot; /&gt;</span>
 <span class="s2">  &lt;link href=&quot;https://fonts.googleapis.com/css2?family=IBM+Plex+Serif&amp;family=JetBrains+Mono&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;</span>
 <span class="s2">  &lt;link href=&quot;https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;</span>
-<span class="s2">  &lt;!-- Google tag (gtag.js) --&gt;</span>
-<span class="s2">  &lt;script async src=&quot;https://www.googletagmanager.com/gtag/js?id=G-831T0SSK24&quot;&gt;&lt;/script&gt;</span>
-<span class="s2">  &lt;script&gt;</span>
-<span class="s2">    window.dataLayer = window.dataLayer || [];</span>
-<span class="s2">    function gtag()</span><span class="se">{{</span><span class="s2">dataLayer.push(arguments);</span><span class="se">}}</span>
-<span class="s2">    gtag(&#39;js&#39;, new Date());</span>
-
-<span class="s2">    gtag(&#39;config&#39;, &#39;G-831T0SSK24&#39;);</span>
-<span class="s2">  &lt;/script&gt;</span>
+<span class="si">{</span><span class="n">ga4_tag</span><span class="si">}</span>
 <span class="s2">&lt;/head&gt;</span>
 <span class="s2">&lt;body&gt;</span>
 
@@ -291,7 +280,7 @@ This function handles parsing custom image blocks and turns them into proper HTM
 <span class="kn">import</span> <span class="nn">markdown</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
-<span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">embed_image_float</span><span class="p">,</span> <span class="n">embed_image_row</span><span class="p">,</span> <span class="n">embed_video</span><span class="p">,</span> <span class="n">embed_video_row</span><span class="p">,</span> <span class="n">embed_code_from_files</span>
+<span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">embed_image_float</span><span class="p">,</span> <span class="n">embed_image_row</span><span class="p">,</span> <span class="n">embed_video</span><span class="p">,</span> <span class="n">embed_video_row</span><span class="p">,</span> <span class="n">embed_code_from_files</span><span class="p">,</span> <span class="n">get_ga4_tag</span>
 
 <span class="k">def</span> <span class="nf">md_path_to_title</span><span class="p">(</span><span class="n">md_path</span><span class="p">):</span>
     <span class="k">return</span> <span class="s2">&quot;blog - &quot;</span> <span class="o">+</span> <span class="n">md_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.md&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
@@ -331,6 +320,7 @@ This function handles parsing custom image blocks and turns them into proper HTM
 <span class="s2">&quot;&quot;&quot;</span>
 
     <span class="n">title</span> <span class="o">=</span> <span class="n">md_path_to_title</span><span class="p">(</span><span class="n">md_path</span><span class="p">)</span>
+    <span class="n">ga4_tag</span> <span class="o">=</span> <span class="n">get_ga4_tag</span><span class="p">()</span>
 
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_html</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
@@ -344,15 +334,7 @@ This function handles parsing custom image blocks and turns them into proper HTM
 <span class="s2">  &lt;link rel=&quot;stylesheet&quot; href=&quot;../css/codehilite.css&quot; /&gt;</span>
 <span class="s2">  &lt;link href=&quot;https://fonts.googleapis.com/css2?family=IBM+Plex+Serif&amp;family=JetBrains+Mono&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;</span>
 <span class="s2">  &lt;link href=&quot;https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;</span>
-<span class="s2">  &lt;!-- Google tag (gtag.js) --&gt;</span>
-<span class="s2">  &lt;script async src=&quot;https://www.googletagmanager.com/gtag/js?id=G-831T0SSK24&quot;&gt;&lt;/script&gt;</span>
-<span class="s2">  &lt;script&gt;</span>
-<span class="s2">    window.dataLayer = window.dataLayer || [];</span>
-<span class="s2">    function gtag()</span><span class="se">{{</span><span class="s2">dataLayer.push(arguments);</span><span class="se">}}</span>
-<span class="s2">    gtag(&#39;js&#39;, new Date());</span>
-
-<span class="s2">    gtag(&#39;config&#39;, &#39;G-831T0SSK24&#39;);</span>
-<span class="s2">  &lt;/script&gt;</span>
+<span class="si">{</span><span class="n">ga4_tag</span><span class="si">}</span>
 <span class="s2">  &lt;script&gt;</span>
 <span class="s2">    MathJax = </span><span class="se">{{</span>
 <span class="s2">      options: </span><span class="se">{{</span>
