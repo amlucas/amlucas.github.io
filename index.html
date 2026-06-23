@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="css/main.css" />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif&family=JetBrains+Mono&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap" rel="stylesheet">
+  <link rel="alternate" type="application/rss+xml" href="feed.xml" title="RSS Feed" />
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-5XKH0GTGGB"></script>
   <script>
@@ -29,7 +30,7 @@
 </nav>
 
 <section id="about">
-  <div class="markdown-body">
+  <div class="markdown-body main-body">
     <h1>About</h1>
 <p>Welcome to my personal website!</p>
 <div class="image-wrap float-img-right" style="width: 20%;">
@@ -84,7 +85,7 @@ Since September 2025, I am also a lecturer at Harvard university for the class "
   </div>
 </section>
 <section id="research">
-  <div class="markdown-body">
+  <div class="markdown-body main-body">
     <h1>Research</h1>
 <p>I develop computational methods and software to simulate and control microscale systems, including blood flow and artificial microswimmers.
 My work combines high-performance computing, fluid dynamics, Bayesian inference, and artificial intelligence to enable biomedical applications such as targeted drug delivery and flow manipulation in microfluidics.</p>
@@ -164,7 +165,7 @@ More details are available in our <a href="https://doi.org/10.1103/PhysRevApplie
   </div>
 </section>
 <section id="publications">
-  <div class="markdown-body">
+  <div class="markdown-body main-body">
     <h1>Publications</h1>
 <h2>2026</h2>
 <details class="pub-entry">
@@ -456,6 +457,27 @@ More details are available in our <a href="https://doi.org/10.1103/PhysRevApplie
   </div>
 </section>
 
+
+<footer class="site-footer">
+  <p>&copy; 2026 Lucas Amoudruz &nbsp;&nbsp;|&nbsp;&nbsp; <a href="feed.xml">Subscribe (RSS)</a></p>
+</footer>
+
+  <script>
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        const id = entry.target.getAttribute('id');
+        const navLink = document.querySelector(`.top-nav a[href="#${id}"]`);
+        if (!navLink) return;
+
+        if (entry.isIntersecting) {
+          document.querySelectorAll('.top-nav a.active').forEach(a => a.classList.remove('active'));
+          navLink.classList.add('active');
+        }
+      });
+    }, { threshold: 0.3 });
+
+    document.querySelectorAll('section[id]').forEach(section => observer.observe(section));
+  </script>
 
 </body>
 </html>

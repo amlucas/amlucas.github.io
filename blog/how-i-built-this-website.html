@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="../css/codehilite.css" />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif&family=JetBrains+Mono&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&display=swap" rel="stylesheet">
+  <link rel="alternate" type="application/rss+xml" href="../feed.xml" title="RSS Feed" />
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-5XKH0GTGGB"></script>
   <script>
@@ -47,7 +48,7 @@
 </nav>
 
 
-<section class="markdown-body">
+<section class="markdown-body blog-body">
   <h1>How I built this website with Python and Markdown</h1>
 <p>July 12, 2025</p>
 <p>I have recently redesigned my website.
@@ -78,7 +79,7 @@ Below, I describe the structure of the code in more detail.</p>
 <span class="kn">import</span> <span class="nn">markdown</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
-<span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">embed_image_float</span><span class="p">,</span> <span class="n">get_ga4_tag</span>
+<span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">embed_image_float</span><span class="p">,</span> <span class="n">get_ga4_tag</span><span class="p">,</span> <span class="n">get_active_nav_script</span><span class="p">,</span> <span class="n">get_rss_link</span><span class="p">,</span> <span class="n">get_footer</span>
 
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
@@ -104,7 +105,7 @@ Below, I describe the structure of the code in more detail.</p>
         <span class="n">processed_md</span> <span class="o">=</span> <span class="n">embed_image_float</span><span class="p">(</span><span class="n">raw_md</span><span class="p">)</span>
         <span class="n">html_content</span> <span class="o">=</span> <span class="n">markdown</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span><span class="n">processed_md</span><span class="p">)</span>
         <span class="n">html_sections</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;&#39;&#39;&lt;section id=&quot;</span><span class="si">{</span><span class="n">section_id</span><span class="si">}</span><span class="s1">&quot;&gt;</span>
-<span class="s1">  &lt;div class=&quot;markdown-body&quot;&gt;</span>
+<span class="s1">  &lt;div class=&quot;markdown-body main-body&quot;&gt;</span>
 <span class="s1">    </span><span class="si">{</span><span class="n">html_content</span><span class="si">}</span>
 <span class="s1">  &lt;/div&gt;</span>
 <span class="s1">&lt;/section&gt;</span>
@@ -120,6 +121,7 @@ Below, I describe the structure of the code in more detail.</p>
 
 
     <span class="n">ga4_tag</span> <span class="o">=</span> <span class="n">get_ga4_tag</span><span class="p">()</span>
+    <span class="n">active_nav_script</span> <span class="o">=</span> <span class="n">get_active_nav_script</span><span class="p">()</span>
 
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_html</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
@@ -132,6 +134,7 @@ Below, I describe the structure of the code in more detail.</p>
 <span class="s2">  &lt;link rel=&quot;stylesheet&quot; href=&quot;css/main.css&quot; /&gt;</span>
 <span class="s2">  &lt;link href=&quot;https://fonts.googleapis.com/css2?family=IBM+Plex+Serif&amp;family=JetBrains+Mono&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;</span>
 <span class="s2">  &lt;link href=&quot;https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;</span>
+<span class="si">{</span><span class="n">get_rss_link</span><span class="p">()</span><span class="si">}</span>
 <span class="si">{</span><span class="n">ga4_tag</span><span class="si">}</span>
 <span class="s2">&lt;/head&gt;</span>
 <span class="s2">&lt;body&gt;</span>
@@ -141,6 +144,10 @@ Below, I describe the structure of the code in more detail.</p>
 <span class="s2">&lt;/nav&gt;</span>
 
 <span class="si">{</span><span class="n">html_sections</span><span class="si">}</span>
+
+<span class="si">{</span><span class="n">get_footer</span><span class="p">()</span><span class="si">}</span>
+
+<span class="si">{</span><span class="n">active_nav_script</span><span class="si">}</span>
 
 <span class="s2">&lt;/body&gt;</span>
 <span class="s2">&lt;/html&gt;</span>
@@ -209,7 +216,7 @@ This function handles parsing custom image blocks and turns them into proper HTM
 <span class="kn">import</span> <span class="nn">markdown</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
-<span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">get_ga4_tag</span>
+<span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">get_ga4_tag</span><span class="p">,</span> <span class="n">get_rss_link</span><span class="p">,</span> <span class="n">get_footer</span>
 
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
@@ -227,12 +234,15 @@ This function handles parsing custom image blocks and turns them into proper HTM
     <span class="n">html_content</span> <span class="o">=</span> <span class="n">markdown</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span><span class="n">processed_md</span><span class="p">)</span>
 
     <span class="n">html_section</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">&lt;section class=&quot;markdown-body&quot;&gt;</span>
+<span class="s2">&lt;section class=&quot;markdown-body blog-body&quot;&gt;</span>
 <span class="s2">  </span><span class="si">{</span><span class="n">html_content</span><span class="si">}</span>
 <span class="s2">&lt;/section&gt;</span>
 <span class="s2">&quot;&quot;&quot;</span>
 
     <span class="n">ga4_tag</span> <span class="o">=</span> <span class="n">get_ga4_tag</span><span class="p">()</span>
+    <span class="n">blog_nav_script</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;  &lt;script&gt;</span>
+<span class="s1">    document.querySelectorAll(&#39;.top-nav a[href=&quot;./blog.html&quot;]&#39;).forEach(a =&gt; a.classList.add(&#39;active&#39;));</span>
+<span class="s1">  &lt;/script&gt;&#39;&#39;&#39;</span>
 
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_html</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
@@ -245,6 +255,7 @@ This function handles parsing custom image blocks and turns them into proper HTM
 <span class="s2">  &lt;link rel=&quot;stylesheet&quot; href=&quot;css/main.css&quot; /&gt;</span>
 <span class="s2">  &lt;link href=&quot;https://fonts.googleapis.com/css2?family=IBM+Plex+Serif&amp;family=JetBrains+Mono&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;</span>
 <span class="s2">  &lt;link href=&quot;https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;</span>
+<span class="si">{</span><span class="n">get_rss_link</span><span class="p">()</span><span class="si">}</span>
 <span class="si">{</span><span class="n">ga4_tag</span><span class="si">}</span>
 <span class="s2">&lt;/head&gt;</span>
 <span class="s2">&lt;body&gt;</span>
@@ -255,6 +266,10 @@ This function handles parsing custom image blocks and turns them into proper HTM
 <span class="s2">&lt;/nav&gt;</span>
 
 <span class="si">{</span><span class="n">html_section</span><span class="si">}</span>
+
+<span class="si">{</span><span class="n">get_footer</span><span class="p">()</span><span class="si">}</span>
+
+<span class="si">{</span><span class="n">blog_nav_script</span><span class="si">}</span>
 
 <span class="s2">&lt;/body&gt;</span>
 <span class="s2">&lt;/html&gt;</span>
@@ -280,7 +295,7 @@ This function handles parsing custom image blocks and turns them into proper HTM
 <span class="kn">import</span> <span class="nn">markdown</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
-<span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">embed_image_float</span><span class="p">,</span> <span class="n">embed_image_row</span><span class="p">,</span> <span class="n">embed_video</span><span class="p">,</span> <span class="n">embed_video_row</span><span class="p">,</span> <span class="n">embed_code_from_files</span><span class="p">,</span> <span class="n">get_ga4_tag</span>
+<span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">embed_image_float</span><span class="p">,</span> <span class="n">embed_image_row</span><span class="p">,</span> <span class="n">embed_video</span><span class="p">,</span> <span class="n">embed_video_row</span><span class="p">,</span> <span class="n">embed_code_from_files</span><span class="p">,</span> <span class="n">get_ga4_tag</span><span class="p">,</span> <span class="n">get_rss_link</span><span class="p">,</span> <span class="n">get_footer</span>
 
 <span class="k">def</span> <span class="nf">md_path_to_title</span><span class="p">(</span><span class="n">md_path</span><span class="p">):</span>
     <span class="k">return</span> <span class="s2">&quot;blog - &quot;</span> <span class="o">+</span> <span class="n">md_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.md&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
@@ -314,13 +329,16 @@ This function handles parsing custom image blocks and turns them into proper HTM
 
 
     <span class="n">html_section</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">&lt;section class=&quot;markdown-body&quot;&gt;</span>
+<span class="s2">&lt;section class=&quot;markdown-body blog-body&quot;&gt;</span>
 <span class="s2">  </span><span class="si">{</span><span class="n">html_content</span><span class="si">}</span>
 <span class="s2">&lt;/section&gt;</span>
 <span class="s2">&quot;&quot;&quot;</span>
 
     <span class="n">title</span> <span class="o">=</span> <span class="n">md_path_to_title</span><span class="p">(</span><span class="n">md_path</span><span class="p">)</span>
     <span class="n">ga4_tag</span> <span class="o">=</span> <span class="n">get_ga4_tag</span><span class="p">()</span>
+    <span class="n">blog_nav_script</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;  &lt;script&gt;</span>
+<span class="s1">    document.querySelectorAll(&#39;.top-nav a[href=&quot;../blog.html&quot;]&#39;).forEach(a =&gt; a.classList.add(&#39;active&#39;));</span>
+<span class="s1">  &lt;/script&gt;&#39;&#39;&#39;</span>
 
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_html</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
@@ -334,6 +352,7 @@ This function handles parsing custom image blocks and turns them into proper HTM
 <span class="s2">  &lt;link rel=&quot;stylesheet&quot; href=&quot;../css/codehilite.css&quot; /&gt;</span>
 <span class="s2">  &lt;link href=&quot;https://fonts.googleapis.com/css2?family=IBM+Plex+Serif&amp;family=JetBrains+Mono&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;</span>
 <span class="s2">  &lt;link href=&quot;https://fonts.googleapis.com/css2?family=IBM+Plex+Sans&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;</span>
+<span class="si">{</span><span class="n">get_rss_link</span><span class="p">(</span><span class="s1">&#39;../&#39;</span><span class="p">)</span><span class="si">}</span>
 <span class="si">{</span><span class="n">ga4_tag</span><span class="si">}</span>
 <span class="s2">  &lt;script&gt;</span>
 <span class="s2">    MathJax = </span><span class="se">{{</span>
@@ -364,6 +383,10 @@ This function handles parsing custom image blocks and turns them into proper HTM
 <span class="s2">&lt;/nav&gt;</span>
 
 <span class="si">{</span><span class="n">html_section</span><span class="si">}</span>
+
+<span class="si">{</span><span class="n">get_footer</span><span class="p">(</span><span class="s1">&#39;../feed.xml&#39;</span><span class="p">)</span><span class="si">}</span>
+
+<span class="si">{</span><span class="n">blog_nav_script</span><span class="si">}</span>
 
 <span class="s2">&lt;/body&gt;</span>
 <span class="s2">&lt;/html&gt;</span>
@@ -507,7 +530,7 @@ Here I have two options:</p>
 <span class="w">  </span><span class="k">justify-content</span><span class="p">:</span><span class="w"> </span><span class="kc">center</span><span class="p">;</span>
 <span class="w">  </span><span class="k">gap</span><span class="p">:</span><span class="w"> </span><span class="mf">1.5</span><span class="kt">rem</span><span class="p">;</span>
 <span class="w">  </span><span class="k">z-index</span><span class="p">:</span><span class="w"> </span><span class="mi">1000</span><span class="p">;</span>
-<span class="w">  </span><span class="k">box-shadow</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="mi">2</span><span class="kt">px</span><span class="w"> </span><span class="mi">5</span><span class="kt">px</span><span class="w"> </span><span class="nb">rgba</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.5</span><span class="p">);</span>
+<span class="w">  </span><span class="k">box-shadow</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="mi">2</span><span class="kt">px</span><span class="w"> </span><span class="mi">5</span><span class="kt">px</span><span class="w"> </span><span class="nb">rgba</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.1</span><span class="p">);</span>
 <span class="w">  </span><span class="k">font-family</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;IBM Plex Sans&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">sans-serif</span><span class="p">;</span>
 <span class="p">}</span>
 
@@ -525,6 +548,11 @@ Here I have two options:</p>
 <span class="w">  </span><span class="k">background-color</span><span class="p">:</span><span class="w"> </span><span class="nb">rgba</span><span class="p">(</span><span class="mi">62</span><span class="p">,</span><span class="w"> </span><span class="mi">96</span><span class="p">,</span><span class="w"> </span><span class="mi">117</span><span class="p">,</span><span class="w"> </span><span class="mf">0.1</span><span class="p">);</span>
 <span class="p">}</span>
 
+<span class="p">.</span><span class="nc">top-nav</span><span class="w"> </span><span class="nt">a</span><span class="p">.</span><span class="nc">active</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">background-color</span><span class="p">:</span><span class="w"> </span><span class="nb">rgba</span><span class="p">(</span><span class="mi">62</span><span class="p">,</span><span class="w"> </span><span class="mi">96</span><span class="p">,</span><span class="w"> </span><span class="mi">117</span><span class="p">,</span><span class="w"> </span><span class="mf">0.15</span><span class="p">);</span>
+<span class="w">  </span><span class="k">font-weight</span><span class="p">:</span><span class="w"> </span><span class="mi">600</span><span class="p">;</span>
+<span class="p">}</span>
+
 <span class="c">/* --- Layout --- */</span>
 
 <span class="nt">section</span><span class="w"> </span><span class="p">{</span>
@@ -537,8 +565,12 @@ Here I have two options:</p>
 
 <span class="c">/* --- Markdown body --- */</span>
 
-<span class="p">.</span><span class="nc">markdown-body</span><span class="w"> </span><span class="nt">p</span><span class="w"> </span><span class="p">{</span>
+<span class="p">.</span><span class="nc">main-body</span><span class="w"> </span><span class="nt">p</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="k">text-align</span><span class="p">:</span><span class="w"> </span><span class="kc">justify</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">.</span><span class="nc">blog-body</span><span class="w"> </span><span class="nt">p</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">text-align</span><span class="p">:</span><span class="w"> </span><span class="kc">left</span><span class="p">;</span>
 <span class="p">}</span>
 
 <span class="p">.</span><span class="nc">markdown-body</span><span class="w"> </span><span class="nt">img</span><span class="p">:</span><span class="nd">not</span><span class="o">(</span><span class="p">.</span><span class="nc">float-img-left</span><span class="o">)</span><span class="p">:</span><span class="nd">not</span><span class="o">(</span><span class="p">.</span><span class="nc">float-img-right</span><span class="o">)</span><span class="w"> </span><span class="p">{</span>
@@ -723,6 +755,26 @@ Here I have two options:</p>
 <span class="w">  </span><span class="k">font-weight</span><span class="p">:</span><span class="w"> </span><span class="mi">600</span><span class="p">;</span>
 <span class="p">}</span>
 
+<span class="c">/* --- Footer --- */</span>
+
+<span class="p">.</span><span class="nc">site-footer</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">text-align</span><span class="p">:</span><span class="w"> </span><span class="kc">center</span><span class="p">;</span>
+<span class="w">  </span><span class="k">font-size</span><span class="p">:</span><span class="w"> </span><span class="mf">0.9</span><span class="kt">rem</span><span class="p">;</span>
+<span class="w">  </span><span class="k">color</span><span class="p">:</span><span class="w"> </span><span class="mh">#666</span><span class="p">;</span>
+<span class="w">  </span><span class="k">margin-top</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="kt">rem</span><span class="p">;</span>
+<span class="w">  </span><span class="k">padding</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="kt">rem</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">border-top</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="kt">px</span><span class="w"> </span><span class="kc">solid</span><span class="w"> </span><span class="mh">#eee</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">.</span><span class="nc">site-footer</span><span class="w"> </span><span class="nt">a</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">color</span><span class="p">:</span><span class="w"> </span><span class="nf">var</span><span class="p">(</span><span class="nv">--color-brand</span><span class="p">);</span>
+<span class="w">  </span><span class="k">text-decoration</span><span class="p">:</span><span class="w"> </span><span class="kc">none</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">.</span><span class="nc">site-footer</span><span class="w"> </span><span class="nt">a</span><span class="p">:</span><span class="nd">hover</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">text-decoration</span><span class="p">:</span><span class="w"> </span><span class="kc">underline</span><span class="p">;</span>
+<span class="p">}</span>
+
 <span class="c">/* --- Misc --- */</span>
 
 <span class="nt">hr</span><span class="w"> </span><span class="p">{</span>
@@ -783,6 +835,14 @@ I'll probably extend the tools to handle bibtex and other things that I can't th
 Probably for a future blog post!</p>
 </section>
 
+
+<footer class="site-footer">
+  <p>&copy; 2026 Lucas Amoudruz &nbsp;&nbsp;|&nbsp;&nbsp; <a href="../feed.xml">Subscribe (RSS)</a></p>
+</footer>
+
+  <script>
+    document.querySelectorAll('.top-nav a[href="../blog.html"]').forEach(a => a.classList.add('active'));
+  </script>
 
 </body>
 </html>
