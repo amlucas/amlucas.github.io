@@ -80,7 +80,7 @@ Below, I describe the structure of the code in more detail.</p>
 <span class="kn">import</span> <span class="nn">markdown</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
-<span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">embed_image_float</span><span class="p">,</span> <span class="n">get_ga4_tag</span><span class="p">,</span> <span class="n">get_active_nav_script</span><span class="p">,</span> <span class="n">get_rss_link</span><span class="p">,</span> <span class="n">get_footer</span>
+<span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">embed_image_float</span><span class="p">,</span> <span class="n">get_ga4_tag</span><span class="p">,</span> <span class="n">get_active_nav_script</span><span class="p">,</span> <span class="n">get_rss_link</span><span class="p">,</span> <span class="n">get_footer</span><span class="p">,</span> <span class="n">add_lazy_loading</span>
 
 <span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
@@ -105,6 +105,7 @@ Below, I describe the structure of the code in more detail.</p>
             <span class="n">raw_md</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
         <span class="n">processed_md</span> <span class="o">=</span> <span class="n">embed_image_float</span><span class="p">(</span><span class="n">raw_md</span><span class="p">)</span>
         <span class="n">html_content</span> <span class="o">=</span> <span class="n">markdown</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span><span class="n">processed_md</span><span class="p">)</span>
+        <span class="n">html_content</span> <span class="o">=</span> <span class="n">add_lazy_loading</span><span class="p">(</span><span class="n">html_content</span><span class="p">)</span>
         <span class="n">html_sections</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;&#39;&#39;&lt;section id=&quot;</span><span class="si">{</span><span class="n">section_id</span><span class="si">}</span><span class="s1">&quot;&gt;</span>
 <span class="s1">  &lt;div class=&quot;markdown-body main-body&quot;&gt;</span>
 <span class="s1">    </span><span class="si">{</span><span class="n">html_content</span><span class="si">}</span>
@@ -402,7 +403,7 @@ This function handles parsing custom image blocks and turns them into proper HTM
 <span class="kn">import</span> <span class="nn">markdown</span>
 <span class="kn">import</span> <span class="nn">os</span>
 
-<span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">embed_image_float</span><span class="p">,</span> <span class="n">embed_image_row</span><span class="p">,</span> <span class="n">embed_video</span><span class="p">,</span> <span class="n">embed_video_row</span><span class="p">,</span> <span class="n">embed_code_from_files</span><span class="p">,</span> <span class="n">get_ga4_tag</span><span class="p">,</span> <span class="n">get_rss_link</span><span class="p">,</span> <span class="n">get_footer</span>
+<span class="kn">from</span> <span class="nn">utils</span> <span class="kn">import</span> <span class="n">embed_image_float</span><span class="p">,</span> <span class="n">embed_image_row</span><span class="p">,</span> <span class="n">embed_video</span><span class="p">,</span> <span class="n">embed_video_row</span><span class="p">,</span> <span class="n">embed_code_from_files</span><span class="p">,</span> <span class="n">get_ga4_tag</span><span class="p">,</span> <span class="n">get_rss_link</span><span class="p">,</span> <span class="n">get_footer</span><span class="p">,</span> <span class="n">add_lazy_loading</span>
 
 <span class="k">def</span> <span class="nf">md_path_to_title</span><span class="p">(</span><span class="n">md_path</span><span class="p">):</span>
     <span class="k">return</span> <span class="s2">&quot;blog - &quot;</span> <span class="o">+</span> <span class="n">md_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.md&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
@@ -434,6 +435,7 @@ This function handles parsing custom image blocks and turns them into proper HTM
                                          <span class="s1">&#39;mdx_math&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;enable_dollar_delimiter&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
                                      <span class="p">})</span>
 
+    <span class="n">html_content</span> <span class="o">=</span> <span class="n">add_lazy_loading</span><span class="p">(</span><span class="n">html_content</span><span class="p">)</span>
 
     <span class="n">html_section</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">&lt;main&gt;</span>

@@ -59,7 +59,7 @@ Let’s try to find the optimal time to maximize sun exposure during her walk.</
 <p>Conveniently, I already know how to import GPS traces from my Garmin watch (see previous posts like <a href="fetch-stadium-data.html">this one</a>).
 Yesterday I went on my parents' usual walk to record the trace:</p>
 <figure class="image-wrap image-center" style="width: 70%;">
-  <img src="../images/blog/sunny-walk/walk_map.svg" alt="My parents' usual walk. In many places, the mountains block the sun.">
+  <img loading="lazy" src="../images/blog/sunny-walk/walk_map.svg" alt="My parents' usual walk. In many places, the mountains block the sun.">
   <figcaption class="image-caption">My parents' usual walk. In many places, the mountains block the sun.</figcaption>
 </figure>
 
@@ -70,7 +70,7 @@ Luckily, the horizon is time independent, it only depends on the location and th
 We can thus precompute the horizon and store it on a grid parameterized by the azimuth angle and the walk duration from the start (the latter is a parameterization of the position along the walk).
 This is what I obtained:</p>
 <figure class="image-wrap image-center" style="width: 70%;">
-  <img src="../images/blog/sunny-walk/horizon.svg" alt="Precomputed horizon against the azimuth angle (deg) and the position along the walk, parameterized by the walk duration from the start.">
+  <img loading="lazy" src="../images/blog/sunny-walk/horizon.svg" alt="Precomputed horizon against the azimuth angle (deg) and the position along the walk, parameterized by the walk duration from the start.">
   <figcaption class="image-caption">Precomputed horizon against the azimuth angle (deg) and the position along the walk, parameterized by the walk duration from the start.</figcaption>
 </figure>
 
@@ -81,7 +81,7 @@ These discontinuities should not alter the results too much, I just want an idea
 The sun exposure time is then the amount of time when the sun is above the horizon.</p>
 <p>For example, this is what I obtain for today, assuming clear-sky conditions:</p>
 <figure class="image-wrap image-center" style="width: 70%;">
-  <img src="../images/blog/sunny-walk/sun_time-today.svg" alt="Predicted sun exposure during the walk against the starting time.">
+  <img loading="lazy" src="../images/blog/sunny-walk/sun_time-today.svg" alt="Predicted sun exposure during the walk against the starting time.">
   <figcaption class="image-caption">Predicted sun exposure during the walk against the starting time.</figcaption>
 </figure>
 
@@ -89,7 +89,7 @@ The sun exposure time is then the amount of time when the sun is above the horiz
 After that it will feel colder.</p>
 <p>Below is what this model predicts for the upcoming weeks:</p>
 <figure class="image-wrap image-center" style="width: 70%;">
-  <img src="../images/blog/sunny-walk/sun_time-nexts.svg" alt="Predicted sun exposure during the walk in the next few weeks.">
+  <img loading="lazy" src="../images/blog/sunny-walk/sun_time-nexts.svg" alt="Predicted sun exposure during the walk in the next few weeks.">
   <figcaption class="image-caption">Predicted sun exposure during the walk in the next few weeks.</figcaption>
 </figure>
 
