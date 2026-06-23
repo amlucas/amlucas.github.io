@@ -11,6 +11,18 @@ html {
   scroll-behavior: smooth;
 }
 
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 body {
   font-family: "IBM Plex Serif", serif;
   background-color: white;
@@ -122,6 +134,26 @@ article.markdown-body {
   font-weight: 500;
   margin-top: 1rem;
   margin-bottom: 0.5rem;
+  color: var(--color-brand-light);
+}
+
+/* Main page: section headings are demoted (h2/h3) so the page has a single
+   h1, but they keep the original visual sizing of the old h1/h2. */
+.main-body h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 0.3rem;
+  color: var(--color-brand);
+}
+
+.main-body h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
   color: var(--color-brand-light);
 }
 
