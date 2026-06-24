@@ -66,7 +66,7 @@
 This isn't my first experience with this kind of device: in 2024 I used a toolkit from AMD as part of a <a href="hydrocube.html">robot that moves particles with fluids</a>.</p>
 <p>As a computational scientist, I usually see computers as tools for simulation and data analysis. 
 What attracted me here was a different use: turning a computer into an instrument that continuously observes the physical world.
-I also bought a USB microphone for a few dollars, and wrote a short program to record the noise intensity in my bedroom for about two weeks.
+I bought a USB microphone for a few dollars, and wrote a short program to record how loud my bedroom was over the course of two weeks.
 Let's see if we find anything interesting.</p>
 <figure class="image-wrap image-center" style="width: 70%;">
   <img width="560" height="416" loading="lazy" src="../images/blog/raspberry-pi-listener/raw_signal.svg" alt="The root-mean-square sound intensity over 10s and 1h intervals against time, in arbitrary units.">
@@ -75,7 +75,7 @@ Let's see if we find anything interesting.</p>
 
 <p>The signal is very noisy, partly because of the low-quality microphone, but mostly because the street under my window is a noisy place.
 Nevertheless, a simple moving average reveals some expected patterns.
-There are clear peaks in the morning and evenings, corresponding to rush hours, when the traffic is the heaviest.
+There are clear peaks during the morning and evening rush hours, when the traffic is the heaviest.
 It is also easy to distinguish the nighttime, when it is a lot quieter.
 The large peak in the night of May 21st corresponds to my AC unit fighting the particular high heat of that day.</p>
 <p>We can observe this daily repetition when we look at the autocorrelation of the signal:</p>
@@ -95,7 +95,7 @@ Let's zoom in:</p>
 
 <p>Surprisingly, among all the apparent noise, we see very clear oscillations.
 Their period is around 85 seconds. 
-This was actually the time scale I was hoping to find: the traffic light cycle around the block. 
+This was the time scale I was hoping to find: the traffic light cycle around the block. 
 I measured it on my walk home and the agreement is surprisingly good.</p>
 <p>This was the first experiment with my Raspberry Pi.
 I had no specific questions other than: <em>how noisy is my street when I am not paying attention?</em>
@@ -109,14 +109,14 @@ Right now my Raspberry Pi isn't listening anymore, but I might make it <em>watch
 
 <div class="codehilite"><pre><span></span><code><span class="ch">#!/usr/bin/env python</span>
 
-<span class="kn">import</span> <span class="nn">argparse</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">matplotlib.dates</span> <span class="k">as</span> <span class="nn">mdates</span>
-<span class="kn">from</span> <span class="nn">matplotlib.lines</span> <span class="kn">import</span> <span class="n">Line2D</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.dates</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">mdates</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">matplotlib.lines</span><span class="w"> </span><span class="kn">import</span> <span class="n">Line2D</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;audio_csv&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;rms data&#39;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--save&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
@@ -195,13 +195,13 @@ Right now my Raspberry Pi isn't listening anymore, but I might make it <em>watch
 
 <div class="codehilite"><pre><span></span><code><span class="ch">#!/usr/bin/env python</span>
 
-<span class="kn">import</span> <span class="nn">argparse</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
 
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;audio_csv&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;rms data&quot;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--max-lag-hours&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">float</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">24.0</span><span class="p">)</span>
