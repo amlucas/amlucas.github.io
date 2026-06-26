@@ -55,7 +55,7 @@
 </p>
 </div>
 <div class="profile-photo-wrap">
-<img width="645" height="645" loading="lazy" class="profile-photo" src="images/misc/portrait.png" alt="Lucas Amoudruz">
+<img width="645" height="645" loading="eager" class="profile-photo" src="images/misc/portrait.png" alt="Lucas Amoudruz">
 </div>
 </div>
 <p>I am a computational scientist focused on problems in fluid mechanics targeting biomedical applications, prediction of extreme events, and turbulence modeling.
@@ -393,9 +393,22 @@ I am a lecturer at Harvard University, teaching the course "Advanced Scientific 
 
 </main>
 
+<button class="back-to-top" aria-label="Back to top">&uarr;</button>
+
 <footer class="site-footer">
   <p>&copy; 2026 Lucas Amoudruz &nbsp;&nbsp;|&nbsp;&nbsp; <a href="feed.xml">Subscribe (RSS)</a></p>
 </footer>
+
+<script>
+  (function() {
+    const btn = document.querySelector('.back-to-top');
+    if (!btn) return;
+    const toggle = () => btn.classList.toggle('visible', window.scrollY > 400);
+    window.addEventListener('scroll', toggle, { passive: true });
+    toggle();
+    btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  })();
+</script>
 
 </body>
 </html>

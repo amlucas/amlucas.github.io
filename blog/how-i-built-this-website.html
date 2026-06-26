@@ -433,6 +433,7 @@ This function handles parsing custom image blocks and turns them into proper HTM
 <span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">markdown</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">embed_image_float</span><span class="p">,</span> <span class="n">embed_image_row</span><span class="p">,</span> <span class="n">embed_video</span><span class="p">,</span> <span class="n">embed_video_row</span><span class="p">,</span> <span class="n">embed_code_from_files</span><span class="p">,</span> <span class="n">get_ga4_tag</span><span class="p">,</span> <span class="n">get_rss_link</span><span class="p">,</span> <span class="n">get_footer</span><span class="p">,</span> <span class="n">enhance_images</span><span class="p">,</span> <span class="n">get_meta_tags</span><span class="p">,</span> <span class="n">first_raster_image</span><span class="p">,</span> <span class="n">get_favicon_link</span>
 
@@ -452,6 +453,49 @@ This function handles parsing custom image blocks and turns them into proper HTM
                     <span class="k">continue</span>
                 <span class="k">return</span> <span class="n">s</span>
     <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_ordered_posts</span><span class="p">(</span><span class="n">blog_md</span><span class="o">=</span><span class="s1">&#39;source/blog.md&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return [(slug, title), ...] in the order listed in blog.md (newest first).&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">blog_md</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="n">posts</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">link_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;###\s*\[([^\]]+)\]\(blog/([^)]+)\.html\)&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">text</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">link_re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+            <span class="n">posts</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">posts</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">build_post_nav</span><span class="p">(</span><span class="n">slug</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Render prev/next navigation for the post `slug`, based on blog.md order.&quot;&quot;&quot;</span>
+    <span class="n">posts</span> <span class="o">=</span> <span class="n">get_ordered_posts</span><span class="p">()</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">posts</span><span class="p">)</span> <span class="k">if</span> <span class="n">s</span> <span class="o">==</span> <span class="n">slug</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">idx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">newer</span> <span class="o">=</span> <span class="n">posts</span><span class="p">[</span><span class="n">idx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">idx</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
+    <span class="n">older</span> <span class="o">=</span> <span class="n">posts</span><span class="p">[</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">posts</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">newer</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">older</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">link</span><span class="p">(</span><span class="n">post</span><span class="p">,</span> <span class="n">direction</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">post</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;&lt;span class=&quot;post-nav-link post-nav-empty&quot;&gt;&lt;/span&gt;&#39;</span>
+        <span class="n">s</span><span class="p">,</span> <span class="n">t</span> <span class="o">=</span> <span class="n">post</span>
+        <span class="k">return</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;&lt;a class=&quot;post-nav-link post-nav-</span><span class="si">{</span><span class="n">direction</span><span class="si">}</span><span class="s1">&quot; href=&quot;</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s1">.html&quot;&gt;&#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;&lt;span class=&quot;post-nav-dir&quot;&gt;</span><span class="si">{</span><span class="n">label</span><span class="si">}</span><span class="s1">&lt;/span&gt;&#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;&lt;span class=&quot;post-nav-title&quot;&gt;</span><span class="si">{</span><span class="n">t</span><span class="si">}</span><span class="s1">&lt;/span&gt;&lt;/a&gt;&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">&lt;nav class=&quot;post-nav&quot; aria-label=&quot;Post navigation&quot;&gt;</span>
+<span class="s2">  </span><span class="si">{</span><span class="n">link</span><span class="p">(</span><span class="n">newer</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;prev&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;← Newer&#39;</span><span class="p">)</span><span class="si">}</span>
+<span class="s2">  </span><span class="si">{</span><span class="n">link</span><span class="p">(</span><span class="n">older</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;next&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;Older →&#39;</span><span class="p">)</span><span class="si">}</span>
+<span class="s2">&lt;/nav&gt;</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
 
 <span class="k">def</span><span class="w"> </span><span class="nf">extract_title</span><span class="p">(</span><span class="n">raw_md</span><span class="p">,</span> <span class="n">md_path</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Use the post&#39;s first `# Heading` as its title; fall back to the slug.&quot;&quot;&quot;</span>
@@ -490,18 +534,21 @@ This function handles parsing custom image blocks and turns them into proper HTM
 
     <span class="n">html_content</span> <span class="o">=</span> <span class="n">enhance_images</span><span class="p">(</span><span class="n">html_content</span><span class="p">)</span>
 
+    <span class="n">slug</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">md_path</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">post_nav</span> <span class="o">=</span> <span class="n">build_post_nav</span><span class="p">(</span><span class="n">slug</span><span class="p">)</span>
+
     <span class="n">html_section</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">&lt;main&gt;</span>
 <span class="s2">&lt;article class=&quot;markdown-body blog-body&quot;&gt;</span>
 <span class="s2">  </span><span class="si">{</span><span class="n">html_content</span><span class="si">}</span>
 <span class="s2">&lt;/article&gt;</span>
+<span class="si">{</span><span class="n">post_nav</span><span class="si">}</span>
 <span class="s2">&lt;/main&gt;</span>
 <span class="s2">&quot;&quot;&quot;</span>
 
     <span class="n">bare_title</span> <span class="o">=</span> <span class="n">extract_title</span><span class="p">(</span><span class="n">raw_md</span><span class="p">,</span> <span class="n">md_path</span><span class="p">)</span>
     <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bare_title</span><span class="si">}</span><span class="s2"> – Lucas Amoudruz&quot;</span>
 
-    <span class="n">slug</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">md_path</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">description</span> <span class="o">=</span> <span class="n">get_blog_description</span><span class="p">(</span><span class="n">slug</span><span class="p">)</span>
     <span class="n">meta_tags</span> <span class="o">=</span> <span class="n">get_meta_tags</span><span class="p">(</span>
         <span class="n">bare_title</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;blog/</span><span class="si">{</span><span class="n">slug</span><span class="si">}</span><span class="s2">.html&quot;</span><span class="p">,</span>
@@ -1133,6 +1180,54 @@ Here I have two options:</p>
 <span class="w">  </span><span class="k">background</span><span class="p">:</span><span class="w"> </span><span class="nf">var</span><span class="p">(</span><span class="nv">--color-border</span><span class="p">);</span>
 <span class="p">}</span>
 
+<span class="c">/* --- Post navigation (prev/next) --- */</span>
+
+<span class="p">.</span><span class="nc">post-nav</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">max-width</span><span class="p">:</span><span class="w"> </span><span class="mi">800</span><span class="kt">px</span><span class="p">;</span>
+<span class="w">  </span><span class="k">margin</span><span class="p">:</span><span class="w"> </span><span class="mf">2.5</span><span class="kt">rem</span><span class="w"> </span><span class="kc">auto</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">padding</span><span class="p">:</span><span class="w"> </span><span class="mf">1.5</span><span class="kt">rem</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">border-top</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="kt">px</span><span class="w"> </span><span class="kc">solid</span><span class="w"> </span><span class="nf">var</span><span class="p">(</span><span class="nv">--color-border-muted</span><span class="p">);</span>
+<span class="w">  </span><span class="k">display</span><span class="p">:</span><span class="w"> </span><span class="kc">flex</span><span class="p">;</span>
+<span class="w">  </span><span class="k">justify-content</span><span class="p">:</span><span class="w"> </span><span class="kc">space-between</span><span class="p">;</span>
+<span class="w">  </span><span class="k">gap</span><span class="p">:</span><span class="w"> </span><span class="mf">1.5</span><span class="kt">rem</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">.</span><span class="nc">post-nav-link</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">display</span><span class="p">:</span><span class="w"> </span><span class="kc">flex</span><span class="p">;</span>
+<span class="w">  </span><span class="k">flex-direction</span><span class="p">:</span><span class="w"> </span><span class="kc">column</span><span class="p">;</span>
+<span class="w">  </span><span class="k">max-width</span><span class="p">:</span><span class="w"> </span><span class="mi">48</span><span class="kt">%</span><span class="p">;</span>
+<span class="w">  </span><span class="k">font-family</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Inter&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="n">apple-system</span><span class="p">,</span><span class="w"> </span><span class="n">BlinkMacSystemFont</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Segoe UI&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">sans-serif</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">.</span><span class="nc">post-nav-prev</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">text-align</span><span class="p">:</span><span class="w"> </span><span class="kc">left</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">.</span><span class="nc">post-nav-next</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">text-align</span><span class="p">:</span><span class="w"> </span><span class="kc">right</span><span class="p">;</span>
+<span class="w">  </span><span class="k">margin-left</span><span class="p">:</span><span class="w"> </span><span class="kc">auto</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">.</span><span class="nc">post-nav-empty</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">visibility</span><span class="p">:</span><span class="w"> </span><span class="kc">hidden</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">.</span><span class="nc">post-nav-dir</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">font-size</span><span class="p">:</span><span class="w"> </span><span class="mf">0.8</span><span class="kt">rem</span><span class="p">;</span>
+<span class="w">  </span><span class="k">color</span><span class="p">:</span><span class="w"> </span><span class="nf">var</span><span class="p">(</span><span class="nv">--color-text-muted</span><span class="p">);</span>
+<span class="w">  </span><span class="k">margin-bottom</span><span class="p">:</span><span class="w"> </span><span class="mf">0.2</span><span class="kt">rem</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">.</span><span class="nc">post-nav-title</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">font-weight</span><span class="p">:</span><span class="w"> </span><span class="mi">600</span><span class="p">;</span>
+<span class="w">  </span><span class="k">color</span><span class="p">:</span><span class="w"> </span><span class="nf">var</span><span class="p">(</span><span class="nv">--color-accent</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="p">.</span><span class="nc">post-nav-link</span><span class="p">:</span><span class="nd">hover</span><span class="w"> </span><span class="p">.</span><span class="nc">post-nav-title</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">text-decoration</span><span class="p">:</span><span class="w"> </span><span class="kc">underline</span><span class="p">;</span>
+<span class="w">  </span><span class="k">text-underline-offset</span><span class="p">:</span><span class="w"> </span><span class="mf">0.15</span><span class="kt">em</span><span class="p">;</span>
+<span class="p">}</span>
+
 <span class="c">/* --- Footer --- */</span>
 
 <span class="p">.</span><span class="nc">site-footer</span><span class="w"> </span><span class="p">{</span>
@@ -1216,6 +1311,11 @@ Here I have two options:</p>
 <span class="w">  </span><span class="p">.</span><span class="nc">video-row</span><span class="w"> </span><span class="p">.</span><span class="nc">video-wrap</span><span class="w"> </span><span class="p">{</span>
 <span class="w">    </span><span class="k">width</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="kt">%</span><span class="p">;</span>
 <span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="p">.</span><span class="nc">post-nav</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">padding-left</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="kt">rem</span><span class="p">;</span>
+<span class="w">    </span><span class="k">padding-right</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="kt">rem</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
 <span class="p">}</span>
 </code></pre></div>
 
@@ -1228,6 +1328,12 @@ Markdown is a great format to write content without needing to write any HTML, a
 I'll probably extend the tools to handle bibtex and other things that I can't think of as of now.
 Probably for a future blog post!</p>
 </article>
+
+<nav class="post-nav" aria-label="Post navigation">
+  <a class="post-nav-link post-nav-prev" href="fetch-stadium-data.html"><span class="post-nav-dir">← Newer</span><span class="post-nav-title">Fetch stadium run data</span></a>
+  <span class="post-nav-link post-nav-empty"></span>
+</nav>
+
 </main>
 
 
