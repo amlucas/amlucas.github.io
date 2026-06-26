@@ -56,8 +56,8 @@
 <body>
 
 <nav class="top-nav" aria-label="Main navigation">
-  <a href="../index.html">Home</a>
-  <a href="../blog.html">Blog</a>
+  <a href="../index.html">About</a>
+  <a href="../blog.html" class="active" aria-current="page">Blog</a>
 </nav>
 
 
@@ -110,7 +110,7 @@ I have rather strong opinions on the design of computational programs; here are 
 It is very simple: each particle is rendered as a disc on the screen with some shader that mimics light.
 Here is the result for a few particles organized on a lattice:</p>
 <figure class="image-wrap image-center" style="width: 90%;">
-  <img loading="lazy" src="../images/blog/parti/lattice_rendering.png" alt="Vibe-coded particles renderer. 262144 particles on a white background.">
+  <img width="1600" height="900" loading="lazy" src="../images/blog/parti/lattice_rendering.png" alt="Vibe-coded particles renderer. 262144 particles on a white background.">
   <figcaption class="image-caption">Vibe-coded particles renderer. 262144 particles on a white background.</figcaption>
 </figure>
 
@@ -165,13 +165,6 @@ We'll either wait for a rainy weekend or the next version of LLMs.</p>
 <footer class="site-footer">
   <p>&copy; 2026 Lucas Amoudruz &nbsp;&nbsp;|&nbsp;&nbsp; <a href="../feed.xml">Subscribe (RSS)</a></p>
 </footer>
-
-  <script>
-    document.querySelectorAll('.top-nav a[href="../blog.html"]').forEach(a => {
-      a.classList.add('active');
-      a.setAttribute('aria-current', 'page');
-    });
-  </script>
 
 </body>
 </html>
