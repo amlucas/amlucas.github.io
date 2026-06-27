@@ -34,8 +34,8 @@
 
 <nav class="top-nav" aria-label="Main navigation">
   <a href="#about" class="active" aria-current="page">About</a>
+  <a href="#publications">Publications</a>
   <a href="./blog.html">Blog</a>
-
 </nav>
 
 <main>
@@ -64,7 +64,7 @@ We can't see all cancer cells around tumors.
 We can't predict the effect of unresolved scales in turbulent flows.
 My work is often about inference: using large-scale simulations, probabilistic methods, and machine learning to reconstruct what can't be seen directly, whether that's a hidden state, a past event, or what comes next. 
 Sometimes the question is simpler: will a rare event happen at all, like the pyroconvective storms that wildfires sometimes propel into the stratosphere?</p>
-<h2>Education</h2>
+<h3>Education</h3>
 <div class="cv-line">
   <span>Ph.D. Mechanical Engineering — ETH Zurich</span>
   <span>2016 – 2022</span>
@@ -84,7 +84,7 @@ Sometimes the question is simpler: will a rare event happen at all, like the pyr
   <span>2010 – 2013</span>
 </div>
 
-<h2>Academic Appointments</h2>
+<h3>Academic Appointments</h3>
 <div class="cv-line">
   <span>Lecturer — Harvard University</span>
   <span>2025 – present</span>
@@ -410,6 +410,33 @@ Sometimes the question is simpler: will a rare event happen at all, like the pyr
     window.addEventListener('scroll', toggle, { passive: true });
     toggle();
     btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  })();
+
+  // Scroll-spy: highlight the nav link of the section currently in view.
+  (function() {
+    const links = {
+      about: document.querySelector('.top-nav a[href="#about"]'),
+      publications: document.querySelector('.top-nav a[href="#publications"]'),
+    };
+    const sections = Object.keys(links)
+      .map(id => document.getElementById(id))
+      .filter(Boolean);
+    if (sections.length < 2) return;
+    const setActive = (id) => {
+      for (const [key, a] of Object.entries(links)) {
+        if (!a) continue;
+        const on = key === id;
+        a.classList.toggle('active', on);
+        if (on) a.setAttribute('aria-current', 'page');
+        else a.removeAttribute('aria-current');
+      }
+    };
+    const observer = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (e.isIntersecting) setActive(e.target.id);
+      }
+    }, { rootMargin: '-80px 0px -60% 0px', threshold: 0 });
+    sections.forEach(s => observer.observe(s));
   })();
 </script>
 

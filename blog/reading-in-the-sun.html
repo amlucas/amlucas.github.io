@@ -55,6 +55,7 @@
 
 <nav class="top-nav" aria-label="Main navigation">
   <a href="../index.html">About</a>
+  <a href="../index.html#publications">Publications</a>
   <a href="../blog.html" class="active" aria-current="page">Blog</a>
 </nav>
 
@@ -102,10 +103,10 @@ I have used the following code to estimate its trajectory. This is a blind copy-
 
 
 
-<div class="codehilite"><pre><span></span><code><span class="k">def</span> <span class="nf">day_of_year</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<div class="codehilite"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">day_of_year</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">date</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
     <span class="k">return</span> <span class="n">d</span><span class="o">.</span><span class="n">timetuple</span><span class="p">()</span><span class="o">.</span><span class="n">tm_yday</span>
 
-<span class="k">def</span> <span class="nf">refraction_correction_deg</span><span class="p">(</span><span class="n">elevation_deg</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">refraction_correction_deg</span><span class="p">(</span><span class="n">elevation_deg</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Atmospheric refraction correction in degrees.</span>
 <span class="sd">    Valid for elevations &gt; ~ -1 deg.</span>
@@ -115,7 +116,7 @@ I have used the following code to estimate its trajectory. This is a blind copy-
         <span class="k">return</span> <span class="mf">0.0</span>
     <span class="k">return</span> <span class="p">(</span><span class="mf">1.02</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">tan</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">h</span> <span class="o">+</span> <span class="mf">10.3</span> <span class="o">/</span> <span class="p">(</span><span class="n">h</span> <span class="o">+</span> <span class="mf">5.11</span><span class="p">))))</span> <span class="o">/</span> <span class="mf">60.0</span>
 
-<span class="k">def</span> <span class="nf">solar_position_noaa</span><span class="p">(</span><span class="n">lat_deg</span><span class="p">,</span> <span class="n">lon_deg</span><span class="p">,</span> <span class="n">when_local</span><span class="p">,</span> <span class="n">tz_offset_hours</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">solar_position_noaa</span><span class="p">(</span><span class="n">lat_deg</span><span class="p">,</span> <span class="n">lon_deg</span><span class="p">,</span> <span class="n">when_local</span><span class="p">,</span> <span class="n">tz_offset_hours</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Approx solar azimuth/elevation (degrees) using NOAA-style formulas.</span>
 <span class="sd">    lat_deg, lon_deg: observer location (deg), lon positive east.</span>
@@ -186,7 +187,7 @@ I have used the following code to estimate its trajectory. This is a blind copy-
 
     <span class="k">return</span> <span class="n">az_deg</span><span class="p">,</span> <span class="n">elevation</span>
 
-<span class="k">def</span> <span class="nf">solar_track</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">tz_offset_hours</span><span class="p">,</span> <span class="n">start_h</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">end_h</span><span class="o">=</span><span class="mi">22</span><span class="p">,</span> <span class="n">step_min</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">solar_track</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">date</span><span class="p">,</span> <span class="n">tz_offset_hours</span><span class="p">,</span> <span class="n">start_h</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">end_h</span><span class="o">=</span><span class="mi">22</span><span class="p">,</span> <span class="n">step_min</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
     <span class="n">times</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">azs</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">els</span> <span class="o">=</span> <span class="p">[]</span>
