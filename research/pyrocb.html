@@ -65,9 +65,31 @@
 <article class="markdown-body blog-body">
   <h1>PyroCb event explorers</h1>
 <p>Interactive explorers for pyroCb prediction models.</p>
+<p>Models are trained using the combined loss:
+<script type="math/tex; mode=display">
+\mathcal{L} = \lambda\, \mathcal{L}_{\mathrm{CE}} + (1 - \lambda)\, \mathcal{L}_{\mathrm{Tv}},
+</script>
+where <script type="math/tex">\lambda \in [0, 1]</script>.
+<script type="math/tex">\mathcal{L}_{\mathrm{CE}}</script> is the binary weighted cross-entropy loss:
+<script type="math/tex; mode=display">
+\mathcal{L}_{\mathrm{CE}} = -\frac{1}{N}\sum_{n=1}^{N}
+      \left[ w\, y_n \log \sigma(p_n)
+              + (1 - y_n)\log\!\left(1 - \sigma(p_n)\right) \right],
+</script>
+and <script type="math/tex">\mathcal{L}_{\mathrm{Tv}}</script> is the <strong>dilated</strong> Tversky loss,
+<script type="math/tex; mode=display">
+\mathcal{L}_{\mathrm{Tv}}
+  = 1 - \frac{\mathrm{TP} + \epsilon}
+             {\mathrm{TP} + \alpha\,\mathrm{FP} + \beta\,\mathrm{FN} + \epsilon},
+</script> 
+where <script type="math/tex">\epsilon > 0</script> is a small number to avoid dividing by 0, <script type="math/tex">\alpha</script> and <script type="math/tex">\beta</script> control the preference to penalizing false positives and false negatives, and
+<script type="math/tex; mode=display">
+\mathrm{TP} = \sum_{n} p_n\, \tilde y_n, \qquad \mathrm{FP} = \sum_{n} p_n\, (1 - \tilde y_n), \qquad \mathrm{FN} = \sum_{n} (1 - p_n)\, y_n.
+</script>
+</p>
 <h3><a href="https://files.lucasamoudruz.com/event_explorer_2024_base.html">Event explorer base — 2024</a></h3>
 <p>Baseline model, trained on 2017 to 2023 except 2021 as validation set.
-Uses all features.</p>
+Uses all features; trained with <script type="math/tex">\lambda=0.5</script>, <script type="math/tex">\alpha=0.3</script>, and <script type="math/tex">\beta=0.7</script>.</p>
 </article>
 
 </main>
