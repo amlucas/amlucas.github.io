@@ -579,6 +579,8 @@ This function handles parsing custom image blocks and turns them into proper HTM
                         <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Site-root-relative path of the page (default: blog/&lt;slug&gt;.html)&quot;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--nav-active&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;blog&#39;</span><span class="p">,</span>
                         <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Nav item to highlight (&#39;&#39; for none)&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--no-nav&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Omit the site nav bar (for standalone pages)&quot;</span><span class="p">)</span>
     <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
 
     <span class="n">md_path</span>  <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">md_path</span>
@@ -647,7 +649,7 @@ This function handles parsing custom image blocks and turns them into proper HTM
 <span class="s2">  &lt;link rel=&quot;preconnect&quot; href=&quot;https://fonts.googleapis.com&quot;&gt;</span>
 <span class="s2">  &lt;link rel=&quot;preconnect&quot; href=&quot;https://fonts.gstatic.com&quot; crossorigin&gt;</span>
 <span class="s2">  &lt;link href=&quot;https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;500;600&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap&quot; rel=&quot;stylesheet&quot;&gt;</span>
-<span class="si">{</span><span class="n">get_rss_link</span><span class="p">(</span><span class="s1">&#39;../&#39;</span><span class="p">)</span><span class="si">}</span>
+<span class="si">{</span><span class="s1">&#39;&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">args</span><span class="o">.</span><span class="n">no_nav</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="n">get_rss_link</span><span class="p">(</span><span class="s1">&#39;../&#39;</span><span class="p">)</span><span class="si">}</span>
 <span class="si">{</span><span class="n">ga4_tag</span><span class="si">}</span>
 <span class="si">{</span><span class="n">plotly_tag</span><span class="si">}</span>
 <span class="s2">  &lt;script&gt;</span>
@@ -673,11 +675,11 @@ This function handles parsing custom image blocks and turns them into proper HTM
 <span class="s2">&lt;/head&gt;</span>
 <span class="s2">&lt;body&gt;</span>
 
-<span class="si">{</span><span class="n">get_nav</span><span class="p">(</span><span class="s1">&#39;../&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">active</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">nav_active</span><span class="p">)</span><span class="si">}</span>
+<span class="si">{</span><span class="s1">&#39;&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">args</span><span class="o">.</span><span class="n">no_nav</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="n">get_nav</span><span class="p">(</span><span class="s1">&#39;../&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">active</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">nav_active</span><span class="p">)</span><span class="si">}</span>
 
 <span class="si">{</span><span class="n">html_section</span><span class="si">}</span>
 
-<span class="si">{</span><span class="n">get_footer</span><span class="p">(</span><span class="s1">&#39;../feed.xml&#39;</span><span class="p">)</span><span class="si">}</span>
+<span class="si">{</span><span class="n">get_footer</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">args</span><span class="o">.</span><span class="n">no_nav</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;../feed.xml&#39;</span><span class="p">)</span><span class="si">}</span>
 
 <span class="s2">&lt;/body&gt;</span>
 <span class="s2">&lt;/html&gt;</span>

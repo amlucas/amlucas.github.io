@@ -20,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;500;600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="alternate" type="application/rss+xml" href="../feed.xml" title="RSS Feed" />
+
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-5XKH0GTGGB"></script>
   <script>
@@ -54,11 +54,7 @@
 </head>
 <body>
 
-<nav class="top-nav" aria-label="Main navigation">
-  <a href="../index.html">About</a>
-  <a href="../index.html#publications">Publications</a>
-  <a href="../blog.html">Blog</a>
-</nav>
+
 
 
 <main>
@@ -88,8 +84,8 @@ where <script type="math/tex">\epsilon > 0</script> is a small number to avoid d
 \mathrm{TP} = \sum_{n} q_n\, \tilde y_n, \qquad \mathrm{FP} = \sum_{n} q_n\, (1 - \tilde y_n), \qquad \mathrm{FN} = \sum_{n} (1 - q_n)\, y_n.
 </script>
 </p>
-<p>The <script type="math/tex">\tilde \cdot</script> variables are dilated, meaning that their neighbors are also set to 1 over a given spatial and temporal radius.
-Here we choose a radius corresponding to about <script type="math/tex">\pm 150</script> km in space and <script type="math/tex">\pm 6</script> h in time.</p>
+<p>The <script type="math/tex">\tilde \cdot</script> variables are dilated, meaning that their neighbors are also set to 1 over a given spatial and temporal neighborhood.
+Here we choose a box neighborhood centered on the prediction, of size <script type="math/tex">1.75^\circ \approx 190</script> km in space and <script type="math/tex">15</script> h in time.</p>
 <h3><a href="https://files.lucasamoudruz.com/event_explorer_2024_base.html">Event explorer base — 2024</a></h3>
 <p>Baseline model, trained on 2017–2023, with 2021 held out as the validation set.
 Uses all features; trained with <script type="math/tex">\lambda=0.5</script>, <script type="math/tex">\alpha=0.3</script>, and <script type="math/tex">\beta=0.7</script>.</p>
@@ -99,7 +95,7 @@ Uses all features; trained with <script type="math/tex">\lambda=0.5</script>, <s
 
 
 <footer class="site-footer">
-  <p>&copy; 2026 Lucas Amoudruz &nbsp;&nbsp;|&nbsp;&nbsp; <a href="../feed.xml">Subscribe (RSS)</a></p>
+  <p>&copy; 2026 Lucas Amoudruz</p>
 </footer>
 
 </body>
