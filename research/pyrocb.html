@@ -1,0 +1,81 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PyroCb event explorers – Lucas Amoudruz</title>
+  <link rel="icon" href="../favicon.ico" sizes="any" />
+  <meta name="description" content="" />
+  <meta property="og:site_name" content="Lucas Amoudruz" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="PyroCb event explorers" />
+  <meta property="og:description" content="" />
+  <meta property="og:url" content="https://lucasamoudruz.com/research/pyrocb.html" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="PyroCb event explorers" />
+  <meta name="twitter:description" content="" />
+  <link rel="stylesheet" href="../css/main.css" />
+  <link rel="stylesheet" href="../css/codehilite.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;500;600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="alternate" type="application/rss+xml" href="../feed.xml" title="RSS Feed" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-5XKH0GTGGB"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-5XKH0GTGGB');
+  </script>
+
+  <script>
+    MathJax = {
+      options: {
+        renderActions: {
+          find: [10, function (doc) {
+            for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+              const display = node.type.indexOf('display') >= 0;
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.insertBefore(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end   = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            }
+          }, '']
+        }
+      }
+    };
+  </script>
+  <script src="../mathjax/tex-chtml.min.js"></script>
+</head>
+<body>
+
+<nav class="top-nav" aria-label="Main navigation">
+  <a href="../index.html">About</a>
+  <a href="../index.html#publications">Publications</a>
+  <a href="../blog.html">Blog</a>
+</nav>
+
+
+<main>
+<article class="markdown-body blog-body">
+  <h1>PyroCb event explorers</h1>
+<p>Interactive explorers for pyroCb prediction models.</p>
+<h3><a href="https://files.lucasamoudruz.com/event_explorer_2024_base.html">Event explorer base — 2024</a></h3>
+<p>Baseline model, trained on 2017 to 2023 except 2021 as validation set.
+Uses all features.</p>
+</article>
+
+</main>
+
+
+<footer class="site-footer">
+  <p>&copy; 2026 Lucas Amoudruz &nbsp;&nbsp;|&nbsp;&nbsp; <a href="../feed.xml">Subscribe (RSS)</a></p>
+</footer>
+
+</body>
+</html>

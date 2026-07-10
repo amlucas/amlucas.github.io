@@ -575,6 +575,10 @@ This function handles parsing custom image blocks and turns them into proper HTM
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;md_path&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;path to md file&quot;</span><span class="p">)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--out-html&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Path to output html file.&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--site-path&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Site-root-relative path of the page (default: blog/&lt;slug&gt;.html)&quot;</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--nav-active&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;blog&#39;</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Nav item to highlight (&#39;&#39; for none)&quot;</span><span class="p">)</span>
     <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
 
     <span class="n">md_path</span>  <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">md_path</span>
@@ -617,8 +621,9 @@ This function handles parsing custom image blocks and turns them into proper HTM
     <span class="n">title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bare_title</span><span class="si">}</span><span class="s2"> – Lucas Amoudruz&quot;</span>
 
     <span class="n">description</span> <span class="o">=</span> <span class="n">get_blog_description</span><span class="p">(</span><span class="n">slug</span><span class="p">)</span>
+    <span class="n">site_path</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">site_path</span> <span class="ow">or</span> <span class="sa">f</span><span class="s2">&quot;blog/</span><span class="si">{</span><span class="n">slug</span><span class="si">}</span><span class="s2">.html&quot;</span>
     <span class="n">meta_tags</span> <span class="o">=</span> <span class="n">get_meta_tags</span><span class="p">(</span>
-        <span class="n">bare_title</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;blog/</span><span class="si">{</span><span class="n">slug</span><span class="si">}</span><span class="s2">.html&quot;</span><span class="p">,</span>
+        <span class="n">bare_title</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">site_path</span><span class="p">,</span>
         <span class="n">image</span><span class="o">=</span><span class="n">first_raster_image</span><span class="p">(</span><span class="n">html_content</span><span class="p">),</span> <span class="n">og_type</span><span class="o">=</span><span class="s2">&quot;article&quot;</span><span class="p">,</span>
     <span class="p">)</span>
 
@@ -668,7 +673,7 @@ This function handles parsing custom image blocks and turns them into proper HTM
 <span class="s2">&lt;/head&gt;</span>
 <span class="s2">&lt;body&gt;</span>
 
-<span class="si">{</span><span class="n">get_nav</span><span class="p">(</span><span class="s1">&#39;../&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">active</span><span class="o">=</span><span class="s1">&#39;blog&#39;</span><span class="p">)</span><span class="si">}</span>
+<span class="si">{</span><span class="n">get_nav</span><span class="p">(</span><span class="s1">&#39;../&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">active</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">nav_active</span><span class="p">)</span><span class="si">}</span>
 
 <span class="si">{</span><span class="n">html_section</span><span class="si">}</span>
 
