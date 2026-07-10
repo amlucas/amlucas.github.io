@@ -11,7 +11,7 @@
   <meta property="og:type" content="article" />
   <meta property="og:title" content="Running the Harvard stadium: automatically retrieve data" />
   <meta property="og:description" content="How I downloaded, cleaned, and merged my Garmin and weather data to build a useful personal dataset." />
-  <meta property="og:url" content="https://amlucas.github.io/blog/fetch-stadium-data.html" />
+  <meta property="og:url" content="https://lucasamoudruz.com/blog/fetch-stadium-data.html" />
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="Running the Harvard stadium: automatically retrieve data" />
   <meta name="twitter:description" content="How I downloaded, cleaned, and merged my Garmin and weather data to build a useful personal dataset." />
@@ -110,7 +110,7 @@ This is why I filter them using the following function, assuming each stadium ru
 </code></pre></div>
 
 <p>Now all we need to do is retrieve weather data at these activity times.
-Here I have chosen to use <a href="https://dev.meteostat.net/python/">meteostat</a> to do so:</p>
+Here I have chosen to use <a href="https://github.com/meteostat/meteostat-python">meteostat</a> to do so:</p>
 <div class="codehilite"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">meteostat</span><span class="w"> </span><span class="kn">import</span> <span class="n">Point</span><span class="p">,</span> <span class="n">Hourly</span>
 
 <span class="k">def</span><span class="w"> </span><span class="nf">retrieve_weather_data</span><span class="p">(</span><span class="n">start_times</span><span class="p">):</span>

@@ -11,7 +11,7 @@
   <meta property="og:type" content="article" />
   <meta property="og:title" content="How I built this website with Python and Markdown" />
   <meta property="og:description" content="How I built a custom site with code snippets, citations, and full control." />
-  <meta property="og:url" content="https://amlucas.github.io/blog/how-i-built-this-website.html" />
+  <meta property="og:url" content="https://lucasamoudruz.com/blog/how-i-built-this-website.html" />
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="How I built this website with Python and Markdown" />
   <meta name="twitter:description" content="How I built a custom site with code snippets, citations, and full control." />
@@ -205,6 +205,46 @@ Below, I describe the structure of the code in more detail.</p>
 <span class="s2">      </span><span class="se">}}</span>
 <span class="s2">    </span><span class="se">}}</span><span class="s2">, </span><span class="se">{{</span><span class="s2"> rootMargin: &#39;-80px 0px -60% 0px&#39;, threshold: 0 </span><span class="se">}}</span><span class="s2">);</span>
 <span class="s2">    sections.forEach(s =&gt; observer.observe(s));</span>
+<span class="s2">  </span><span class="se">}}</span><span class="s2">)();</span>
+
+<span class="s2">  // Copy bibtex to clipboard and show a short-lived toast.</span>
+<span class="s2">  (function() </span><span class="se">{{</span>
+<span class="s2">    const entries = document.querySelectorAll(&#39;.pub-entry .bibtex-copy&#39;);</span>
+<span class="s2">    if (!entries.length) return;</span>
+<span class="s2">    const toast = document.createElement(&#39;div&#39;);</span>
+<span class="s2">    toast.className = &#39;copy-toast&#39;;</span>
+<span class="s2">    toast.setAttribute(&#39;role&#39;, &#39;status&#39;);</span>
+<span class="s2">    toast.textContent = &#39;Copied to clipboard&#39;;</span>
+<span class="s2">    document.body.appendChild(toast);</span>
+<span class="s2">    let timer = null;</span>
+<span class="s2">    const showToast = (msg) =&gt; </span><span class="se">{{</span>
+<span class="s2">      toast.textContent = msg;</span>
+<span class="s2">      toast.classList.add(&#39;visible&#39;);</span>
+<span class="s2">      clearTimeout(timer);</span>
+<span class="s2">      timer = setTimeout(() =&gt; toast.classList.remove(&#39;visible&#39;), 2000);</span>
+<span class="s2">    </span><span class="se">}}</span><span class="s2">;</span>
+<span class="s2">    entries.forEach(btn =&gt; </span><span class="se">{{</span>
+<span class="s2">      let restore = null;</span>
+<span class="s2">      btn.addEventListener(&#39;click&#39;, () =&gt; </span><span class="se">{{</span>
+<span class="s2">        const src = btn.closest(&#39;.pub-entry&#39;).querySelector(&#39;.bibtex-src&#39;);</span>
+<span class="s2">        if (!src) return;</span>
+<span class="s2">        const text = (src.content || src).textContent.trim() + &#39;</span><span class="se">\\</span><span class="s2">n&#39;;</span>
+<span class="s2">        navigator.clipboard.writeText(text).then(</span>
+<span class="s2">          () =&gt; </span><span class="se">{{</span>
+<span class="s2">            showToast(&#39;Copied to clipboard&#39;);</span>
+<span class="s2">            const label = btn.querySelector(&#39;.bibtex-label&#39;);</span>
+<span class="s2">            btn.classList.add(&#39;copied&#39;);</span>
+<span class="s2">            if (label) label.textContent = &#39;copied!&#39;;</span>
+<span class="s2">            clearTimeout(restore);</span>
+<span class="s2">            restore = setTimeout(() =&gt; </span><span class="se">{{</span>
+<span class="s2">              btn.classList.remove(&#39;copied&#39;);</span>
+<span class="s2">              if (label) label.textContent = &#39;bibtex&#39;;</span>
+<span class="s2">            </span><span class="se">}}</span><span class="s2">, 1600);</span>
+<span class="s2">          </span><span class="se">}}</span><span class="s2">,</span>
+<span class="s2">          () =&gt; showToast(&#39;Could not copy&#39;),</span>
+<span class="s2">        );</span>
+<span class="s2">      </span><span class="se">}}</span><span class="s2">);</span>
+<span class="s2">    </span><span class="se">}}</span><span class="s2">);</span>
 <span class="s2">  </span><span class="se">}}</span><span class="s2">)();</span>
 <span class="s2">&lt;/script&gt;</span>
 
@@ -1105,21 +1145,79 @@ Here I have two options:</p>
 <span class="w">  </span><span class="k">color</span><span class="p">:</span><span class="w"> </span><span class="nf">var</span><span class="p">(</span><span class="nv">--color-accent</span><span class="p">);</span>
 <span class="p">}</span>
 
-<span class="p">.</span><span class="nc">pub-entry</span><span class="w"> </span><span class="nt">summary</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="k">cursor</span><span class="p">:</span><span class="w"> </span><span class="kc">pointer</span><span class="p">;</span>
-<span class="w">  </span><span class="k">font-weight</span><span class="p">:</span><span class="w"> </span><span class="kc">normal</span><span class="p">;</span>
-<span class="w">  </span><span class="k">color</span><span class="p">:</span><span class="w"> </span><span class="kc">inherit</span><span class="p">;</span>
-<span class="w">  </span><span class="k">margin</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-<span class="w">  </span><span class="k">padding</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="c">/* --- Publications --- */</span>
+
+<span class="p">.</span><span class="nc">pub-entry</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">margin-bottom</span><span class="p">:</span><span class="w"> </span><span class="mf">1.25</span><span class="kt">rem</span><span class="p">;</span>
 <span class="p">}</span>
 
-<span class="p">.</span><span class="nc">pub-entry</span><span class="w"> </span><span class="nt">pre</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="k">background</span><span class="p">:</span><span class="w"> </span><span class="nf">var</span><span class="p">(</span><span class="nv">--color-surface</span><span class="p">);</span>
-<span class="w">  </span><span class="k">border</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="kt">px</span><span class="w"> </span><span class="kc">solid</span><span class="w"> </span><span class="nf">var</span><span class="p">(</span><span class="nv">--color-border</span><span class="p">);</span>
-<span class="w">  </span><span class="k">padding</span><span class="p">:</span><span class="w"> </span><span class="mf">0.75</span><span class="kt">rem</span><span class="p">;</span>
+<span class="p">.</span><span class="nc">pub-citation</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">margin</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="mf">0.4</span><span class="kt">rem</span><span class="p">;</span>
+<span class="w">  </span><span class="k">line-height</span><span class="p">:</span><span class="w"> </span><span class="mf">1.45</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">.</span><span class="nc">pub-venue</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">color</span><span class="p">:</span><span class="w"> </span><span class="nf">var</span><span class="p">(</span><span class="nv">--color-text-muted</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="p">.</span><span class="nc">pub-links</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">display</span><span class="p">:</span><span class="w"> </span><span class="kc">flex</span><span class="p">;</span>
+<span class="w">  </span><span class="k">flex-wrap</span><span class="p">:</span><span class="w"> </span><span class="kc">wrap</span><span class="p">;</span>
+<span class="w">  </span><span class="k">gap</span><span class="p">:</span><span class="w"> </span><span class="mf">0.4</span><span class="kt">rem</span><span class="p">;</span>
+<span class="w">  </span><span class="k">align-items</span><span class="p">:</span><span class="w"> </span><span class="kc">center</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">.</span><span class="nc">pub-pill</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">display</span><span class="p">:</span><span class="w"> </span><span class="kc">inline-flex</span><span class="p">;</span>
+<span class="w">  </span><span class="k">align-items</span><span class="p">:</span><span class="w"> </span><span class="kc">center</span><span class="p">;</span>
+<span class="w">  </span><span class="k">gap</span><span class="p">:</span><span class="w"> </span><span class="mf">0.3</span><span class="kt">rem</span><span class="p">;</span>
+<span class="w">  </span><span class="k">font-family</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Inter&quot;</span><span class="p">,</span><span class="w"> </span><span class="o">-</span><span class="n">apple-system</span><span class="p">,</span><span class="w"> </span><span class="n">BlinkMacSystemFont</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Segoe UI&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">sans-serif</span><span class="p">;</span>
+<span class="w">  </span><span class="k">font-size</span><span class="p">:</span><span class="w"> </span><span class="mf">0.75</span><span class="kt">rem</span><span class="p">;</span>
+<span class="w">  </span><span class="k">line-height</span><span class="p">:</span><span class="w"> </span><span class="mf">1.4</span><span class="p">;</span>
+<span class="w">  </span><span class="k">color</span><span class="p">:</span><span class="w"> </span><span class="nf">var</span><span class="p">(</span><span class="nv">--color-text-muted</span><span class="p">);</span>
+<span class="w">  </span><span class="k">background</span><span class="p">:</span><span class="w"> </span><span class="nf">var</span><span class="p">(</span><span class="nv">--color-surface-</span><span class="mi">2</span><span class="p">);</span>
+<span class="w">  </span><span class="k">border</span><span class="p">:</span><span class="w"> </span><span class="kc">none</span><span class="p">;</span>
+<span class="w">  </span><span class="k">border-radius</span><span class="p">:</span><span class="w"> </span><span class="mi">999</span><span class="kt">px</span><span class="p">;</span>
+<span class="w">  </span><span class="k">padding</span><span class="p">:</span><span class="w"> </span><span class="mf">0.15</span><span class="kt">rem</span><span class="w"> </span><span class="mf">0.65</span><span class="kt">rem</span><span class="p">;</span>
+<span class="w">  </span><span class="k">cursor</span><span class="p">:</span><span class="w"> </span><span class="kc">pointer</span><span class="p">;</span>
+<span class="w">  </span><span class="k">text-decoration</span><span class="p">:</span><span class="w"> </span><span class="kc">none</span><span class="p">;</span>
+<span class="w">  </span><span class="k">transition</span><span class="p">:</span><span class="w"> </span><span class="k">background</span><span class="w"> </span><span class="mf">0.15</span><span class="kt">s</span><span class="w"> </span><span class="kc">ease</span><span class="p">,</span><span class="w"> </span><span class="kc">color</span><span class="w"> </span><span class="mf">0.15</span><span class="kt">s</span><span class="w"> </span><span class="kc">ease</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">.</span><span class="nc">pub-pill</span><span class="p">:</span><span class="nd">hover</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">background</span><span class="p">:</span><span class="w"> </span><span class="nf">var</span><span class="p">(</span><span class="nv">--color-border</span><span class="p">);</span>
+<span class="w">  </span><span class="k">color</span><span class="p">:</span><span class="w"> </span><span class="nf">var</span><span class="p">(</span><span class="nv">--color-text</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="p">.</span><span class="nc">pub-pill</span><span class="w"> </span><span class="p">.</span><span class="nc">copy-icon</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">flex-shrink</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">.</span><span class="nc">pub-pill</span><span class="p">.</span><span class="nc">copied</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">background</span><span class="p">:</span><span class="w"> </span><span class="nf">var</span><span class="p">(</span><span class="nv">--color-accent-wash-strong</span><span class="p">);</span>
+<span class="w">  </span><span class="k">color</span><span class="p">:</span><span class="w"> </span><span class="nf">var</span><span class="p">(</span><span class="nv">--color-accent</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="p">.</span><span class="nc">copy-toast</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">position</span><span class="p">:</span><span class="w"> </span><span class="kc">fixed</span><span class="p">;</span>
+<span class="w">  </span><span class="k">bottom</span><span class="p">:</span><span class="w"> </span><span class="mf">1.5</span><span class="kt">rem</span><span class="p">;</span>
+<span class="w">  </span><span class="k">right</span><span class="p">:</span><span class="w"> </span><span class="mf">1.5</span><span class="kt">rem</span><span class="p">;</span>
+<span class="w">  </span><span class="k">background</span><span class="p">:</span><span class="w"> </span><span class="nf">var</span><span class="p">(</span><span class="nv">--color-text</span><span class="p">);</span>
+<span class="w">  </span><span class="k">color</span><span class="p">:</span><span class="w"> </span><span class="nf">var</span><span class="p">(</span><span class="nv">--color-bg</span><span class="p">,</span><span class="w"> </span><span class="mh">#fff</span><span class="p">);</span>
+<span class="w">  </span><span class="k">padding</span><span class="p">:</span><span class="w"> </span><span class="mf">0.5</span><span class="kt">rem</span><span class="w"> </span><span class="mi">1</span><span class="kt">rem</span><span class="p">;</span>
 <span class="w">  </span><span class="k">border-radius</span><span class="p">:</span><span class="w"> </span><span class="mi">6</span><span class="kt">px</span><span class="p">;</span>
-<span class="w">  </span><span class="k">overflow-x</span><span class="p">:</span><span class="w"> </span><span class="kc">auto</span><span class="p">;</span>
 <span class="w">  </span><span class="k">font-size</span><span class="p">:</span><span class="w"> </span><span class="mf">0.9</span><span class="kt">rem</span><span class="p">;</span>
+<span class="w">  </span><span class="k">box-shadow</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="mi">2</span><span class="kt">px</span><span class="w"> </span><span class="mi">8</span><span class="kt">px</span><span class="w"> </span><span class="nb">rgba</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mf">0.2</span><span class="p">);</span>
+<span class="w">  </span><span class="k">opacity</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">  </span><span class="k">transform</span><span class="p">:</span><span class="w"> </span><span class="nb">translateY</span><span class="p">(</span><span class="mf">0.5</span><span class="kt">rem</span><span class="p">);</span>
+<span class="w">  </span><span class="k">transition</span><span class="p">:</span><span class="w"> </span><span class="k">opacity</span><span class="w"> </span><span class="mf">0.2</span><span class="kt">s</span><span class="w"> </span><span class="kc">ease</span><span class="p">,</span><span class="w"> </span><span class="k">transform</span><span class="w"> </span><span class="mf">0.2</span><span class="kt">s</span><span class="w"> </span><span class="kc">ease</span><span class="p">;</span>
+<span class="w">  </span><span class="k">pointer-events</span><span class="p">:</span><span class="w"> </span><span class="kc">none</span><span class="p">;</span>
+<span class="w">  </span><span class="k">z-index</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">.</span><span class="nc">copy-toast</span><span class="p">.</span><span class="nc">visible</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">opacity</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<span class="w">  </span><span class="k">transform</span><span class="p">:</span><span class="w"> </span><span class="nb">translateY</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
 <span class="p">}</span>
 
 <span class="p">.</span><span class="nc">codehilite</span><span class="w"> </span><span class="p">{</span>

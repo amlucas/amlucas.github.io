@@ -2,84 +2,84 @@
 <rss version="2.0">
   <channel>
     <title>Lucas Amoudruz – Blog</title>
-    <link>https://amlucas.github.io</link>
+    <link>https://lucasamoudruz.com</link>
     <description>Personal blog covering scientific computing, fluid dynamics, and more</description>
     <language>en-us</language>
-    <lastBuildDate>Tue, 07 Jul 2026 17:03:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 10 Jul 2026 10:30:14 +0000</lastBuildDate>
   <item>
     <title>Rhythms of a street</title>
-    <link>https://amlucas.github.io/blog/raspberry-pi-listener.html</link>
-    <guid>https://amlucas.github.io/blog/raspberry-pi-listener.html</guid>
+    <link>https://lucasamoudruz.com/blog/raspberry-pi-listener.html</link>
+    <guid>https://lucasamoudruz.com/blog/raspberry-pi-listener.html</guid>
     <pubDate>Tue, 23 Jun 2026 00:00:00 +0000</pubDate>
     <description>A two week experiment with my new Raspberry Pi.</description>
   </item>
   <item>
     <title>Vibe-coding a particle solver</title>
-    <link>https://amlucas.github.io/blog/parti.html</link>
-    <guid>https://amlucas.github.io/blog/parti.html</guid>
+    <link>https://lucasamoudruz.com/blog/parti.html</link>
+    <guid>https://lucasamoudruz.com/blog/parti.html</guid>
     <pubDate>Wed, 06 May 2026 00:00:00 +0000</pubDate>
     <description>Simulating sedimenting particles in Stokes flow with Barnes–Hut.</description>
   </item>
   <item>
     <title>Magnetic Newton&apos;s cradle</title>
-    <link>https://amlucas.github.io/blog/newton-cradle-magnets.html</link>
-    <guid>https://amlucas.github.io/blog/newton-cradle-magnets.html</guid>
+    <link>https://lucasamoudruz.com/blog/newton-cradle-magnets.html</link>
+    <guid>https://lucasamoudruz.com/blog/newton-cradle-magnets.html</guid>
     <pubDate>Thu, 23 Apr 2026 00:00:00 +0000</pubDate>
     <description>Simulating a Newton’s cradle with magnetic interactions, and how long-range forces break the clean transfer of energy.</description>
   </item>
   <item>
     <title>Sunny walk in the French Alps</title>
-    <link>https://amlucas.github.io/blog/sunny-walk.html</link>
-    <guid>https://amlucas.github.io/blog/sunny-walk.html</guid>
+    <link>https://lucasamoudruz.com/blog/sunny-walk.html</link>
+    <guid>https://lucasamoudruz.com/blog/sunny-walk.html</guid>
     <pubDate>Tue, 06 Jan 2026 00:00:00 +0000</pubDate>
     <description>Combining GPS and topographic data to find the perfect winter walk time for my parents.</description>
   </item>
   <item>
     <title>Predicting shades in the French Alps</title>
-    <link>https://amlucas.github.io/blog/reading-in-the-sun.html</link>
-    <guid>https://amlucas.github.io/blog/reading-in-the-sun.html</guid>
+    <link>https://lucasamoudruz.com/blog/reading-in-the-sun.html</link>
+    <guid>https://lucasamoudruz.com/blog/reading-in-the-sun.html</guid>
     <pubDate>Mon, 05 Jan 2026 00:00:00 +0000</pubDate>
     <description>From topographic data and solar geometry to the optimal reading time on my parent&apos;s terrace.</description>
   </item>
   <item>
     <title>My pace during stadium runs</title>
-    <link>https://amlucas.github.io/blog/stadium-pacing.html</link>
-    <guid>https://amlucas.github.io/blog/stadium-pacing.html</guid>
+    <link>https://lucasamoudruz.com/blog/stadium-pacing.html</link>
+    <guid>https://lucasamoudruz.com/blog/stadium-pacing.html</guid>
     <pubDate>Sun, 21 Dec 2025 00:00:00 +0000</pubDate>
     <description>Using elevation data from my watch to analyze pacing strategies at the Harvard Stadium, and finding out what my best runs have in common.</description>
   </item>
   <item>
     <title>Tossing potatoes</title>
-    <link>https://amlucas.github.io/blog/tossing-potatoes.html</link>
-    <guid>https://amlucas.github.io/blog/tossing-potatoes.html</guid>
+    <link>https://lucasamoudruz.com/blog/tossing-potatoes.html</link>
+    <guid>https://lucasamoudruz.com/blog/tossing-potatoes.html</guid>
     <pubDate>Tue, 02 Dec 2025 00:00:00 +0000</pubDate>
     <description>A probability model for how many times you need to toss potatoes in a pan so each side gets cooked. Inclusion-exclusion in the kitchen.</description>
   </item>
   <item>
     <title>Analyze stadium run data</title>
-    <link>https://amlucas.github.io/blog/analyze-stadium-data.html</link>
-    <guid>https://amlucas.github.io/blog/analyze-stadium-data.html</guid>
+    <link>https://lucasamoudruz.com/blog/analyze-stadium-data.html</link>
+    <guid>https://lucasamoudruz.com/blog/analyze-stadium-data.html</guid>
     <pubDate>Sat, 09 Aug 2025 00:00:00 +0000</pubDate>
     <description>Modeling run time using temperature, sleep, and training history, with linear regression and Sobol indices.</description>
   </item>
   <item>
     <title>The Hydrocube</title>
-    <link>https://amlucas.github.io/blog/hydrocube.html</link>
-    <guid>https://amlucas.github.io/blog/hydrocube.html</guid>
+    <link>https://lucasamoudruz.com/blog/hydrocube.html</link>
+    <guid>https://lucasamoudruz.com/blog/hydrocube.html</guid>
     <pubDate>Sun, 03 Aug 2025 00:00:00 +0000</pubDate>
     <description>A 3D-printed robot for testing learned fluid controllers: from simulations to a robotics prize.</description>
   </item>
   <item>
     <title>Fetch stadium run data</title>
-    <link>https://amlucas.github.io/blog/fetch-stadium-data.html</link>
-    <guid>https://amlucas.github.io/blog/fetch-stadium-data.html</guid>
+    <link>https://lucasamoudruz.com/blog/fetch-stadium-data.html</link>
+    <guid>https://lucasamoudruz.com/blog/fetch-stadium-data.html</guid>
     <pubDate>Sat, 12 Jul 2025 00:00:00 +0000</pubDate>
     <description>How I downloaded, cleaned, and merged my Garmin and weather data to build a useful personal dataset.</description>
   </item>
   <item>
     <title>How I built this website</title>
-    <link>https://amlucas.github.io/blog/how-i-built-this-website.html</link>
-    <guid>https://amlucas.github.io/blog/how-i-built-this-website.html</guid>
+    <link>https://lucasamoudruz.com/blog/how-i-built-this-website.html</link>
+    <guid>https://lucasamoudruz.com/blog/how-i-built-this-website.html</guid>
     <pubDate>Sat, 12 Jul 2025 00:00:00 +0000</pubDate>
     <description>How I built a custom site with code snippets, citations, and full control.</description>
   </item>
