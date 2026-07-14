@@ -4,18 +4,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PyroCb event explorers – Lucas Amoudruz</title>
+  <title>PyroCb – Lucas Amoudruz</title>
   <link rel="icon" href="../favicon.ico" sizes="any" />
   <meta name="description" content="" />
   <link rel="canonical" href="https://lucasamoudruz.com/research/pyrocb.html" />
   <meta property="og:site_name" content="Lucas Amoudruz" />
   <meta property="og:type" content="article" />
-  <meta property="og:title" content="PyroCb event explorers" />
+  <meta property="og:title" content="PyroCb" />
   <meta property="og:description" content="" />
   <meta property="og:url" content="https://lucasamoudruz.com/research/pyrocb.html" />
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="PyroCb event explorers" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="PyroCb" />
   <meta name="twitter:description" content="" />
+  <meta property="og:image" content="https://lucasamoudruz.com/images/research/pyrocb/pyrocb_noaa.jpg" />
+  <meta name="twitter:image" content="https://lucasamoudruz.com/images/research/pyrocb/pyrocb_noaa.jpg" />
   <link rel="stylesheet" href="../css/main.css" />
   <link rel="stylesheet" href="../css/codehilite.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -60,8 +62,30 @@
 
 <main>
 <article class="markdown-body blog-body">
-  <h1>PyroCb event explorers</h1>
-<p>Interactive explorers for pyroCb prediction models.</p>
+  <h1>PyroCb</h1>
+<p>Intense wildfires, in combination with atmospheric conditions that favor convection, sometimes produce pyrocumulonimbus (pyroCb) clouds that propel large quantities of smoke, ash, and moisture high into the atmosphere.
+These extreme events can cause severe hazards, such as lightning that can start new fires, intense storms, and long-term climate impacts due to long-lasting smoke injected into the stratosphere.</p>
+<figure class="image-wrap image-center" style="width: 75%;">
+  <img width="2500" height="1250" loading="lazy" src="../images/research/pyrocb/pyrocb_noaa.jpg" alt="PyroCb clouds (Image credit: NOAA NESDIS)">
+  <figcaption class="image-caption">PyroCb clouds (Image credit: NOAA NESDIS)</figcaption>
+</figure>
+
+<p>Because of the intensity and rarity of these events, it is difficult to predict when they occur.
+Here we take a machine learning approach to predict the occurrence of these events from wildfire and weather data over North America.</p>
+<h2>Data and features</h2>
+<p>The input features are formed from several datasets covering North America between 2017 and 2024:</p>
+<ul>
+<li>RAVE dataset, merging fire products extracted from GOES and VIIRS.</li>
+<li>Engineered features from GFS analysis data on a <script type="math/tex">0.25^\circ</script> grid with <script type="math/tex">3</script> h time intervals.</li>
+<li>Cloud-top temperatures from the GOES cloud and moisture imagery product (channel C13, <script type="math/tex">10.3</script> µm infrared), which measures the brightness temperature at the top of clouds.</li>
+</ul>
+<p>The task becomes a classification problem, where we need to determine whether each fire will give rise to a pyroCb or not.
+Labels are computed from an inventory of observed pyroCbs between 2013 and 2024.</p>
+<p>A list of features and their separability and correlations can be visualized on the <a href="https://files.lucasamoudruz.com/class_separability.html">input features explorer</a>.</p>
+<h2>Models and training</h2>
+<!-- TODO: brief description of the model architecture and training setup
+     (patch inputs, seeds, train/validation split by year) before the loss. -->
+
 <p>Models are trained using the combined loss:
 <script type="math/tex; mode=display">
 \mathcal{L} = \lambda\, \mathcal{L}_{\mathrm{CE}} + (1 - \lambda)\, \mathcal{L}_{\mathrm{Tv}},
@@ -87,6 +111,16 @@ where <script type="math/tex">\epsilon > 0</script> is a small number to avoid d
 </p>
 <p>The <script type="math/tex">\tilde \cdot</script> variables are dilated, meaning that their neighbors are also set to 1 over a given spatial and temporal neighborhood.
 Here we choose a box neighborhood centered on the prediction, of size <script type="math/tex">1.75^\circ \approx 190</script> km in space and <script type="math/tex">15</script> h in time.</p>
+<h2>Sweeps and threshold metrics</h2>
+<h3><a href="https://files.lucasamoudruz.com/thr_loss_sweep.html">Loss sweep</a></h3>
+<p>Compare loss functions for the base model, with all features.</p>
+<h3>Config sweep [TODO]</h3>
+<h3>Architecture sweep [TODO]</h3>
+<!-- TODO: link the metrics-vs-threshold explorer for all trained models
+     across sweeps, hosted on files.lucasamoudruz.com -->
+
+<h2>PyroCb event explorers</h2>
+<p>Interactive explorers for pyroCb prediction models.</p>
 <h3><a href="https://files.lucasamoudruz.com/event_explorer_2024_base.html">Event explorer base — 2024</a></h3>
 <p>Baseline model, trained on 2017–2023, with 2021 held out as the validation set.
 Uses all features; trained with <script type="math/tex">\lambda=0.5</script>, <script type="math/tex">\alpha=0.3</script>, and <script type="math/tex">\beta=0.7</script>.</p>
