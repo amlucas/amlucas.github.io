@@ -112,16 +112,20 @@ where <script type="math/tex">\epsilon > 0</script> is a small number to avoid d
 <p>The <script type="math/tex">\tilde \cdot</script> variables are dilated, meaning that their neighbors are also set to 1 over a given spatial and temporal neighborhood.
 Here we choose a box neighborhood centered on the prediction, of size <script type="math/tex">1.75^\circ \approx 190</script> km in space and <script type="math/tex">15</script> h in time.</p>
 <h2>Sweeps and threshold metrics</h2>
-<h3><a href="https://files.lucasamoudruz.com/thr_loss_sweep.html">Loss sweep</a></h3>
-<p>Compare loss functions for the base model, with all features.</p>
-<h3>Config sweep [TODO]</h3>
+<h3>Loss sweep [<a href="https://files.lucasamoudruz.com/thr_loss_sweep.html">click to view</a>]</h3>
+<p>Compare the effect of the loss function (different values of <script type="math/tex">\lambda</script>, <script type="math/tex">\alpha</script>, and <script type="math/tex">\beta</script>) on the prediction capabilities of the base model with all input features.
+To maximize the Tversky-CSI with <script type="math/tex">\alpha=0.3</script> and <script type="math/tex">\beta=0.7</script>, it is best to use a training loss with <script type="math/tex">\lambda=0.5</script>,  <script type="math/tex">\alpha=0.3</script>, and <script type="math/tex">\beta=0.7</script>.
+A pure Tversky loss leads to lower performance.</p>
+<h3>Feature config sweep [<a href="https://files.lucasamoudruz.com/thr_feature_config_sweep.html">click to view</a>]</h3>
+<p>Compare the effect of removing input features that may be detrimental to generalization: lat/lon and the features with negative permutation importance.
+This tells us that to maximize the Tversky loss, we should use all input features available.</p>
 <h3>Architecture sweep [TODO]</h3>
 <!-- TODO: link the metrics-vs-threshold explorer for all trained models
      across sweeps, hosted on files.lucasamoudruz.com -->
 
 <h2>PyroCb event explorers</h2>
 <p>Interactive explorers for pyroCb prediction models.</p>
-<h3><a href="https://files.lucasamoudruz.com/event_explorer_2024_base.html">Event explorer base — 2024</a></h3>
+<h3>Event explorer base — 2024 <a href="https://files.lucasamoudruz.com/event_explorer_2024_base.html">click to view</a></h3>
 <p>Baseline model, trained on 2017–2023, with 2021 held out as the validation set.
 Uses all features; trained with <script type="math/tex">\lambda=0.5</script>, <script type="math/tex">\alpha=0.3</script>, and <script type="math/tex">\beta=0.7</script>.</p>
 </article>
