@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PyroCb – Lucas Amoudruz</title>
   <link rel="icon" href="../favicon.ico" sizes="any" />
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
   <meta name="description" content="" />
   <link rel="canonical" href="https://lucasamoudruz.com/research/pyrocb.html" />
   <meta property="og:site_name" content="Lucas Amoudruz" />
@@ -82,10 +83,25 @@ Here we take a machine learning approach to predict the occurrence of these even
 <p>The task becomes a classification problem, where we need to determine whether each fire will give rise to a pyroCb or not.
 Labels are computed from an inventory of observed pyroCbs between 2013 and 2024.</p>
 <p>A list of features and their separability and correlations can be visualized on the <a href="https://files.lucasamoudruz.com/class_separability.html">input features explorer</a>.</p>
+<h2>Evaluation metrics</h2>
+<p>The model needs to predict where pyroCbs may occur.
+In particular, it is more important to avoid misses than to avoid false alarms.
+Predicting an occurrence near a true event should also be rewarded, and we thus don't use a pure pixel-wise metric to evaluate the model.
+We make use of fuzzy predictions instead.
+This motivates the use of the <strong>dilated Tversky metric</strong>, defined as
+<script type="math/tex; mode=display">
+\mathrm{CSI}_{\alpha,\beta} = \frac{\mathrm{TP} + \epsilon} {\mathrm{TP} + \alpha\,\mathrm{FP} + \beta\,\mathrm{FN} + \epsilon},
+</script> 
+where <script type="math/tex">\epsilon > 0</script> is a small number to avoid dividing by 0 (we used <script type="math/tex">\epsilon=10^{-6}</script>), <script type="math/tex">\alpha</script> and <script type="math/tex">\beta</script> control the preference for penalizing false positives versus false negatives, and
+<script type="math/tex; mode=display">
+\mathrm{TP} = \sum_{n} q_n\, \tilde y_n, \qquad \mathrm{FP} = \sum_{n} q_n\, (1 - \tilde y_n), \qquad \mathrm{FN} = \sum_{n} (1 - q_n)\, y_n.
+</script>
+</p>
+<p>The <script type="math/tex">\tilde \cdot</script> variables are dilated, meaning that their neighbors take the same value over a given spatial and temporal neighborhood.
+Here we choose a box neighborhood centered on the prediction point, of size <script type="math/tex">1.75^\circ \approx 190</script> km in space and <script type="math/tex">15</script> h in time.
+Note that for <script type="math/tex">\alpha = \beta = 1</script> and no dilation, <script type="math/tex">\mathrm{CSI}_{1,1}</script> reduces to the standard critical success index (CSI).</p>
 <h2>Models and training</h2>
-<!-- TODO: brief description of the model architecture and training setup
-     (patch inputs, seeds, train/validation split by year) before the loss. -->
-
+<h3>Loss</h3>
 <p>Models are trained using the combined loss:
 <script type="math/tex; mode=display">
 \mathcal{L} = \lambda\, \mathcal{L}_{\mathrm{CE}} + (1 - \lambda)\, \mathcal{L}_{\mathrm{Tv}},
@@ -100,32 +116,28 @@ For each sample <script type="math/tex">n = 1, \dots, N</script>, we denote by <
 </script>
 where <script type="math/tex">w</script> upweights the rare positive class, and <script type="math/tex">\mathcal{L}_{\mathrm{Tv}}</script> is the <strong>dilated</strong> Tversky loss,
 <script type="math/tex; mode=display">
-\mathcal{L}_{\mathrm{Tv}}
-  = 1 - \frac{\mathrm{TP} + \epsilon}
-             {\mathrm{TP} + \alpha\,\mathrm{FP} + \beta\,\mathrm{FN} + \epsilon},
-</script> 
-where <script type="math/tex">\epsilon > 0</script> is a small number to avoid dividing by 0, <script type="math/tex">\alpha</script> and <script type="math/tex">\beta</script> control the preference for penalizing false positives versus false negatives, and
-<script type="math/tex; mode=display">
-\mathrm{TP} = \sum_{n} q_n\, \tilde y_n, \qquad \mathrm{FP} = \sum_{n} q_n\, (1 - \tilde y_n), \qquad \mathrm{FN} = \sum_{n} (1 - q_n)\, y_n.
+\mathcal{L}_{\mathrm{Tv}} = 1 - \mathrm{CSI}_{\alpha,\beta}.
 </script>
 </p>
-<p>The <script type="math/tex">\tilde \cdot</script> variables are dilated, meaning that their neighbors are also set to 1 over a given spatial and temporal neighborhood.
-Here we choose a box neighborhood centered on the prediction, of size <script type="math/tex">1.75^\circ \approx 190</script> km in space and <script type="math/tex">15</script> h in time.</p>
+<h3>Early stopping</h3>
+<p>We keep track of an EMA model (whose weights are an exponential moving average of the trained model's weights) during training, and use this model for future predictions.</p>
+<p>The dilated Tversky metric <script type="math/tex">\mathrm{CSI}_{0.3,0.7}</script> is computed on the validation set (year 2021) at every epoch with the EMA model.
+We record the best model in that metric, typically after about 200 epochs of training.</p>
 <h2>Sweeps and threshold metrics</h2>
 <h3>Loss sweep [<a href="https://files.lucasamoudruz.com/thr_loss_sweep.html">click to view</a>]</h3>
 <p>Compare the effect of the loss function (different values of <script type="math/tex">\lambda</script>, <script type="math/tex">\alpha</script>, and <script type="math/tex">\beta</script>) on the prediction capabilities of the base model with all input features.
-To maximize the Tversky-CSI with <script type="math/tex">\alpha=0.3</script> and <script type="math/tex">\beta=0.7</script>, it is best to use a training loss with <script type="math/tex">\lambda=0.5</script>,  <script type="math/tex">\alpha=0.3</script>, and <script type="math/tex">\beta=0.7</script>.
+To maximize <script type="math/tex">\mathrm{CSI}_{0.3,0.7}</script>, it is best to use a training loss with <script type="math/tex">\lambda=0.25</script>, <script type="math/tex">\alpha=0.2</script>, and <script type="math/tex">\beta=0.8</script>.
 A pure Tversky loss leads to lower performance.</p>
 <h3>Feature config sweep [<a href="https://files.lucasamoudruz.com/thr_feature_config_sweep.html">click to view</a>]</h3>
 <p>Compare the effect of removing input features that may be detrimental to generalization: lat/lon and the features with negative permutation importance.
-This tells us that to maximize the Tversky loss, we should use all input features available.</p>
+This tells us that to maximize <script type="math/tex">\mathrm{CSI}_{0.3,0.7}</script>, we should use all available input features.</p>
 <h3>Architecture sweep [TODO]</h3>
 <!-- TODO: link the metrics-vs-threshold explorer for all trained models
      across sweeps, hosted on files.lucasamoudruz.com -->
 
 <h2>PyroCb event explorers</h2>
 <p>Interactive explorers for pyroCb prediction models.</p>
-<h3>Event explorer base — 2024 <a href="https://files.lucasamoudruz.com/event_explorer_2024_base.html">click to view</a></h3>
+<h3>Event explorer base — 2024 [<a href="https://files.lucasamoudruz.com/event_explorer_2024_base.html">click to view</a>]</h3>
 <p>Baseline model, trained on 2017–2023, with 2021 held out as the validation set.
 Uses all features; trained with <script type="math/tex">\lambda=0.5</script>, <script type="math/tex">\alpha=0.3</script>, and <script type="math/tex">\beta=0.7</script>.</p>
 </article>
