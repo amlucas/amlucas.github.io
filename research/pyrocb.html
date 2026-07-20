@@ -146,7 +146,7 @@ Uses all features; trained with <script type="math/tex">\lambda=0.5</script>, <s
 <p>Same as baseline model, trained with <script type="math/tex">\lambda=0.25</script>, <script type="math/tex">\alpha=0.2</script>, and <script type="math/tex">\beta=0.8</script>.</p>
 <h3>Event explorer fewer inputs — 2024 [<a href="https://files.lucasamoudruz.com/event_explorer_2024_posimp_nolatlon.html">click to view</a>]</h3>
 <p>Same as baseline model, trained with <script type="math/tex">\lambda=0.25</script>, <script type="math/tex">\alpha=0.2</script>, and <script type="math/tex">\beta=0.8</script>, and without lat and lon as input features.
-In addition, a few weather variables were removed ().</p>
+In addition, a few weather variables were removed (<code>land_frac_cropland</code>, <code>mdpwly</code>, and <code>ttpwat</code>) because their permutation feature importance was negative.</p>
 <h3>Event explorer wide weather — 2024 [<a href="https://files.lucasamoudruz.com/event_explorer_2024_kw_17_all_weather.html">click to view</a>]</h3>
 <p>Same as baseline model, trained with <script type="math/tex">\lambda=0.25</script>, <script type="math/tex">\alpha=0.2</script>, and <script type="math/tex">\beta=0.8</script>.
 Weather variables are coarsened and have a larger input spacial window (<script type="math/tex">17\times 17</script> pixels). </p>
