@@ -131,15 +131,25 @@ A pure Tversky loss leads to lower performance.</p>
 <h3>Feature config sweep [<a href="https://files.lucasamoudruz.com/thr_feature_config_sweep.html">click to view</a>]</h3>
 <p>Compare the effect of removing input features that may be detrimental to generalization: lat/lon and the features with negative permutation importance.
 This tells us that to maximize <script type="math/tex">\mathrm{CSI}_{0.3,0.7}</script>, we should use all available input features.</p>
-<h3>Architecture sweep [TODO]</h3>
-<!-- TODO: link the metrics-vs-threshold explorer for all trained models
-     across sweeps, hosted on files.lucasamoudruz.com -->
-
+<h3>Architecture sweep [<a href="https://files.lucasamoudruz.com/thr_arch_sweep.html">click to view</a>]</h3>
+<p>Compare the effect of the neural network size and the size view of the weather variables.
+Having a wider view of weather variables is beneficial here.</p>
+<h3>Wide variable sweep [<a href="https://files.lucasamoudruz.com/thr_wide_var_sweep.html">click to view</a>]</h3>
+<p>Is a wider view on specific variables helping? While the other variables are viewd on a smaller window.
+There is no model beating the best model for the previous (architecture) sweep.</p>
 <h2>PyroCb event explorers</h2>
 <p>Interactive explorers for pyroCb prediction models.</p>
 <h3>Event explorer base — 2024 [<a href="https://files.lucasamoudruz.com/event_explorer_2024_base.html">click to view</a>]</h3>
 <p>Baseline model, trained on 2017–2023, with 2021 held out as the validation set.
 Uses all features; trained with <script type="math/tex">\lambda=0.5</script>, <script type="math/tex">\alpha=0.3</script>, and <script type="math/tex">\beta=0.7</script>.</p>
+<h3>Event explorer loss — 2024 [<a href="https://files.lucasamoudruz.com/event_explorer_2024_loss.html">click to view</a>]</h3>
+<p>Same as baseline model, trained with <script type="math/tex">\lambda=0.25</script>, <script type="math/tex">\alpha=0.2</script>, and <script type="math/tex">\beta=0.8</script>.</p>
+<h3>Event explorer fewer inputs — 2024 [<a href="https://files.lucasamoudruz.com/event_explorer_2024_posimp_nolatlon.html">click to view</a>]</h3>
+<p>Same as baseline model, trained with <script type="math/tex">\lambda=0.25</script>, <script type="math/tex">\alpha=0.2</script>, and <script type="math/tex">\beta=0.8</script>, and without lat and lon as input features.
+In addition, a few weather variables were removed ().</p>
+<h3>Event explorer wide weather — 2024 [<a href="https://files.lucasamoudruz.com/event_explorer_2024_kw_17_all_weather.html">click to view</a>]</h3>
+<p>Same as baseline model, trained with <script type="math/tex">\lambda=0.25</script>, <script type="math/tex">\alpha=0.2</script>, and <script type="math/tex">\beta=0.8</script>.
+Weather variables are coarsened and have a larger input spacial window (<script type="math/tex">17\times 17</script> pixels). </p>
 </article>
 
 </main>
