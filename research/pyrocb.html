@@ -86,20 +86,23 @@ Labels are computed from an inventory of observed pyroCbs between 2013 and 2024.
 <h2>Evaluation metrics</h2>
 <p>The model needs to predict where pyroCbs may occur.
 In particular, it is more important to avoid misses than to avoid false alarms.
-Predicting an occurrence near a true event should also be rewarded, and we thus don't use a pure pixel-wise metric to evaluate the model.
-We make use of fuzzy predictions instead.
-This motivates the use of the <strong>dilated Tversky metric</strong>, defined as
+Predicting an occurrence spatially and temporally close to a true event should also be rewarded, and we thus adopt a fuzzy metric rather than a pure pixel-wise loss to evaluate the model.
+This motivates the use of the <strong>symmetric dilated Tversky metric</strong>, defined as
 <script type="math/tex; mode=display">
 \mathrm{CSI}_{\alpha,\beta} = \frac{\mathrm{TP} + \epsilon} {\mathrm{TP} + \alpha\,\mathrm{FP} + \beta\,\mathrm{FN} + \epsilon},
 </script> 
 where <script type="math/tex">\epsilon > 0</script> is a small number to avoid dividing by 0 (we used <script type="math/tex">\epsilon=10^{-6}</script>), <script type="math/tex">\alpha</script> and <script type="math/tex">\beta</script> control the preference for penalizing false positives versus false negatives, and
 <script type="math/tex; mode=display">
-\mathrm{TP} = \sum_{n} q_n\, \tilde y_n, \qquad \mathrm{FP} = \sum_{n} q_n\, (1 - \tilde y_n), \qquad \mathrm{FN} = \sum_{n} (1 - q_n)\, y_n.
+\mathrm{TP} = \sum_{n} y_n\, \tilde q_n, \qquad \mathrm{FP} = \sum_{n} q_n\, (1 - \tilde y_n), \qquad \mathrm{FN} = \sum_{n} y_n\, (1 - \tilde q_n).
 </script>
 </p>
-<p>The <script type="math/tex">\tilde \cdot</script> variables are dilated, meaning that their neighbors take the same value over a given spatial and temporal neighborhood.
+<p>The <script type="math/tex">\tilde \cdot</script> variables are dilated with a max pool over a given spatial and temporal neighborhood: <script type="math/tex">\tilde q_n</script> is the largest prediction within the neighborhood of point <script type="math/tex">n</script>, and <script type="math/tex">\tilde y_n</script> indicates whether an observed event lies within that neighborhood.
+An observed event thus counts as a hit when a prediction fires anywhere nearby and as a miss otherwise, so each event is credited at most once (<script type="math/tex">\mathrm{TP} + \mathrm{FN} = \sum_n y_n</script>); conversely, a prediction is a false alarm only when no event lies within its neighborhood.
+The metric is symmetric in the sense that misses and false alarms are both judged with the same spatial and temporal tolerance.
+This fixes a flaw of the asymmetric variant that scores hits against the dilated labels, <script type="math/tex">\mathrm{TP} = \sum_n q_n \tilde y_n</script>: there, a single event can collect hits proportional to the volume of its dilated halo, so a model can inflate its score by spraying predictions around events.
 Here we choose a box neighborhood centered on the prediction point, of size <script type="math/tex">1.75^\circ \approx 190</script> km in space and <script type="math/tex">15</script> h in time.
 Note that for <script type="math/tex">\alpha = \beta = 1</script> and no dilation, <script type="math/tex">\mathrm{CSI}_{1,1}</script> reduces to the standard critical success index (CSI).</p>
+<p>Similar constructions appear in the neighborhood verification literature in meteorology <sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup> <sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup>: this metric can be seen as a Tversky-weighted <sup id="fnref:3"><a class="footnote-ref" href="#fn:3">3</a></sup> <sup id="fnref:4"><a class="footnote-ref" href="#fn:4">4</a></sup> single-ratio variant of the neighborhood CSI loss of Lagerquist and Ebert-Uphoff <sup id="fnref:5"><a class="footnote-ref" href="#fn:5">5</a></sup>, with the tolerance applied to both sides of the contingency table, in the same spirit as the relaxed precision and recall used to evaluate road extraction in computer vision <sup id="fnref:6"><a class="footnote-ref" href="#fn:6">6</a></sup>.</p>
 <h2>Models and training</h2>
 <h3>Loss</h3>
 <p>Models are trained using the combined loss:
@@ -114,14 +117,14 @@ For each sample <script type="math/tex">n = 1, \dots, N</script>, we denote by <
       \left[ w\, y_n \log q_n
               + (1 - y_n)\log\!\left(1 - q_n\right) \right],
 </script>
-where <script type="math/tex">w</script> upweights the rare positive class, and <script type="math/tex">\mathcal{L}_{\mathrm{Tv}}</script> is the <strong>dilated</strong> Tversky loss,
+where <script type="math/tex">w</script> upweights the rare positive class, and <script type="math/tex">\mathcal{L}_{\mathrm{Tv}}</script> is the <strong>symmetric dilated</strong> Tversky loss,
 <script type="math/tex; mode=display">
 \mathcal{L}_{\mathrm{Tv}} = 1 - \mathrm{CSI}_{\alpha,\beta}.
 </script>
 </p>
 <h3>Early stopping</h3>
 <p>We keep track of an EMA model (whose weights are an exponential moving average of the trained model's weights) during training, and use this model for future predictions.</p>
-<p>The dilated Tversky metric <script type="math/tex">\mathrm{CSI}_{0.3,0.7}</script> is computed on the validation set (year 2021) at every epoch with the EMA model.
+<p>The symmetric dilated Tversky metric <script type="math/tex">\mathrm{CSI}_{0.3,0.7}</script> is computed on the validation set (year 2021) at every epoch with the EMA model.
 We record the best model in that metric, typically after about 200 epochs of training.</p>
 <h2>Sweeps and threshold metrics</h2>
 <h3>Loss sweep [<a href="https://files.lucasamoudruz.com/thr_loss_sweep.html">click to view</a>]</h3>
@@ -150,6 +153,30 @@ In addition, a few weather variables were removed (<code>land_frac_cropland</cod
 <h3>Event explorer wide weather — 2024 [<a href="https://files.lucasamoudruz.com/event_explorer_2024_kw_17_all_weather.html">click to view</a>]</h3>
 <p>Same as baseline model, trained with <script type="math/tex">\lambda=0.25</script>, <script type="math/tex">\alpha=0.2</script>, and <script type="math/tex">\beta=0.8</script>.
 Weather variables are coarsened and have a larger input spacial window (<script type="math/tex">17\times 17</script> pixels). </p>
+<h2>References</h2>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>Ebert, E.E., 2008. Fuzzy verification of high-resolution gridded forecasts: a review and proposed framework. Meteorological Applications, 15(1), pp.51-64. <a href="https://doi.org/10.1002/met.25">DOI</a>&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:2">
+<p>Clark, A.J., Gallus Jr, W.A. and Weisman, M.L., 2010. Neighborhood-based verification of precipitation forecasts from convection-allowing NCAR WRF model simulations and the operational NAM. Weather and Forecasting, 25(5), pp.1495-1509. <a href="https://doi.org/10.1175/2010WAF2222404.1">DOI</a>&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:3">
+<p>Tversky, A., 1977. Features of similarity. Psychological Review, 84(4), pp.327-352. <a href="https://doi.org/10.1037/0033-295X.84.4.327">DOI</a>&#160;<a class="footnote-backref" href="#fnref:3" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+<li id="fn:4">
+<p>Salehi, S.S.M., Erdogmus, D. and Gholipour, A., 2017. Tversky loss function for image segmentation using 3D fully convolutional deep networks. In Machine Learning in Medical Imaging (MLMI 2017), pp.379-387. <a href="https://doi.org/10.1007/978-3-319-67389-9_44">DOI</a>&#160;<a class="footnote-backref" href="#fnref:4" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+</li>
+<li id="fn:5">
+<p>Lagerquist, R. and Ebert-Uphoff, I., 2022. Can we integrate spatial verification methods into neural network loss functions for atmospheric science? Artificial Intelligence for the Earth Systems, 1(4), e220021. <a href="https://doi.org/10.1175/AIES-D-22-0021.1">DOI</a>&#160;<a class="footnote-backref" href="#fnref:5" title="Jump back to footnote 5 in the text">&#8617;</a></p>
+</li>
+<li id="fn:6">
+<p>Wiedemann, C., Heipke, C., Mayer, H. and Jamet, O., 1998. Empirical evaluation of automatically extracted road axes. In Empirical Evaluation Techniques in Computer Vision, pp.172-187.&#160;<a class="footnote-backref" href="#fnref:6" title="Jump back to footnote 6 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
 </article>
 
 </main>
