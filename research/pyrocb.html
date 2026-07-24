@@ -126,33 +126,78 @@ where <script type="math/tex">w</script> upweights the rare positive class, and 
 <p>We keep track of an EMA model (whose weights are an exponential moving average of the trained model's weights) during training, and use this model for future predictions.</p>
 <p>The symmetric dilated Tversky metric <script type="math/tex">\mathrm{CSI}_{0.3,0.7}</script> is computed on the validation set (year 2021) at every epoch with the EMA model.
 We record the best model in that metric, typically after about 200 epochs of training.</p>
-<h2>Sweeps and threshold metrics</h2>
-<h3>Loss sweep [<a href="https://files.lucasamoudruz.com/thr_loss_sweep.html">click to view</a>]</h3>
+<h2>Tuning of the setup</h2>
+<p>The number of pyroCbs varies a lot throughout the years. 
+Generalization to a new year (in this work: 2024) should be robust to these variations.
+The following tuning stages thus operate over a leave-one-out cross validation per year.
+Models with the highest robustness over the training years (2017-2023) will be selected and tested on the test year.</p>
+<h3>Baseline</h3>
+<p>The baseline case uses pixel-wise metrics, and all available input features.
+This reduces to <script type="math/tex">\lambda=1</script> (pure binary cross-entropy loss), and the early stopping metric is set to the average precision (AP).</p>
+<table>
+<thead>
+<tr>
+<th>model</th>
+<th>deployed POD (mean <script type="math/tex">\pm</script> std)</th>
+<th>range</th>
+<th>abs. error</th>
+<th>mean FP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>bce_ap_seedavg</td>
+<td>0.639 <script type="math/tex">\pm</script> 0.108</td>
+<td>[0.423, 0.771]</td>
+<td>0.090</td>
+<td>207</td>
+</tr>
+</tbody>
+</table>
+<h3>Loss sweep [<a href="https://files.lucasamoudruz.com/event_explorer_2024_lam_0.25_a_0.3_b_0.7.html">Event explorer</a>]</h3>
 <p>Compare the effect of the loss function (different values of <script type="math/tex">\lambda</script>, <script type="math/tex">\alpha</script>, and <script type="math/tex">\beta</script>) on the prediction capabilities of the base model with all input features.
-To maximize <script type="math/tex">\mathrm{CSI}_{0.3,0.7}</script>, it is best to use a training loss with <script type="math/tex">\lambda=0.25</script>, <script type="math/tex">\alpha=0.2</script>, and <script type="math/tex">\beta=0.8</script>.
-A pure Tversky loss leads to lower performance.</p>
-<h3>Feature config sweep [<a href="https://files.lucasamoudruz.com/thr_feature_config_sweep.html">click to view</a>]</h3>
-<p>Compare the effect of removing input features that may be detrimental to generalization: lat/lon and the features with negative permutation importance.
-This tells us that to maximize <script type="math/tex">\mathrm{CSI}_{0.3,0.7}</script>, we should use all available input features.</p>
-<h3>Architecture sweep [<a href="https://files.lucasamoudruz.com/thr_arch_sweep.html">click to view</a>]</h3>
-<p>Compare the effect of the neural network size and the size view of the weather variables.
-Having a wider view of weather variables is beneficial here.</p>
-<h3>Wide variable sweep [<a href="https://files.lucasamoudruz.com/thr_wide_var_sweep.html">click to view</a>]</h3>
-<p>Is a wider view on specific variables helping? While the other variables are viewd on a smaller window.
-There is no model beating the best model for the previous (architecture) sweep.</p>
-<h2>PyroCb event explorers</h2>
-<p>Interactive explorers for pyroCb prediction models.</p>
-<h3>Event explorer base — 2024 [<a href="https://files.lucasamoudruz.com/event_explorer_2024_base.html">click to view</a>]</h3>
-<p>Baseline model, trained on 2017–2023, with 2021 held out as the validation set.
-Uses all features; trained with <script type="math/tex">\lambda=0.5</script>, <script type="math/tex">\alpha=0.3</script>, and <script type="math/tex">\beta=0.7</script>.</p>
-<h3>Event explorer loss — 2024 [<a href="https://files.lucasamoudruz.com/event_explorer_2024_loss.html">click to view</a>]</h3>
-<p>Same as baseline model, trained with <script type="math/tex">\lambda=0.25</script>, <script type="math/tex">\alpha=0.2</script>, and <script type="math/tex">\beta=0.8</script>.</p>
-<h3>Event explorer fewer inputs — 2024 [<a href="https://files.lucasamoudruz.com/event_explorer_2024_posimp_nolatlon.html">click to view</a>]</h3>
-<p>Same as baseline model, trained with <script type="math/tex">\lambda=0.25</script>, <script type="math/tex">\alpha=0.2</script>, and <script type="math/tex">\beta=0.8</script>, and without lat and lon as input features.
-In addition, a few weather variables were removed (<code>land_frac_cropland</code>, <code>mdpwly</code>, and <code>ttpwat</code>) because their permutation feature importance was negative.</p>
-<h3>Event explorer wide weather — 2024 [<a href="https://files.lucasamoudruz.com/event_explorer_2024_kw_17_all_weather.html">click to view</a>]</h3>
-<p>Same as baseline model, trained with <script type="math/tex">\lambda=0.25</script>, <script type="math/tex">\alpha=0.2</script>, and <script type="math/tex">\beta=0.8</script>.
-Weather variables are coarsened and have a larger input spacial window (<script type="math/tex">17\times 17</script> pixels). </p>
+To maximize <script type="math/tex">\mathrm{CSI}_{0.3,0.7}</script>, it is best to use a training loss with <script type="math/tex">\lambda=0.25</script>, <script type="math/tex">\alpha=0.2</script>, and <script type="math/tex">\beta=0.8</script>:</p>
+<table>
+<thead>
+<tr>
+<th>model</th>
+<th>deployed POD (mean <script type="math/tex">\pm</script> std)</th>
+<th>range</th>
+<th>abs. error</th>
+<th>mean FP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>lam_0.25_a_0.2_b_0.8_seedavg</td>
+<td>0.581 <script type="math/tex">\pm</script> 0.101</td>
+<td>[0.462, 0.802]</td>
+<td>0.076</td>
+<td>117</td>
+</tr>
+<tr>
+<td>lam_0.25_a_0.3_b_0.7_seedavg</td>
+<td><strong>0.599 <script type="math/tex">\pm</script> 0.077</strong></td>
+<td>[0.538, 0.779]</td>
+<td>0.057</td>
+<td>135</td>
+</tr>
+<tr>
+<td>lam_0.5_a_0.5_b_0.5_seedavg</td>
+<td>0.623 <script type="math/tex">\pm</script> 0.103</td>
+<td>[0.462, 0.767]</td>
+<td>0.089</td>
+<td>153</td>
+</tr>
+<tr>
+<td>ens_mean</td>
+<td>0.590 <script type="math/tex">\pm</script> 0.090</td>
+<td>[0.500, 0.791]</td>
+<td>0.064</td>
+<td>131</td>
+</tr>
+</tbody>
+</table>
 <h2>References</h2>
 <div class="footnote">
 <hr />
