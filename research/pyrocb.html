@@ -131,6 +131,14 @@ We record the best model in that metric, typically after about 200 epochs of tra
 Generalization to a new year (in this work: 2024) should be robust to these variations.
 The following tuning stages thus operate over a leave-one-out cross validation per year.
 Models with the highest robustness over the training years (2017-2023) will be selected and tested on the test year.</p>
+<p>The procedure is as follow:</p>
+<ol>
+<li>train the model on each fold, on 4 seeds; record early stopping epochs.</li>
+<li>foreach fold, calibrate the threshold to get a given target POD (0.6). Measure the POD on the left-out year with this operational thresholed. </li>
+<li>train a model on all train years with the mean number of epochs obtained in (1).</li>
+<li>test on year 2024 with ensemble prediction over seeds with the mean operational threshold obtained in (2). </li>
+</ol>
+<p>The model with the best POD (closest to target in step 2) is selected.</p>
 <h3>Baseline</h3>
 <p>The baseline case uses pixel-wise metrics, and all available input features.
 This reduces to <script type="math/tex">\lambda=1</script> (pure binary cross-entropy loss), and the early stopping metric is set to the average precision (AP).</p>
