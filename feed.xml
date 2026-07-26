@@ -5,7 +5,14 @@
     <link>https://lucasamoudruz.com</link>
     <description>Personal blog covering scientific computing, fluid dynamics, and more</description>
     <language>en-us</language>
-    <lastBuildDate>Fri, 17 Jul 2026 16:07:13 +0000</lastBuildDate>
+    <lastBuildDate>Sun, 26 Jul 2026 13:12:13 +0000</lastBuildDate>
+  <item>
+    <title>Plant growth</title>
+    <link>https://lucasamoudruz.com/blog/plant.html</link>
+    <guid>https://lucasamoudruz.com/blog/plant.html</guid>
+    <pubDate>Sun, 26 Jul 2026 00:00:00 +0000</pubDate>
+    <description>My Raspberry Pi watches a plant grow.</description>
+  </item>
   <item>
     <title>Rhythms of a street</title>
     <link>https://lucasamoudruz.com/blog/raspberry-pi-listener.html</link>
