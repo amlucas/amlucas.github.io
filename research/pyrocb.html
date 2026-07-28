@@ -270,6 +270,11 @@ To maximize <script type="math/tex">\mathrm{CSI}_{0.3,0.7}</script>, it is best 
 baseline shows the opposite failure mode: its probabilities saturate near 1, so the threshold <em>value</em> is stable but the operating point is not — the deployed POD overshoots systematically at roughly twice the false alarms.</p>
 <p>On the held-out test year 2024 (80 events, thresholds frozen from the folds), <code>no_lonlat</code> reaches POD 0.55 with 89 false alarms and <code>no_lon</code> POD 0.65 with 121; both score a frozen-threshold <script type="math/tex">\mathrm{CSI}_{0.3,0.7}</script> within 2–7% of the 
 (label-leaking) oracle threshold, confirming that the calibrated operating point transfers to an unseen season.</p>
+<figure class="image-wrap image-center" style="width: 100%;">
+  <img width="1950" height="930" loading="lazy" src="../images/research/pyrocb/relaxed_pod_sr_cover_tversky.png" alt="POD vs SR of the different models.">
+  <figcaption class="image-caption">POD vs SR of the different models.</figcaption>
+</figure>
+
 <p>The results of the <code>no_lonlat</code> case can be seen in this [<a href="https://files.lucasamoudruz.com/event_explorer_2024_no_lonlat.html">event explorer</a>].</p>
 <h2>References</h2>
 <div class="footnote">
