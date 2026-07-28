@@ -206,6 +206,71 @@ To maximize <script type="math/tex">\mathrm{CSI}_{0.3,0.7}</script>, it is best 
 </tr>
 </tbody>
 </table>
+<h2>Equal-area reprojection</h2>
+<p>All results above were obtained on the <script type="math/tex">0.25^\circ</script> latitude–longitude grid, whose east–west cell size shrinks ~3.5<script type="math/tex">\times</script> from the southern to the northern edge of the domain: the physical footprint of a CNN patch — and of the dilation neighborhood — depended on latitude. All products are now consolidated on a shared Lambert conformal conic grid (<script type="math/tex">25</script> km cells, standard parallels <script type="math/tex">35^\circ</script>N/<script type="math/tex">65^\circ</script>N), so patches and the neighborhood tolerance correspond to a fixed physical scale everywhere, and wind features are rotated into grid-relative components. The full pipeline (loss sweep, cross-validation, threshold calibration) was re-run on this grid; the numbers below supersede the tables above.</p>
+<h3>POD generalization</h3>
+<p>Step (2) of the tuning procedure is a deployment simulation: the operational threshold is frozen from all <em>other</em> folds and applied to the left-out year, so the deployed POD measures how well the target operating point transfers to an unseen fire season. One season breaks this for every model: 2017 (only 25 events) sits far below target (deployed POD 0.24–0.48 across all cases) and its fold-optimal threshold is a strong outlier. Since this common failure does not discriminate between models, 2017 is excluded both from the summary below and from the frozen-threshold average — a leak-free choice, as only training years are involved.</p>
+<p>Two further variants remove geographic coordinates from the input features, testing whether the model uses them to memorize year-specific fire geography:</p>
+<table>
+<thead>
+<tr>
+<th>model</th>
+<th>deployed POD (mean <script type="math/tex">\pm</script> std)</th>
+<th>range</th>
+<th>abs. error</th>
+<th>mean FP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>bce_ap_seedavg</td>
+<td>0.684 <script type="math/tex">\pm</script> 0.093</td>
+<td>[0.538, 0.788]</td>
+<td>0.104</td>
+<td>185</td>
+</tr>
+<tr>
+<td>lam_0.25_a_0.2_b_0.8_seedavg</td>
+<td>0.610 <script type="math/tex">\pm</script> 0.138</td>
+<td>[0.361, 0.788]</td>
+<td>0.111</td>
+<td>101</td>
+</tr>
+<tr>
+<td>lam_0.25_a_0.3_b_0.7_seedavg</td>
+<td>0.619 <script type="math/tex">\pm</script> 0.071</td>
+<td>[0.543, 0.718]</td>
+<td>0.069</td>
+<td>103</td>
+</tr>
+<tr>
+<td>lam_0.5_a_0.5_b_0.5_seedavg</td>
+<td>0.610 <script type="math/tex">\pm</script> 0.046</td>
+<td>[0.559, 0.692]</td>
+<td>0.037</td>
+<td>105</td>
+</tr>
+<tr>
+<td>no_lon_seedavg</td>
+<td>0.612 <script type="math/tex">\pm</script> 0.056</td>
+<td>[0.538, 0.692]</td>
+<td>0.052</td>
+<td>115</td>
+</tr>
+<tr>
+<td><strong>no_lonlat_seedavg</strong></td>
+<td><strong>0.599 <script type="math/tex">\pm</script> 0.049</strong></td>
+<td>[0.528, 0.671]</td>
+<td>0.042</td>
+<td><strong>92</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Removing longitude and latitude gives the most faithful threshold transfer (essentially unbiased, smallest scatter) at the lowest false-alarm cost — the coordinates were indeed encoding fire geography that shifts from year to year. The BCE
+baseline shows the opposite failure mode: its probabilities saturate near 1, so the threshold <em>value</em> is stable but the operating point is not — the deployed POD overshoots systematically at roughly twice the false alarms.</p>
+<p>On the held-out test year 2024 (80 events, thresholds frozen from the folds), <code>no_lonlat</code> reaches POD 0.55 with 89 false alarms and <code>no_lon</code> POD 0.65 with 121; both score a frozen-threshold <script type="math/tex">\mathrm{CSI}_{0.3,0.7}</script> within 2–7% of the 
+(label-leaking) oracle threshold, confirming that the calibrated operating point transfers to an unseen season.</p>
+<p>The results of the <code>no_lonlat</code> case can be seen in this [<a href="https://files.lucasamoudruz.com/event_explorer_2024_no_lonlat.html">event explorer</a>].</p>
 <h2>References</h2>
 <div class="footnote">
 <hr />
