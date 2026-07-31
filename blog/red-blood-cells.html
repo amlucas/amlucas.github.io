@@ -1,0 +1,180 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The trajectory of a red blood cell – Lucas Amoudruz</title>
+  <link rel="icon" href="../favicon.ico" sizes="any" />
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
+  <meta name="description" content="" />
+  <link rel="canonical" href="https://lucasamoudruz.com/blog/red-blood-cells.html" />
+  <meta property="og:site_name" content="Lucas Amoudruz" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="The trajectory of a red blood cell" />
+  <meta property="og:description" content="" />
+  <meta property="og:url" content="https://lucasamoudruz.com/blog/red-blood-cells.html" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="The trajectory of a red blood cell" />
+  <meta name="twitter:description" content="" />
+  <link rel="stylesheet" href="../css/main.css" />
+  <link rel="stylesheet" href="../css/codehilite.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;500;600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="alternate" type="application/rss+xml" href="../feed.xml" title="RSS Feed" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-5XKH0GTGGB"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-5XKH0GTGGB');
+  </script>
+  <script src="../js/mesh-anim.js" defer></script>
+  <script>
+    MathJax = {
+      options: {
+        renderActions: {
+          find: [10, function (doc) {
+            for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+              const display = node.type.indexOf('display') >= 0;
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.insertBefore(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end   = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            }
+          }, '']
+        }
+      }
+    };
+  </script>
+  <script src="../mathjax/tex-chtml.min.js"></script>
+</head>
+<body>
+
+<nav class="top-nav" aria-label="Main navigation">
+  <a href="../index.html">About</a>
+  <a href="../index.html#publications">Publications</a>
+  <a href="../blog.html" class="active" aria-current="page">Blog</a>
+</nav>
+
+
+<main>
+<article class="markdown-body blog-body">
+  <h1>The trajectory of a red blood cell</h1>
+<p>July 27, 2026</p>
+<p>A few months after I started my PhD, I was part of a team trying to model how red blood cells (RBCs) flow through a microfluidic device.
+These devices are prime candidates for detecting circulating tumor cells, extremely rare cells that signal cancer metastasis, terribly difficult to catch among the trillions of red blood cells around them.
+To optimize these devices, we first needed a numerical model that can reproduce the correct physics.</p>
+<p>One day, we were comparing two videos, one from a real experiment, and one from our simulations.
+The trajectories were different, meaning the simulations were wrong.
+In the simulations, the fluid was modeled with a particle method called dissipative particle dynamics (DPD), and we had a coarse-grained model for the membrane dynamics.
+At this point, we were not sure whether the mismatch came from the fluid or from the membrane surface model.
+To rule out the fluid part, I was tasked with writing a boundary-integral method (BIM) code, a trusted method for solving Stokes flows, to compare with the DPD method.
+I never got to finish properly since we discovered that increasing the DPD method resolution fixed that part.</p>
+<p>Recently I made simulations of <a href="parti.html">sedimenting particles in a viscous flow</a>, where a cloud of small particles transformed into a torus before breaking up.
+This relies on the same principles for solving the Stokes equations, and it made me want to finally implement the boundary-integral method for a red blood cell.
+I decided to extend my solver to handle the complex membrane dynamics of RBCs, based on my previous research, and combine them with the fluid solver I implemented.</p>
+<p>In particular, I have seen several experimental videos of these cells none of them looking like the visualizations of my "perfect" cells produced numerically. 
+Can we produce similar pictures, with the microscopic artifacts?</p>
+<p>Let's reproduce the simulations first.</p>
+<p>Red blood cells are roughly two things: a membrane, enclosing a cytosol, containing the hemoglobin necessary to transport oxygen efficiently.
+The cytosol can be modeled as a viscous fluid about 5 times more viscous than the plasma.
+The membrane is more complicated: it is composed of a cytoskeleton and a lipid bilayer.
+The former is mainly responsible for shear elasticity, while the latter contributes to bending resistance, area conservation, membrane viscosity, and area-difference elasticity, depending on the surrounding chemical conditions.
+All these terms can be modeled mathematically on a single surface, and discretized onto a triangle mesh.
+I spare all the math and energy functionals, but it's described in detail in my previous research <sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup> <sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup>, and has been discretized initially in some of my colleague's work <sup id="fnref:3"><a class="footnote-ref" href="#fn:3">3</a></sup> and implemented in Mirheo <sup id="fnref:4"><a class="footnote-ref" href="#fn:4">4</a></sup>.
+I plot a few contributions below. </p>
+<figure class="image-wrap image-center" style="width: 70%;">
+<div class="mesh-anim mesh-anim-static" data-src="../images/blog/red-blood-cells/discocyte_forces.bin">
+  <canvas class="mesh-anim-canvas"></canvas>
+  <div class="mesh-anim-controls"></div>
+  <div class="mesh-anim-status">Loading…</div>
+</div>
+<figcaption class="image-caption">Force magnitude of each term on a discocyte at equilibrium.</figcaption>
+</figure>
+
+<p>The energies are relatively simple to implement, and have analytical solutions on spheres.
+Forces are derivatives of these energies with respect to positions, 
+much more involved, but validated against finite differences of the energy.
+I also created functions to compute the Hessian of the energies, allowing to compute equilibrium shapes (minimal energy) faster thanks to Newton's method.
+This was of course all facilitated by LLMs (I mainly used <code>Opus 5.8</code> from Claude Code), although I gave tight directives so that the design remained under control, performance stayed reasonable, and I adopted a test-driven development approach.</p>
+<p>After a bit of back and forth with my agent, tweaking, and parameter tuning, I could reproduce the famous SDE sequence (stomatocyte-discocyte-echinocyte), a sequence of shape that RBCs take due to a change in the chemical envoronment, causing an imbalance of between the two layers of the lipid bilayer:</p>
+<div class="image-row mesh-row">
+<figure class="image-wrap" style="width: 32%;">
+<div class="mesh-anim mesh-anim-static" data-src="../images/blog/red-blood-cells/stomatocyte.bin">
+  <canvas class="mesh-anim-canvas"></canvas>
+  <div class="mesh-anim-controls"></div>
+  <div class="mesh-anim-status">Loading…</div>
+</div>
+<figcaption class="image-caption">Stomatocyte</figcaption>
+</figure>
+<figure class="image-wrap" style="width: 32%;">
+<div class="mesh-anim mesh-anim-static" data-src="../images/blog/red-blood-cells/discocyte.bin">
+  <canvas class="mesh-anim-canvas"></canvas>
+  <div class="mesh-anim-controls"></div>
+  <div class="mesh-anim-status">Loading…</div>
+</div>
+<figcaption class="image-caption">Discocyte</figcaption>
+</figure>
+<figure class="image-wrap" style="width: 32%;">
+<div class="mesh-anim mesh-anim-static" data-src="../images/blog/red-blood-cells/echinocyte.bin">
+  <canvas class="mesh-anim-canvas"></canvas>
+  <div class="mesh-anim-controls"></div>
+  <div class="mesh-anim-status">Loading…</div>
+</div>
+<figcaption class="image-caption">Echinocyte</figcaption>
+</figure>
+</div>
+
+<p>Fischer <sup id="fnref:5"><a class="footnote-ref" href="#fn:5">5</a></sup> reproduced this sequence experimentally (EDS, reversed!) by changing the albumin concentration. I remember being fascinated by how much the cells deform under this chemical change:</p>
+<figure class="video-wrap" style="width: 50%;">
+  <video controls autoplay loop muted playsinline>
+    <source src="../images/blog/red-blood-cells/fischer_2022_albumin.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+
+</figure>
+
+<p>This is a microscopic view, very different that the crisp idealized surfaces I showed before.
+How do they compare?
+In an ideal world, we would reconstruct the surface from the video. 
+This is far from easy.
+Instead, let's do the reverse: take our perfect surfaces and model the microscopy.</p>
+<p>[TODO]</p>
+<h2>References</h2>
+<div class="footnote">
+<hr />
+<ol>
+<li id="fn:1">
+<p>Amoudruz, L., 2022. Simulations and control of artificial microswimmers in blood. PhD thesis, ETH Zurich. <a href="https://doi.org/10.3929/ethz-b-000550202">DOI</a>&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
+</li>
+<li id="fn:2">
+<p>Amoudruz, L., Economides, A., Arampatzis, G. and Koumoutsakos, P., 2023. The stress-free state of human erythrocytes: Data-driven inference of a transferable RBC model. Biophysical Journal, 122(8), pp.1517-1525. <a href="https://doi.org/10.1016/j.bpj.2023.03.019">DOI</a> · <a href="../data/publications/amoudruz2023a.pdf">PDF</a>&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+</li>
+<li id="fn:3">
+<p>Bian, X., Litvinov, S. and Koumoutsakos, P., 2020. Bending models of lipid bilayer membranes: Spontaneous curvature and area-difference elasticity. Computer Methods in Applied Mechanics and Engineering, 359, p.112758. <a href="https://doi.org/10.1016/j.cma.2019.112758">DOI</a>&#160;<a class="footnote-backref" href="#fnref:3" title="Jump back to footnote 3 in the text">&#8617;</a></p>
+</li>
+<li id="fn:4">
+<p>Alexeev, D., Amoudruz, L., Litvinov, S. and Koumoutsakos, P., 2020. Mirheo: High-performance mesoscale simulations for microfluidics. Computer Physics Communications, 254, p.107298. <a href="https://doi.org/10.1016/j.cpc.2020.107298">DOI</a> · <a href="../data/publications/alexeev2020a.pdf">PDF</a>&#160;<a class="footnote-backref" href="#fnref:4" title="Jump back to footnote 4 in the text">&#8617;</a></p>
+</li>
+<li id="fn:5">
+<p>Fischer, T.M., 2022. The Shape of Human Red Blood Cells Suspended in Autologous Plasma and Serum. Cells, 11(12), p.1941. <a href="https://doi.org/10.3390/cells11121941">DOI</a>&#160;<a class="footnote-backref" href="#fnref:5" title="Jump back to footnote 5 in the text">&#8617;</a></p>
+</li>
+</ol>
+</div>
+</article>
+
+</main>
+
+
+<footer class="site-footer">
+  <p>&copy; 2026 Lucas Amoudruz &nbsp;&nbsp;|&nbsp;&nbsp; <a href="../feed.xml">Subscribe (RSS)</a></p>
+</footer>
+
+</body>
+</html>

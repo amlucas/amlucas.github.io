@@ -345,8 +345,10 @@ figure {
   text-align: center;
 }
 
+/* width, not max-width: a clip whose intrinsic size is smaller than the figure
+   would otherwise ignore the width% the directive was given and render tiny. */
 .video-wrap video {
-  max-width: 100%;
+  width: 100%;
   height: auto;
   display: block;
   border-radius: 8px;
@@ -707,6 +709,150 @@ hr {
   font-size: 0.9rem;
   color: var(--color-text-muted);
   margin: 0.1rem 0 0.75rem;
+}
+
+/* --- Animated mesh viewer --- */
+
+.mesh-anim {
+  position: relative;
+  border: 1px solid var(--color-border-muted);
+  border-radius: 6px;
+  background: var(--color-surface);
+  overflow: hidden;
+}
+
+.mesh-anim-canvas {
+  display: block;
+  width: 100%;
+  /* Reserved by aspect-ratio so loading the blob causes no layout shift. */
+  aspect-ratio: 4 / 3;
+  touch-action: none;
+  cursor: grab;
+}
+
+.mesh-anim-canvas:active {
+  cursor: grabbing;
+}
+
+.mesh-anim-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.45rem 0.6rem;
+  border-top: 1px solid var(--color-border-muted);
+  background: var(--color-surface-2);
+}
+
+/* A static shape with no scalar fields has nothing to put in the bar. The
+   viewer removes it once the blob is parsed; this hides it until then. */
+.mesh-anim-controls:empty {
+  display: none;
+}
+
+.mesh-anim-play {
+  flex: 0 0 auto;
+  min-width: 4.2rem;
+  padding: 0.2rem 0.5rem;
+  font: inherit;
+  font-size: 0.85rem;
+  color: var(--color-text);
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.mesh-anim-play:hover:not(:disabled) {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.mesh-anim-play:disabled {
+  color: var(--color-text-muted);
+  cursor: default;
+}
+
+.mesh-anim-slider {
+  flex: 1 1 auto;
+  min-width: 0;
+  accent-color: var(--color-accent);
+}
+
+/* Which scalar field the surface is coloured by; 'Shape' turns colouring off.
+   Sits at the right of the bar so it does not push the transport around. */
+.mesh-anim-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-left: auto;
+}
+
+.mesh-anim-field {
+  padding: 0.15rem 0.45rem;
+  font: inherit;
+  font-size: 0.8rem;
+  color: var(--color-text);
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.mesh-anim-field:hover {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.mesh-anim-field.is-active {
+  color: #fff;
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+/* Colour bar for the active field, labelled with its range. */
+.mesh-anim-legend {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.6rem 0.1rem;
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-muted);
+}
+
+/* display:flex above would otherwise defeat the hidden attribute. */
+.mesh-anim-legend[hidden] {
+  display: none;
+}
+
+.mesh-anim-legend-bar {
+  flex: 1 1 auto;
+  height: 0.5rem;
+  border-radius: 2px;
+  border: 1px solid var(--color-border-muted);
+}
+
+.mesh-anim-status {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+/* A row of static shapes read across, from {{mesh_row, ...}}. Squarer than a
+   lone viewer so a narrow column still frames the whole shape, and captions
+   are aligned with each other rather than with the bottom of the row. */
+.mesh-row {
+  align-items: start;
+}
+
+.mesh-row .mesh-anim-canvas {
+  aspect-ratio: 1 / 1;
 }
 
 /* --- Responsive --- */
