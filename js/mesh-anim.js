@@ -502,6 +502,90 @@
         // Open on the first field: showing the quantity is the whole point.
         select(0);
       }
+      // A hint over the canvas, because nothing else says the thing is
+      // interactive: the grab cursor is easy to miss and invisible on a phone.
+      // It goes away for good on the first gesture.
+      const coarse = !!(window.matchMedia
+                        && window.matchMedia('(pointer: coarse)').matches);
+      const hint = document.createElement('div');
+      hint.className = 'mesh-anim-hint';
+      hint.textContent = coarse ? 'Drag to rotate · pinch to zoom'
+                                : 'Drag to rotate · scroll to zoom';
+      root.appendChild(hint);
+      let hintTimer = 0;
+      const dropHint = () => {
+        if (!hint.isConnected) return;
+        clearTimeout(hintTimer);
+        hint.classList.add('is-gone');
+        // Let the fade finish, then stop paying for the node at all.
+        setTimeout(() => hint.remove(), 500);
+      };
+      // Fades on its own too, so it never sits on top of the figure for good.
+      hintTimer = setTimeout(dropHint, 5000);
+
+      // Full screen, for a mesh that deserves more than a column of text. The
+      // Fullscreen API is used where it works on an ordinary element; iPhone
+      // Safari allows it only for <video>, so there is a CSS fallback that pins
+      // the viewer over the page instead. Same layout class either way.
+      if (controls) {
+        const full = document.createElement('button');
+        full.type = 'button';
+        full.className = 'mesh-anim-full';
+        // Icon only: the bar already carries a button per field, and the words
+        // "Full screen" crowd it in a narrow row cell.
+        full.innerHTML =
+          '<svg viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">'
+          + '<path fill="none" stroke="currentColor" stroke-width="1.6" '
+          + 'd="M6 2H2v4M10 2h4v4M6 14H2v-4M10 14h4v-4"/></svg>';
+        full.title = 'Full screen';
+        full.setAttribute('aria-label', 'Full screen');
+        const apiEnabled = !!(document.fullscreenEnabled
+                              || document.webkitFullscreenEnabled);
+        const request = root.requestFullscreen || root.webkitRequestFullscreen;
+        const exit = document.exitFullscreen || document.webkitExitFullscreen;
+        const useApi = apiEnabled && request && exit;
+
+        let pinned = false;      // the fallback's own idea of being full screen
+        const current = () => (useApi
+          ? (document.fullscreenElement || document.webkitFullscreenElement)
+          : (pinned ? root : null));
+
+        // Also runs on fullscreenchange, so pressing Escape keeps the label and
+        // the layout class in step with reality however the state changed.
+        const synced = () => {
+          const on = current() === root;
+          root.classList.toggle('is-fullscreen', on);
+          const label = on ? 'Exit full screen' : 'Full screen';
+          full.title = label;
+          full.setAttribute('aria-label', label);
+          full.setAttribute('aria-pressed', String(on));
+          dirty = true;
+        };
+
+        const onKey = (e) => { if (e.key === 'Escape') setPinned(false); };
+        function setPinned(on) {
+          pinned = on;
+          root.classList.toggle('is-pinned', on);
+          document.body.classList.toggle('mesh-anim-pinned', on);
+          if (on) document.addEventListener('keydown', onKey);
+          else document.removeEventListener('keydown', onKey);
+          synced();
+        }
+
+        full.addEventListener('click', () => {
+          if (!useApi) {
+            setPinned(!pinned);
+            return;
+          }
+          if (current() === root) exit.call(document);
+          else request.call(root);
+        });
+        controls.appendChild(full);
+
+        document.addEventListener('fullscreenchange', synced);
+        document.addEventListener('webkitfullscreenchange', synced);
+      }
+
       // A static shape with no fields has nothing to put in the bar.
       if (controls && !controls.children.length) controls.remove();
 
@@ -574,7 +658,14 @@
         // blank. The 1.05 margin also buys depth precision.
         const near = Math.max(cam.dist - radius * 1.05, radius * 0.01);
         const far = cam.dist + radius * 1.05;
-        gl.uniformMatrix4fv(uProj, false, perspective(0.62, aspect, near, far));
+        // The vertical field of view is the fixed one, so a canvas taller than
+        // it is wide would clip the mesh left and right -- which is exactly what
+        // full screen on a phone gives you. Widen it so the horizontal opening
+        // never shrinks below the landscape case.
+        const fovy = aspect < 1
+          ? 2 * Math.atan(Math.tan(0.62 / 2) / aspect)
+          : 0.62;
+        gl.uniformMatrix4fv(uProj, false, perspective(fovy, aspect, near, far));
         gl.uniformMatrix4fv(uView, false, lookAt(eye, [0, 0, 0], [0, 0, 1]));
 
         // Surface first, then its edges, which the vertex shader nudges toward
@@ -616,31 +707,70 @@
         });
       }
 
-      let drag = null;
+      function zoomBy(factor) {
+        // The clamp keeps the camera outside the bounding sphere, which is also
+        // what keeps the near plane positive; see the projection above.
+        cam.dist = Math.max(radius * 1.6,
+                            Math.min(radius * 9, cam.dist * factor));
+        dirty = true;
+      }
+
+      // Every active pointer, so one finger orbits and two pinch to zoom. A
+      // touch device has no wheel, so without the second case there is no way
+      // to zoom at all on a phone.
+      const pointers = new Map();
+      let pinch = 0;
+
+      function pinchSpan() {
+        const [a, b] = [...pointers.values()];
+        return Math.hypot(a.x - b.x, a.y - b.y);
+      }
+
       canvas.addEventListener('pointerdown', (e) => {
-        drag = { x: e.clientX, y: e.clientY };
-        canvas.setPointerCapture(e.pointerId);
+        dropHint();
+        pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        // Capturing per pointer keeps a drag alive past the canvas edge. It
+        // throws for a synthetic id, which only matters to test harnesses.
+        try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+        if (pointers.size === 2) pinch = pinchSpan();
       });
+
       canvas.addEventListener('pointermove', (e) => {
-        if (!drag) return;
-        cam.yaw -= (e.clientX - drag.x) * 0.008;
+        const prev = pointers.get(e.pointerId);
+        if (!prev) return;
+        pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+        if (pointers.size >= 2) {
+          const span = pinchSpan();
+          // Fingers apart -> span grows -> ratio below one -> camera moves in.
+          if (pinch > 0 && span > 0) zoomBy(pinch / span);
+          pinch = span;
+          return;
+        }
+
+        cam.yaw -= (e.clientX - prev.x) * 0.008;
         // Stop just short of the poles, where the view direction would be
         // parallel to the up vector and the camera basis degenerate. The old
         // limit of 1.45 rad left the reader 7 degrees shy of looking straight
         // down the axis, which is exactly the view a flat cell needs.
         cam.pitch = Math.max(-POLE_LIMIT, Math.min(POLE_LIMIT,
-          cam.pitch + (e.clientY - drag.y) * 0.008));
-        drag = { x: e.clientX, y: e.clientY };
+          cam.pitch + (e.clientY - prev.y) * 0.008));
         dirty = true;
       });
-      const endDrag = () => { drag = null; };
-      canvas.addEventListener('pointerup', endDrag);
-      canvas.addEventListener('pointercancel', endDrag);
+
+      const endPointer = (e) => {
+        pointers.delete(e.pointerId);
+        // Lifting one finger of a pinch hands control back to the other, whose
+        // stored position is current, so the orbit resumes without a jump.
+        pinch = pointers.size === 2 ? pinchSpan() : 0;
+      };
+      canvas.addEventListener('pointerup', endPointer);
+      canvas.addEventListener('pointercancel', endPointer);
+
       canvas.addEventListener('wheel', (e) => {
         e.preventDefault();
-        cam.dist = Math.max(radius * 1.6, Math.min(radius * 9,
-          cam.dist * Math.exp(e.deltaY * 0.001)));
-        dirty = true;
+        dropHint();
+        zoomBy(Math.exp(e.deltaY * 0.001));
       }, { passive: false });
 
       requestAnimationFrame(gate);

@@ -1,0 +1,207 @@
+/* Interactive 3D mesh viewer (js/mesh-anim.js). Loaded only on pages that
+   embed a {{mesh...}} directive, alongside the script itself; relies on the
+   custom properties defined in main.css, which every page loads first. */
+
+.mesh-anim {
+  position: relative;
+  border: 1px solid var(--color-border-muted);
+  border-radius: 6px;
+  background: var(--color-surface);
+  overflow: hidden;
+}
+
+.mesh-anim-canvas {
+  display: block;
+  width: 100%;
+  /* Reserved by aspect-ratio so loading the blob causes no layout shift. */
+  aspect-ratio: 4 / 3;
+  touch-action: none;
+  cursor: grab;
+}
+
+.mesh-anim-canvas:active {
+  cursor: grabbing;
+}
+
+.mesh-anim-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.45rem 0.6rem;
+  border-top: 1px solid var(--color-border-muted);
+  background: var(--color-surface-2);
+}
+
+/* A static shape with no scalar fields has nothing to put in the bar. The
+   viewer removes it once the blob is parsed; this hides it until then. */
+.mesh-anim-controls:empty {
+  display: none;
+}
+
+/* All three kinds of button in the bar share one look. */
+.mesh-anim-play,
+.mesh-anim-field,
+.mesh-anim-full {
+  font: inherit;
+  color: var(--color-text);
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.mesh-anim-play:hover:not(:disabled),
+.mesh-anim-field:hover,
+.mesh-anim-full:hover {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.mesh-anim-play {
+  flex: 0 0 auto;
+  min-width: 4.2rem;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.85rem;
+}
+
+.mesh-anim-play:disabled {
+  color: var(--color-text-muted);
+  cursor: default;
+}
+
+.mesh-anim-slider {
+  flex: 1 1 auto;
+  min-width: 0;
+  accent-color: var(--color-accent);
+}
+
+/* Which scalar field the surface is coloured by; 'Shape' turns colouring off.
+   Sits at the right of the bar so it does not push the transport around. */
+.mesh-anim-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-left: auto;
+}
+
+.mesh-anim-field {
+  padding: 0.15rem 0.45rem;
+  font-size: 0.8rem;
+}
+
+/* After the shared :hover rule, so the active button stays inverted. */
+.mesh-anim-field.is-active {
+  color: #fff;
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+/* Icon-only, so it costs almost nothing next to the field buttons. */
+.mesh-anim-full {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  padding: 0.2rem 0.4rem;
+  color: var(--color-text-muted);
+}
+
+/* Colour bar for the active field, labelled with its range. */
+.mesh-anim-legend {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.6rem 0.1rem;
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-muted);
+}
+
+/* display:flex above would otherwise defeat the hidden attribute. */
+.mesh-anim-legend[hidden] {
+  display: none;
+}
+
+.mesh-anim-legend-bar {
+  flex: 1 1 auto;
+  height: 0.5rem;
+  border-radius: 2px;
+  border: 1px solid var(--color-border-muted);
+}
+
+/* Understated cue that the mesh is interactive, over the top-left of the canvas.
+   Fades on the first gesture, or by itself after a few seconds. */
+.mesh-anim-hint {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  background: rgba(255, 255, 255, 0.72);
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 0.4s ease;
+}
+
+.mesh-anim-hint.is-gone {
+  opacity: 0;
+}
+
+/* Full screen. Driven by a class the viewer toggles from the fullscreenchange
+   event rather than :fullscreen, so one rule covers the vendor-prefixed API too.
+   The canvas gives up its fixed aspect ratio and takes whatever is left over
+   once the legend and the bar have had their share. */
+.mesh-anim.is-fullscreen {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+  background: var(--color-surface);
+}
+
+/* Fallback for browsers that refuse element fullscreen (iPhone Safari): pin the
+   viewer over the page instead. Uses dvh so the iOS toolbars cannot clip it. */
+.mesh-anim.is-pinned {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  width: 100vw;
+  height: 100dvh;
+}
+
+body.mesh-anim-pinned {
+  overflow: hidden;
+}
+
+.mesh-anim.is-fullscreen .mesh-anim-canvas {
+  flex: 1 1 auto;
+  aspect-ratio: auto;
+  min-height: 0;
+  height: auto;
+}
+
+.mesh-anim-status {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+/* A row of static shapes read across, from {{mesh_row, ...}}. Squarer than a
+   lone viewer so a narrow column still frames the whole shape, and captions
+   are aligned with each other rather than with the bottom of the row. */
+.mesh-row {
+  align-items: start;
+}
+
+.mesh-row .mesh-anim-canvas {
+  aspect-ratio: 1 / 1;
+}
