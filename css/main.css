@@ -72,10 +72,11 @@ a:hover {
 
 /* --- Navigation --- */
 
+/* No explicit width: as a block element it fills the viewport already, and
+   width:100% + padding would overflow it (there is no border-box reset). */
 .top-nav {
   position: sticky;
   top: 0;
-  width: 100%;
   background: white;
   border-bottom: 1px solid var(--color-border);
   padding: 1rem;
@@ -118,6 +119,12 @@ article.markdown-body {
   margin-left: auto;
   margin-right: auto;
   padding-bottom: 2rem;
+}
+
+/* Anchor jumps land below the sticky top nav. */
+.markdown-body h2[id],
+.markdown-body h3[id] {
+  scroll-margin-top: 90px;
 }
 
 /* --- Markdown body --- */
@@ -606,6 +613,51 @@ th {
 .post-nav-link:hover .post-nav-title {
   text-decoration: underline;
   text-underline-offset: 0.15em;
+}
+
+/* --- Table of contents (long posts) --- */
+
+/* Plain text in the left margin of the article column, right-aligned toward
+   the text; no box or rules. Only shown where that margin exists, so phones
+   and narrow windows are untouched. */
+.toc {
+  display: none;
+}
+
+@media (min-width: 1280px) {
+  .toc {
+    display: block;
+    position: fixed;
+    top: 7rem;
+    right: calc(50% + 430px);
+    width: 190px;
+    max-height: calc(100vh - 9rem);
+    overflow-y: auto;
+    text-align: right;
+    font-family: var(--font-ui);
+    font-size: 0.85rem;
+    line-height: 1.45;
+  }
+
+  .toc a {
+    display: block;
+    padding: 0.15rem 0;
+    color: var(--color-text-muted);
+  }
+
+  .toc a:hover {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  .toc a.active {
+    font-weight: 600;
+    color: var(--color-text);
+  }
+
+  .toc-h3 {
+    font-size: 0.78rem;
+  }
 }
 
 /* --- Footer --- */

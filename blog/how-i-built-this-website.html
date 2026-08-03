@@ -33,6 +33,7 @@
     gtag('config', 'G-5XKH0GTGGB');
   </script>
   <script src="https://cdn.plot.ly/plotly-3.6.0.min.js" charset="utf-8"></script>
+  <script src="../js/toc.js" defer></script>
   <script>
     MathJax = {
       options: {
@@ -64,8 +65,14 @@
 
 
 <main>
+<nav class="toc" aria-label="Table of contents">
+  <a class="toc-h2" href="#the-main-page">The main page</a>
+  <a class="toc-h2" href="#blog-pages">Blog pages</a>
+  <a class="toc-h2" href="#css">CSS</a>
+  <a class="toc-h2" href="#conclusion">Conclusion</a>
+</nav>
 <article class="markdown-body blog-body">
-  <h1>How I built this website with Python and Markdown</h1>
+  <h1 id="how-i-built-this-website-with-python-and-markdown">How I built this website with Python and Markdown</h1>
 <p>July 12, 2025</p>
 <p>I have recently redesigned my website.
 It now takes a more modern look and remains simple.
@@ -82,7 +89,7 @@ It is simple and powerful enough for my needs.
 Furthermore it is easy to convert Markdown to HTML with the python package <a href="https://python-markdown.github.io/">markdown</a>.
 Due to my very limited knowledge in CSS styling, I have heavily used ChatGPT and I must say I was happy with the result.
 Below, I describe the structure of the code in more detail.</p>
-<h2>The main page</h2>
+<h2 id="the-main-page">The main page</h2>
 <p>The <a href="../index.html">main page</a> is created with the following script:</p>
 <details class="code-block">
 <summary>Show code</summary>
@@ -306,7 +313,7 @@ This function handles parsing custom image blocks and turns them into proper HTM
 
 <p>It replaces patterns of the form <code>{{image, "path/to/image.png", "caption", "left/right/center", width-in-percent}}</code> with the appropriate HTML content.</p>
 <p>After being processed, each md file is placed in <code>section</code>, and a link is added to a navigation bar.</p>
-<h2>Blog pages</h2>
+<h2 id="blog-pages">Blog pages</h2>
 <p>The main blog page is similar to the main page, except that there is a single section containing links to individual blog posts:</p>
 <details class="code-block">
 <summary>Show code</summary>
@@ -499,6 +506,7 @@ This function handles parsing custom image blocks and turns them into proper HTM
 <div class="codehilite"><pre><span></span><code><span class="ch">#!/usr/bin/env python</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">argparse</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">html</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">markdown</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
@@ -565,6 +573,31 @@ This function handles parsing custom image blocks and turns them into proper HTM
 <span class="s2">&quot;&quot;&quot;</span>
 
 
+<span class="c1"># A post only gets a table of contents once it has this many h2/h3 headings;</span>
+<span class="c1"># short posts render exactly as before.</span>
+<span class="n">MIN_TOC_ENTRIES</span> <span class="o">=</span> <span class="mi">4</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">build_toc</span><span class="p">(</span><span class="n">toc_tokens</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Render the sidebar table of contents from the markdown `toc` extension&#39;s</span>
+<span class="sd">    tokens (h2/h3 only, see toc_depth below). Returns &#39;&#39; for short posts.&quot;&quot;&quot;</span>
+    <span class="n">entries</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">flatten</span><span class="p">(</span><span class="n">tokens</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">tok</span> <span class="ow">in</span> <span class="n">tokens</span><span class="p">:</span>
+            <span class="n">entries</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">tok</span><span class="p">[</span><span class="s1">&#39;level&#39;</span><span class="p">],</span> <span class="n">tok</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">],</span> <span class="n">tok</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]))</span>
+            <span class="n">flatten</span><span class="p">(</span><span class="n">tok</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;children&#39;</span><span class="p">,</span> <span class="p">[]))</span>
+
+    <span class="n">flatten</span><span class="p">(</span><span class="n">toc_tokens</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">entries</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">MIN_TOC_ENTRIES</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;&#39;</span>
+
+    <span class="n">links</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s1">&#39;  &lt;a class=&quot;toc-h</span><span class="si">{</span><span class="n">level</span><span class="si">}</span><span class="s1">&quot; href=&quot;#</span><span class="si">{</span><span class="n">anchor</span><span class="si">}</span><span class="s1">&quot;&gt;</span><span class="si">{</span><span class="n">html</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">name</span><span class="p">)</span><span class="si">}</span><span class="s1">&lt;/a&gt;&#39;</span>
+        <span class="k">for</span> <span class="n">level</span><span class="p">,</span> <span class="n">anchor</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">entries</span><span class="p">)</span>
+    <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;&lt;nav class=&quot;toc&quot; aria-label=&quot;Table of contents&quot;&gt;</span><span class="se">\n</span><span class="si">{</span><span class="n">links</span><span class="si">}</span><span class="se">\n</span><span class="s1">&lt;/nav&gt;&#39;</span>
+
+
 <span class="k">def</span><span class="w"> </span><span class="nf">extract_title</span><span class="p">(</span><span class="n">raw_md</span><span class="p">,</span> <span class="n">md_path</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Use the post&#39;s first `# Heading` as its title; fall back to the slug.&quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">raw_md</span><span class="o">.</span><span class="n">splitlines</span><span class="p">():</span>
@@ -600,23 +633,27 @@ This function handles parsing custom image blocks and turns them into proper HTM
     <span class="n">processed_md</span> <span class="o">=</span> <span class="n">embed_mesh</span><span class="p">(</span><span class="n">processed_md</span><span class="p">)</span>
     <span class="n">processed_md</span> <span class="o">=</span> <span class="n">embed_plotly</span><span class="p">(</span><span class="n">processed_md</span><span class="p">)</span>
 
-    <span class="n">html_content</span> <span class="o">=</span> <span class="n">markdown</span><span class="o">.</span><span class="n">markdown</span><span class="p">(</span><span class="n">processed_md</span><span class="p">,</span>
-                                     <span class="n">extensions</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;mdx_math&#39;</span><span class="p">,</span>
-                                                 <span class="s1">&#39;fenced_code&#39;</span><span class="p">,</span>
-                                                 <span class="s1">&#39;codehilite&#39;</span><span class="p">,</span>
-                                                 <span class="s1">&#39;tables&#39;</span><span class="p">,</span>
-                                                 <span class="s1">&#39;footnotes&#39;</span><span class="p">],</span>
-                                     <span class="n">extension_configs</span><span class="o">=</span><span class="p">{</span>
-                                         <span class="s1">&#39;mdx_math&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;enable_dollar_delimiter&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
-                                     <span class="p">})</span>
+    <span class="n">md</span> <span class="o">=</span> <span class="n">markdown</span><span class="o">.</span><span class="n">Markdown</span><span class="p">(</span><span class="n">extensions</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;mdx_math&#39;</span><span class="p">,</span>
+                                       <span class="s1">&#39;fenced_code&#39;</span><span class="p">,</span>
+                                       <span class="s1">&#39;codehilite&#39;</span><span class="p">,</span>
+                                       <span class="s1">&#39;tables&#39;</span><span class="p">,</span>
+                                       <span class="s1">&#39;footnotes&#39;</span><span class="p">,</span>
+                                       <span class="s1">&#39;toc&#39;</span><span class="p">],</span>
+                           <span class="n">extension_configs</span><span class="o">=</span><span class="p">{</span>
+                               <span class="s1">&#39;mdx_math&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;enable_dollar_delimiter&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+                               <span class="s1">&#39;toc&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;toc_depth&#39;</span><span class="p">:</span> <span class="s1">&#39;2-3&#39;</span><span class="p">}</span>
+                           <span class="p">})</span>
+    <span class="n">html_content</span> <span class="o">=</span> <span class="n">md</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="n">processed_md</span><span class="p">)</span>
 
     <span class="n">html_content</span> <span class="o">=</span> <span class="n">enhance_images</span><span class="p">(</span><span class="n">html_content</span><span class="p">)</span>
 
     <span class="n">slug</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">md_path</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">post_nav</span> <span class="o">=</span> <span class="n">build_post_nav</span><span class="p">(</span><span class="n">slug</span><span class="p">)</span>
+    <span class="n">toc</span> <span class="o">=</span> <span class="n">build_toc</span><span class="p">(</span><span class="n">md</span><span class="o">.</span><span class="n">toc_tokens</span><span class="p">)</span>
 
     <span class="n">html_section</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">&lt;main&gt;</span>
+<span class="si">{</span><span class="n">toc</span><span class="si">}</span>
 <span class="s2">&lt;article class=&quot;markdown-body blog-body&quot;&gt;</span>
 <span class="s2">  </span><span class="si">{</span><span class="n">html_content</span><span class="si">}</span>
 <span class="s2">&lt;/article&gt;</span>
@@ -640,6 +677,9 @@ This function handles parsing custom image blocks and turns them into proper HTM
     <span class="n">plotly_tag</span> <span class="o">=</span> <span class="n">get_plotly_script_tag</span><span class="p">()</span> <span class="k">if</span> <span class="s1">&#39;plotly-graph-div&#39;</span> <span class="ow">in</span> <span class="n">html_content</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
     <span class="k">if</span> <span class="s1">&#39;class=&quot;mesh-anim&#39;</span> <span class="ow">in</span> <span class="n">html_content</span><span class="p">:</span>
         <span class="n">plotly_tag</span> <span class="o">+=</span> <span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="k">if</span> <span class="n">plotly_tag</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">get_mesh_anim_script_tag</span><span class="p">()</span>
+    <span class="c1"># Scroll-spy for the table of contents, only where there is one.</span>
+    <span class="k">if</span> <span class="n">toc</span><span class="p">:</span>
+        <span class="n">plotly_tag</span> <span class="o">+=</span> <span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="k">if</span> <span class="n">plotly_tag</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;  &lt;script src=&quot;../js/toc.js&quot; defer&gt;&lt;/script&gt;&#39;</span>
 
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_html</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
@@ -773,7 +813,7 @@ Here I have two options:</p>
 <li><code>{{file_full, "path/to/code", "language", "spoiler"} }</code> (spoiler is optional) to include the full file;</li>
 <li><code>{{file_partial, "path/to/code", "language", "marker", "spoiler"} }</code> (again, spoiler is optional) to include code between markers <code># START_marker</code> and <code># END_marker</code>;</li>
 </ul>
-<h2>CSS</h2>
+<h2 id="css">CSS</h2>
 <p>Here is my full CSS configuration.</p>
 <details class="code-block">
 <summary>Show code</summary>
@@ -854,10 +894,11 @@ Here I have two options:</p>
 
 <span class="c">/* --- Navigation --- */</span>
 
+<span class="c">/* No explicit width: as a block element it fills the viewport already, and</span>
+<span class="c">   width:100% + padding would overflow it (there is no border-box reset). */</span>
 <span class="p">.</span><span class="nc">top-nav</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="k">position</span><span class="p">:</span><span class="w"> </span><span class="kc">sticky</span><span class="p">;</span>
 <span class="w">  </span><span class="k">top</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-<span class="w">  </span><span class="k">width</span><span class="p">:</span><span class="w"> </span><span class="mi">100</span><span class="kt">%</span><span class="p">;</span>
 <span class="w">  </span><span class="k">background</span><span class="p">:</span><span class="w"> </span><span class="kc">white</span><span class="p">;</span>
 <span class="w">  </span><span class="k">border-bottom</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="kt">px</span><span class="w"> </span><span class="kc">solid</span><span class="w"> </span><span class="nf">var</span><span class="p">(</span><span class="nv">--color-border</span><span class="p">);</span>
 <span class="w">  </span><span class="k">padding</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="kt">rem</span><span class="p">;</span>
@@ -900,6 +941,12 @@ Here I have two options:</p>
 <span class="w">  </span><span class="k">margin-left</span><span class="p">:</span><span class="w"> </span><span class="kc">auto</span><span class="p">;</span>
 <span class="w">  </span><span class="k">margin-right</span><span class="p">:</span><span class="w"> </span><span class="kc">auto</span><span class="p">;</span>
 <span class="w">  </span><span class="k">padding-bottom</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="kt">rem</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c">/* Anchor jumps land below the sticky top nav. */</span>
+<span class="p">.</span><span class="nc">markdown-body</span><span class="w"> </span><span class="nt">h2</span><span class="o">[</span><span class="nt">id</span><span class="o">],</span>
+<span class="p">.</span><span class="nc">markdown-body</span><span class="w"> </span><span class="nt">h3</span><span class="o">[</span><span class="nt">id</span><span class="o">]</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">scroll-margin-top</span><span class="p">:</span><span class="w"> </span><span class="mi">90</span><span class="kt">px</span><span class="p">;</span>
 <span class="p">}</span>
 
 <span class="c">/* --- Markdown body --- */</span>
@@ -1390,6 +1437,51 @@ Here I have two options:</p>
 <span class="w">  </span><span class="k">text-underline-offset</span><span class="p">:</span><span class="w"> </span><span class="mf">0.15</span><span class="kt">em</span><span class="p">;</span>
 <span class="p">}</span>
 
+<span class="c">/* --- Table of contents (long posts) --- */</span>
+
+<span class="c">/* Plain text in the left margin of the article column, right-aligned toward</span>
+<span class="c">   the text; no box or rules. Only shown where that margin exists, so phones</span>
+<span class="c">   and narrow windows are untouched. */</span>
+<span class="p">.</span><span class="nc">toc</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="k">display</span><span class="p">:</span><span class="w"> </span><span class="kc">none</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="p">@</span><span class="k">media</span><span class="w"> </span><span class="o">(</span><span class="nt">min-width</span><span class="o">:</span><span class="w"> </span><span class="nt">1280px</span><span class="o">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="p">.</span><span class="nc">toc</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">display</span><span class="p">:</span><span class="w"> </span><span class="kc">block</span><span class="p">;</span>
+<span class="w">    </span><span class="k">position</span><span class="p">:</span><span class="w"> </span><span class="kc">fixed</span><span class="p">;</span>
+<span class="w">    </span><span class="k">top</span><span class="p">:</span><span class="w"> </span><span class="mi">7</span><span class="kt">rem</span><span class="p">;</span>
+<span class="w">    </span><span class="k">right</span><span class="p">:</span><span class="w"> </span><span class="nb">calc</span><span class="p">(</span><span class="mi">50</span><span class="kt">%</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">430</span><span class="kt">px</span><span class="p">);</span>
+<span class="w">    </span><span class="k">width</span><span class="p">:</span><span class="w"> </span><span class="mi">190</span><span class="kt">px</span><span class="p">;</span>
+<span class="w">    </span><span class="k">max-height</span><span class="p">:</span><span class="w"> </span><span class="nb">calc</span><span class="p">(</span><span class="mi">100</span><span class="kt">vh</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">9</span><span class="kt">rem</span><span class="p">);</span>
+<span class="w">    </span><span class="k">overflow-y</span><span class="p">:</span><span class="w"> </span><span class="kc">auto</span><span class="p">;</span>
+<span class="w">    </span><span class="k">text-align</span><span class="p">:</span><span class="w"> </span><span class="kc">right</span><span class="p">;</span>
+<span class="w">    </span><span class="k">font-family</span><span class="p">:</span><span class="w"> </span><span class="nf">var</span><span class="p">(</span><span class="nv">--font-ui</span><span class="p">);</span>
+<span class="w">    </span><span class="k">font-size</span><span class="p">:</span><span class="w"> </span><span class="mf">0.85</span><span class="kt">rem</span><span class="p">;</span>
+<span class="w">    </span><span class="k">line-height</span><span class="p">:</span><span class="w"> </span><span class="mf">1.45</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="p">.</span><span class="nc">toc</span><span class="w"> </span><span class="nt">a</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">display</span><span class="p">:</span><span class="w"> </span><span class="kc">block</span><span class="p">;</span>
+<span class="w">    </span><span class="k">padding</span><span class="p">:</span><span class="w"> </span><span class="mf">0.15</span><span class="kt">rem</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<span class="w">    </span><span class="k">color</span><span class="p">:</span><span class="w"> </span><span class="nf">var</span><span class="p">(</span><span class="nv">--color-text-muted</span><span class="p">);</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="p">.</span><span class="nc">toc</span><span class="w"> </span><span class="nt">a</span><span class="p">:</span><span class="nd">hover</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">color</span><span class="p">:</span><span class="w"> </span><span class="nf">var</span><span class="p">(</span><span class="nv">--color-text</span><span class="p">);</span>
+<span class="w">    </span><span class="k">text-decoration</span><span class="p">:</span><span class="w"> </span><span class="kc">none</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="p">.</span><span class="nc">toc</span><span class="w"> </span><span class="nt">a</span><span class="p">.</span><span class="nc">active</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">font-weight</span><span class="p">:</span><span class="w"> </span><span class="mi">600</span><span class="p">;</span>
+<span class="w">    </span><span class="k">color</span><span class="p">:</span><span class="w"> </span><span class="nf">var</span><span class="p">(</span><span class="nv">--color-text</span><span class="p">);</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="p">.</span><span class="nc">toc-h3</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">font-size</span><span class="p">:</span><span class="w"> </span><span class="mf">0.78</span><span class="kt">rem</span><span class="p">;</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="p">}</span>
+
 <span class="c">/* --- Footer --- */</span>
 
 <span class="p">.</span><span class="nc">site-footer</span><span class="w"> </span><span class="p">{</span>
@@ -1512,7 +1604,7 @@ Here I have two options:</p>
 
 </details>
 
-<h2>Conclusion</h2>
+<h2 id="conclusion">Conclusion</h2>
 <p>I could quite easily get everything working with this approach.
 Markdown is a great format to write content without needing to write any HTML, and the python code is useful to process these Markdown files automatically and convert them into HTML.
 I'll probably extend the tools to handle bibtex and other things that I can't think of as of now.

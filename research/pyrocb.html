@@ -34,7 +34,7 @@
 
     gtag('config', 'G-5XKH0GTGGB');
   </script>
-
+  <script src="../js/toc.js" defer></script>
   <script>
     MathJax = {
       options: {
@@ -62,8 +62,21 @@
 
 
 <main>
+<nav class="toc" aria-label="Table of contents">
+  <a class="toc-h2" href="#data-and-features">Data and features</a>
+  <a class="toc-h2" href="#evaluation-metrics">Evaluation metrics</a>
+  <a class="toc-h2" href="#models-and-training">Models and training</a>
+  <a class="toc-h3" href="#loss">Loss</a>
+  <a class="toc-h3" href="#early-stopping">Early stopping</a>
+  <a class="toc-h2" href="#tuning-of-the-setup">Tuning of the setup</a>
+  <a class="toc-h3" href="#baseline">Baseline</a>
+  <a class="toc-h3" href="#loss-sweep-event-explorer">Loss sweep [Event explorer]</a>
+  <a class="toc-h2" href="#equal-area-reprojection">Equal-area reprojection</a>
+  <a class="toc-h3" href="#pod-generalization">POD generalization</a>
+  <a class="toc-h2" href="#references">References</a>
+</nav>
 <article class="markdown-body blog-body">
-  <h1>PyroCb</h1>
+  <h1 id="pyrocb">PyroCb</h1>
 <p>Intense wildfires, in combination with atmospheric conditions that favor convection, sometimes produce pyrocumulonimbus (pyroCb) clouds that propel large quantities of smoke, ash, and moisture high into the atmosphere.
 These extreme events can cause severe hazards, such as lightning that can start new fires, intense storms, and long-term climate impacts due to long-lasting smoke injected into the stratosphere.</p>
 <figure class="image-wrap image-center" style="width: 75%;">
@@ -73,7 +86,7 @@ These extreme events can cause severe hazards, such as lightning that can start 
 
 <p>Because of the intensity and rarity of these events, it is difficult to predict when they occur.
 Here we take a machine learning approach to predict the occurrence of these events from wildfire and weather data over North America.</p>
-<h2>Data and features</h2>
+<h2 id="data-and-features">Data and features</h2>
 <p>The input features are formed from several datasets covering North America between 2017 and 2024:</p>
 <ul>
 <li>RAVE dataset, merging fire products extracted from GOES and VIIRS.</li>
@@ -83,7 +96,7 @@ Here we take a machine learning approach to predict the occurrence of these even
 <p>The task becomes a classification problem, where we need to determine whether each fire will give rise to a pyroCb or not.
 Labels are computed from an inventory of observed pyroCbs between 2013 and 2024.</p>
 <p>A list of features and their separability and correlations can be visualized on the <a href="https://files.lucasamoudruz.com/class_separability.html">input features explorer</a>.</p>
-<h2>Evaluation metrics</h2>
+<h2 id="evaluation-metrics">Evaluation metrics</h2>
 <p>The model needs to predict where pyroCbs may occur.
 In particular, it is more important to avoid misses than to avoid false alarms.
 Predicting an occurrence spatially and temporally close to a true event should also be rewarded, and we thus adopt a fuzzy metric rather than a pure pixel-wise loss to evaluate the model.
@@ -103,8 +116,8 @@ This fixes a flaw of the asymmetric variant that scores hits against the dilated
 Here we choose a box neighborhood centered on the prediction point, of size <script type="math/tex">1.75^\circ \approx 190</script> km in space and <script type="math/tex">15</script> h in time.
 Note that for <script type="math/tex">\alpha = \beta = 1</script> and no dilation, <script type="math/tex">\mathrm{CSI}_{1,1}</script> reduces to the standard critical success index (CSI).</p>
 <p>Similar constructions appear in the neighborhood verification literature in meteorology <sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup> <sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup>: this metric can be seen as a Tversky-weighted <sup id="fnref:3"><a class="footnote-ref" href="#fn:3">3</a></sup> <sup id="fnref:4"><a class="footnote-ref" href="#fn:4">4</a></sup> single-ratio variant of the neighborhood CSI loss of Lagerquist and Ebert-Uphoff <sup id="fnref:5"><a class="footnote-ref" href="#fn:5">5</a></sup>, with the tolerance applied to both sides of the contingency table, in the same spirit as the relaxed precision and recall used to evaluate road extraction in computer vision <sup id="fnref:6"><a class="footnote-ref" href="#fn:6">6</a></sup>.</p>
-<h2>Models and training</h2>
-<h3>Loss</h3>
+<h2 id="models-and-training">Models and training</h2>
+<h3 id="loss">Loss</h3>
 <p>Models are trained using the combined loss:
 <script type="math/tex; mode=display">
 \mathcal{L} = \lambda\, \mathcal{L}_{\mathrm{CE}} + (1 - \lambda)\, \mathcal{L}_{\mathrm{Tv}},
@@ -122,11 +135,11 @@ where <script type="math/tex">w</script> upweights the rare positive class, and 
 \mathcal{L}_{\mathrm{Tv}} = 1 - \mathrm{CSI}_{\alpha,\beta}.
 </script>
 </p>
-<h3>Early stopping</h3>
+<h3 id="early-stopping">Early stopping</h3>
 <p>We keep track of an EMA model (whose weights are an exponential moving average of the trained model's weights) during training, and use this model for future predictions.</p>
 <p>The symmetric dilated Tversky metric <script type="math/tex">\mathrm{CSI}_{0.3,0.7}</script> is computed on the validation set (year 2021) at every epoch with the EMA model.
 We record the best model in that metric, typically after about 200 epochs of training.</p>
-<h2>Tuning of the setup</h2>
+<h2 id="tuning-of-the-setup">Tuning of the setup</h2>
 <p>The number of pyroCbs varies a lot throughout the years. 
 Generalization to a new year (in this work: 2024) should be robust to these variations.
 The following tuning stages thus operate over a leave-one-out cross validation per year.
@@ -139,7 +152,7 @@ Models with the highest robustness over the training years (2017-2023) will be s
 <li>test on year 2024 with ensemble prediction over seeds with the mean operational threshold obtained in (2). </li>
 </ol>
 <p>The model with the best POD (closest to target in step 2) is selected.</p>
-<h3>Baseline</h3>
+<h3 id="baseline">Baseline</h3>
 <p>The baseline case uses pixel-wise metrics, and all available input features.
 This reduces to <script type="math/tex">\lambda=1</script> (pure binary cross-entropy loss), and the early stopping metric is set to the average precision (AP).</p>
 <table>
@@ -162,7 +175,7 @@ This reduces to <script type="math/tex">\lambda=1</script> (pure binary cross-en
 </tr>
 </tbody>
 </table>
-<h3>Loss sweep [<a href="https://files.lucasamoudruz.com/event_explorer_2024_lam_0.25_a_0.3_b_0.7.html">Event explorer</a>]</h3>
+<h3 id="loss-sweep-event-explorer">Loss sweep [<a href="https://files.lucasamoudruz.com/event_explorer_2024_lam_0.25_a_0.3_b_0.7.html">Event explorer</a>]</h3>
 <p>Compare the effect of the loss function (different values of <script type="math/tex">\lambda</script>, <script type="math/tex">\alpha</script>, and <script type="math/tex">\beta</script>) on the prediction capabilities of the base model with all input features.
 To maximize <script type="math/tex">\mathrm{CSI}_{0.3,0.7}</script>, it is best to use a training loss with <script type="math/tex">\lambda=0.25</script>, <script type="math/tex">\alpha=0.3</script>, and <script type="math/tex">\beta=0.7</script>:</p>
 <table>
@@ -206,9 +219,9 @@ To maximize <script type="math/tex">\mathrm{CSI}_{0.3,0.7}</script>, it is best 
 </tr>
 </tbody>
 </table>
-<h2>Equal-area reprojection</h2>
+<h2 id="equal-area-reprojection">Equal-area reprojection</h2>
 <p>All results above were obtained on the <script type="math/tex">0.25^\circ</script> latitude–longitude grid, whose east–west cell size shrinks ~3.5<script type="math/tex">\times</script> from the southern to the northern edge of the domain: the physical footprint of a CNN patch — and of the dilation neighborhood — depended on latitude. All products are now consolidated on a shared Lambert conformal conic grid (<script type="math/tex">25</script> km cells, standard parallels <script type="math/tex">35^\circ</script>N/<script type="math/tex">65^\circ</script>N), so patches and the neighborhood tolerance correspond to a fixed physical scale everywhere, and wind features are rotated into grid-relative components. The full pipeline (loss sweep, cross-validation, threshold calibration) was re-run on this grid; the numbers below supersede the tables above.</p>
-<h3>POD generalization</h3>
+<h3 id="pod-generalization">POD generalization</h3>
 <p>Step (2) of the tuning procedure is a deployment simulation: the operational threshold is frozen from all <em>other</em> folds and applied to the left-out year, so the deployed POD measures how well the target operating point transfers to an unseen fire season. One season breaks this for every model: 2017 (only 25 events) sits far below target (deployed POD 0.24–0.48 across all cases) and its fold-optimal threshold is a strong outlier. Since this common failure does not discriminate between models, 2017 is excluded both from the summary below and from the frozen-threshold average — a leak-free choice, as only training years are involved.</p>
 <p>Two further variants remove geographic coordinates from the input features, testing whether the model uses them to memorize year-specific fire geography:</p>
 <table>
@@ -276,7 +289,7 @@ baseline shows the opposite failure mode: its probabilities saturate near 1, so 
 </figure>
 
 <p>The results of the <code>no_lonlat</code> case can be seen in this [<a href="https://files.lucasamoudruz.com/event_explorer_2024_no_lonlat.html">event explorer</a>].</p>
-<h2>References</h2>
+<h2 id="references">References</h2>
 <div class="footnote">
 <hr />
 <ol>

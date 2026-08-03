@@ -4,19 +4,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>The trajectory of a red blood cell – Lucas Amoudruz</title>
+  <title>Red Blood Cells Dynamics and Microscopy – Lucas Amoudruz</title>
   <link rel="icon" href="../favicon.ico" sizes="any" />
   <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
   <meta name="description" content="" />
   <link rel="canonical" href="https://lucasamoudruz.com/blog/red-blood-cells.html" />
   <meta property="og:site_name" content="Lucas Amoudruz" />
   <meta property="og:type" content="article" />
-  <meta property="og:title" content="The trajectory of a red blood cell" />
+  <meta property="og:title" content="Red Blood Cells Dynamics and Microscopy" />
   <meta property="og:description" content="" />
   <meta property="og:url" content="https://lucasamoudruz.com/blog/red-blood-cells.html" />
-  <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="The trajectory of a red blood cell" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Red Blood Cells Dynamics and Microscopy" />
   <meta name="twitter:description" content="" />
+  <meta property="og:image" content="https://lucasamoudruz.com/images/blog/red-blood-cells/fischer_comp_echinocyte.png" />
+  <meta name="twitter:image" content="https://lucasamoudruz.com/images/blog/red-blood-cells/fischer_comp_echinocyte.png" />
   <link rel="stylesheet" href="../css/main.css" />
   <link rel="stylesheet" href="../css/codehilite.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -34,6 +36,7 @@
   </script>
   <link rel="stylesheet" href="../css/mesh-anim.css" />
   <script src="../js/mesh-anim.js" defer></script>
+  <script src="../js/toc.js" defer></script>
   <script>
     MathJax = {
       options: {
@@ -65,9 +68,15 @@
 
 
 <main>
+<nav class="toc" aria-label="Table of contents">
+  <a class="toc-h2" href="#from-membrane-energies-to-the-sde-sequence">From membrane energies to the SDE sequence</a>
+  <a class="toc-h2" href="#microscopy-model">Microscopy model</a>
+  <a class="toc-h2" href="#red-blood-cell-in-a-shear-flow">Red blood cell in a shear flow</a>
+  <a class="toc-h2" href="#references">References</a>
+</nav>
 <article class="markdown-body blog-body">
-  <h1>The trajectory of a red blood cell</h1>
-<p>July 27, 2026</p>
+  <h1 id="red-blood-cells-dynamics-and-microscopy">Red Blood Cells Dynamics and Microscopy</h1>
+<p>August 03, 2026</p>
 <p>A few months after I started my PhD, I was part of a team trying to model how red blood cells (RBCs) flow through a microfluidic device.
 These devices are prime candidates for detecting circulating tumor cells, extremely rare cells that signal cancer metastasis, terribly difficult to catch among the trillions of red blood cells around them.
 To optimize these devices, we first needed a numerical model that can reproduce the correct physics.</p>
@@ -80,16 +89,17 @@ I never got to finish properly since we discovered that increasing the DPD metho
 <p>Recently I made simulations of <a href="parti.html">sedimenting particles in a viscous flow</a>, where a cloud of small particles transformed into a torus before breaking up.
 This relies on the same principles for solving the Stokes equations, and it made me want to finally implement the boundary-integral method for a red blood cell.
 I decided to extend my solver to handle the complex membrane dynamics of RBCs, based on my previous research, and combine them with the fluid solver I implemented.</p>
-<p>In particular, I have seen several experimental videos of these cells none of them looking like the visualizations of my "perfect" cells produced numerically. 
+<p>In particular, I have seen several experimental videos of these cells, none of them looking like the visualizations of my "perfect" cells produced numerically.
 Can we produce similar pictures, with the microscopic artifacts?</p>
-<p>Let's reproduce the simulations first.</p>
+<p>Let's first make a few simulations to obtain RBC shapes observed in experiments.</p>
+<h2 id="from-membrane-energies-to-the-sde-sequence">From membrane energies to the SDE sequence</h2>
 <p>Red blood cells are roughly two things: a membrane, enclosing a cytosol, containing the hemoglobin necessary to transport oxygen efficiently.
 The cytosol can be modeled as a viscous fluid about 5 times more viscous than the plasma.
 The membrane is more complicated: it is composed of a cytoskeleton and a lipid bilayer.
 The former is mainly responsible for shear elasticity, while the latter contributes to bending resistance, area conservation, membrane viscosity, and area-difference elasticity, depending on the surrounding chemical conditions.
 All these terms can be modeled mathematically on a single surface, and discretized onto a triangle mesh.
 I spare all the math and energy functionals, but it's described in detail in my previous research <sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup> <sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup>, and has been discretized initially in some of my colleague's work <sup id="fnref:3"><a class="footnote-ref" href="#fn:3">3</a></sup> and implemented in Mirheo <sup id="fnref:4"><a class="footnote-ref" href="#fn:4">4</a></sup>.
-I plot a few contributions below. </p>
+I show a few contributions below. </p>
 <figure class="image-wrap image-center" style="width: 70%;">
 <div class="mesh-anim mesh-anim-static" data-src="../images/blog/red-blood-cells/discocyte_forces.bin">
   <canvas class="mesh-anim-canvas"></canvas>
@@ -104,7 +114,7 @@ Forces are derivatives of these energies with respect to positions,
 much more involved, but validated against finite differences of the energy.
 I also created functions to compute the Hessian of the energies, allowing to compute equilibrium shapes (minimal energy) faster thanks to Newton's method.
 This was of course all facilitated by LLMs (I mainly used <code>Opus 5.8</code> from Claude Code), although I gave tight directives so that the design remained under control, performance stayed reasonable, and I adopted a test-driven development approach.</p>
-<p>After a bit of back and forth with my agent, tweaking, and parameter tuning, I could reproduce the famous SDE sequence (stomatocyte-discocyte-echinocyte), a sequence of shape that RBCs take due to a change in the chemical envoronment, causing an imbalance of between the two layers of the lipid bilayer:</p>
+<p>After a bit of back and forth with my agent, tweaking, and parameter tuning, I could reproduce the famous SDE sequence (stomatocyte-discocyte-echinocyte), a sequence of shapes that RBCs take due to a change in the chemical environment, causing an imbalance between the two layers of the lipid bilayer:</p>
 <div class="image-row mesh-row">
 <figure class="image-wrap" style="width: 32%;">
 <div class="mesh-anim mesh-anim-static" data-src="../images/blog/red-blood-cells/stomatocyte.bin">
@@ -141,13 +151,85 @@ This was of course all facilitated by LLMs (I mainly used <code>Opus 5.8</code> 
 
 </figure>
 
-<p>This is a microscopic view, very different that the crisp idealized surfaces I showed before.
+<p>This is a microscopic view, very different from the crisp idealized surfaces I showed before.
 How do they compare?
 In an ideal world, we would reconstruct the surface from the video. 
 This is far from easy.
 Instead, let's do the reverse: take our perfect surfaces and model the microscopy.</p>
-<p>[TODO]</p>
-<h2>References</h2>
+<h2 id="microscopy-model">Microscopy model</h2>
+<p>The above video uses <a href="https://en.wikipedia.org/wiki/Differential_interference_contrast_microscopy">differential interference contrast (DIC) microscopy</a>.
+This technique is designed to visualize small, transparent objects that are not visible with conventional microscopy.
+It relies on the <a href="https://en.wikipedia.org/wiki/Optical_path_length">optical path length (OPL)</a> accumulated by light through the sample.
+More precisely, a system of prisms decomposes the light source into two beams, separated by a small distance <script type="math/tex">s</script>; these two beams may thus have a different OPL, due to the shape and refractive index of the sample.
+The two beams are then recombined and the resulting intensity is recorded by the camera.
+This intensity depends on the phase difference between the two beams, and thus the image is related to the difference in OPL between them, which for a small <script type="math/tex">s</script> approximates the gradient of the OPL along the shear direction.</p>
+<p>The math is relatively simple.
+First, we can represent the electric field (light) as a wave, with complex numbers:
+<script type="math/tex; mode=display">
+E(\mathbf{r}, t) = \mathrm{Re}\left[U(\mathbf{r}) e^{-i \omega t} \right],
+</script>
+where <script type="math/tex">\omega = \frac{2\pi c}{\lambda}</script> is the angular frequency, <script type="math/tex">\lambda</script> the wavelength and <script type="math/tex">c</script> is the speed of light in vacuum.</p>
+<p>In DIC the key quantity is <script type="math/tex">U</script>, as it contains the phase and amplitude of the light beam.
+In particular, the phase changes when the beam goes through a medium with refractive index <script type="math/tex">n \neq 1</script>:
+<script type="math/tex; mode=display">
+U(z) = U(0) e^{iknz},
+</script>
+where <script type="math/tex">k = \frac{2\pi}{\lambda}</script> is the vacuum wavenumber and <script type="math/tex">z</script> is the physical distance.
+This tells us that the phase "accumulates" at a rate <script type="math/tex">kn</script> per distance.
+This is related to the OPL
+<script type="math/tex; mode=display">
+\mathrm{OPL} = \int n(z) dz.
+</script>
+Thus, if <script type="math/tex">n</script> is the refractive index inside the sample and <script type="math/tex">n_m</script> that of the medium, the OPL can be written as
+<script type="math/tex; mode=display">
+\mathrm{OPL} = \mathrm{total\; path\; length} \cdot n_m + h \Delta n,
+</script>
+where <script type="math/tex">h</script> is the object thickness and <script type="math/tex">\Delta n = n - n_m</script>.
+The phase shift is thus proportional to the object thickness, carrying image contrast.
+On top of that, light gets absorbed as it goes through the medium.
+In that case the amplitude decreases exponentially with distance, at a rate <script type="math/tex">\mu</script> depending on the medium.
+This rate can be included as the imaginary part of the refractive index <script type="math/tex">n</script>.
+Note that absorption alone would not give us as sharp a view as the DIC microscopy - nevertheless it is easy to model and still contributes to the optics.</p>
+<p>In reality, light follows the wave equation and doesn't go straight, due to <em>diffraction</em>.
+To account for this, we need to solve the Helmholtz equation through the sample:
+<script type="math/tex; mode=display">
+\left(\nabla^2 + k^2 n^2 \right) U = 0,
+</script>
+which we solve using the <a href="https://en.wikipedia.org/wiki/Angular_spectrum_method">angular spectrum method</a> and FFT.</p>
+<p>Refraction (the <script type="math/tex">e^{iknz}</script> term) does not commute with the diffraction operation.
+We solve this thanks to a second-order Strang splitting scheme over eight slabs (the thin-phase-object approximation would give a 17% error).</p>
+<p>Finally, the light hitting the sample isn't an ideal plane wave.
+Instead, a real condenser produces a cone of plane waves coming from a spread of angles and from uncorrelated parts of the lamp.
+Thanks to this decorrelation, we can add their contributions only at the end by computing the sum of their intensities.
+This is called Abbe averaging.</p>
+<p>We can now fit all the optics parameters (<script type="math/tex">s</script>, <script type="math/tex">\Delta n</script>, absorption, condenser NA, bias), view parameters (orientation, focus) and physical parameters (stage in the SDE sequence, RBC radius) to match the images in the video.
+Here are the results, after optimizing these parameters with CMA-ES <sup id="fnref:6"><a class="footnote-ref" href="#fn:6">6</a></sup>:</p>
+<div class="image-row">
+
+<figure class="image-wrap" style="width: 30%;">
+  <img width="1278" height="490" loading="lazy" src="../images/blog/red-blood-cells/fischer_comp_echinocyte.png" alt="Echinocyte">
+  <figcaption class="image-caption">Echinocyte</figcaption>
+</figure>
+
+<figure class="image-wrap" style="width: 30%;">
+  <img width="1278" height="490" loading="lazy" src="../images/blog/red-blood-cells/fischer_comp_discocyte.png" alt="Discocyte">
+  <figcaption class="image-caption">Discocyte</figcaption>
+</figure>
+
+<figure class="image-wrap" style="width: 30%;">
+  <img width="1278" height="490" loading="lazy" src="../images/blog/red-blood-cells/fischer_comp_stomatocyte.png" alt="Stomatocyte">
+  <figcaption class="image-caption">Stomatocyte</figcaption>
+</figure>
+</div>
+
+<p>Left images are from Fischer <sup id="fnref2:5"><a class="footnote-ref" href="#fn:5">5</a></sup>, and right ones are the simulated DIC of our computed SDE shapes.
+We can see the main characteristics of the cells, and we seem to capture the most important physics.
+This is encouraging: we have a model that reproduces experimental data!</p>
+<p>We still haven't seen any hydrodynamics though.
+Let's study an RBC in a shear flow.</p>
+<h2 id="red-blood-cell-in-a-shear-flow">Red blood cell in a shear flow</h2>
+<p>Coming soon.</p>
+<h2 id="references">References</h2>
 <div class="footnote">
 <hr />
 <ol>
@@ -164,7 +246,10 @@ Instead, let's do the reverse: take our perfect surfaces and model the microscop
 <p>Alexeev, D., Amoudruz, L., Litvinov, S. and Koumoutsakos, P., 2020. Mirheo: High-performance mesoscale simulations for microfluidics. Computer Physics Communications, 254, p.107298. <a href="https://doi.org/10.1016/j.cpc.2020.107298">DOI</a> · <a href="../data/publications/alexeev2020a.pdf">PDF</a>&#160;<a class="footnote-backref" href="#fnref:4" title="Jump back to footnote 4 in the text">&#8617;</a></p>
 </li>
 <li id="fn:5">
-<p>Fischer, T.M., 2022. The Shape of Human Red Blood Cells Suspended in Autologous Plasma and Serum. Cells, 11(12), p.1941. <a href="https://doi.org/10.3390/cells11121941">DOI</a>&#160;<a class="footnote-backref" href="#fnref:5" title="Jump back to footnote 5 in the text">&#8617;</a></p>
+<p>Fischer, T.M., 2022. The Shape of Human Red Blood Cells Suspended in Autologous Plasma and Serum. Cells, 11(12), p.1941. <a href="https://doi.org/10.3390/cells11121941">DOI</a>&#160;<a class="footnote-backref" href="#fnref:5" title="Jump back to footnote 5 in the text">&#8617;</a><a class="footnote-backref" href="#fnref2:5" title="Jump back to footnote 5 in the text">&#8617;</a></p>
+</li>
+<li id="fn:6">
+<p>Hansen, N. and Ostermeier, A., 2001. Completely derandomized self-adaptation in evolution strategies. Evolutionary Computation, 9(2), pp.159-195. <a href="https://doi.org/10.1162/106365601750190398">DOI</a>&#160;<a class="footnote-backref" href="#fnref:6" title="Jump back to footnote 6 in the text">&#8617;</a></p>
 </li>
 </ol>
 </div>
