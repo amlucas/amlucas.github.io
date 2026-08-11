@@ -228,7 +228,25 @@ This is encouraging: we have a model that reproduces experimental data!</p>
 <p>We still haven't seen any hydrodynamics though.
 Let's study an RBC in a shear flow.</p>
 <h2 id="red-blood-cell-in-a-shear-flow">Red blood cell in a shear flow</h2>
-<p>Coming soon.</p>
+<p>In a shear flow, red blood cells exhibit an impressive range of dynamics.
+One of the most famous type is the so-called <em>tank-treading</em>, where the membranes rotates around a steady shape, like treads on a tank.
+An example is simulated below:</p>
+<figure class="image-wrap image-center" style="width: 60%;">
+<div class="mesh-anim" data-src="../images/blog/red-blood-cells/rbc_shear.bin">
+  <canvas class="mesh-anim-canvas"></canvas>
+  <div class="mesh-anim-controls">
+    <button type="button" class="mesh-anim-play" disabled>Play</button>
+    <input type="range" class="mesh-anim-slider" min="0" max="0" value="0"
+           step="1" disabled aria-label="animation frame" />
+  </div>
+  <div class="mesh-anim-status">Loading…</div>
+</div>
+<figcaption class="image-caption">A tank treading RBC. <span style="white-space: nowrap;"><script type="math/tex">\mathrm{Ca}=0.5</script>,</span> <span style="white-space: nowrap;"><script type="math/tex">\mathrm{Bq}=8</script>,</span> <span style="white-space: nowrap;"><script type="math/tex">\lambda=0.4</script>.</span></figcaption>
+</figure>
+
+<p>The model used here includes, in addition to the forces we have mentioned above, a Boussinesqu-Scriven viscosity model, discretized on the triangle mesh and solved implicitly to accomodate the boundary integral method (BIM) Stokes solver.
+Furthermore, we model the viscosity contrast between the cytosol and the solvent, appearing as a stresslet term in the BIM solver.
+Again, I spare the math here, but this results in a linear system of equation that we solve with conjugate gradient.</p>
 <h2 id="references">References</h2>
 <div class="footnote">
 <hr />
