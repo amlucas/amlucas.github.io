@@ -4,19 +4,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Red Blood Cells Dynamics and Microscopy – Lucas Amoudruz</title>
+  <title>Red Blood Cell Dynamics and Microscopy – Lucas Amoudruz</title>
   <link rel="icon" href="../favicon.ico" sizes="any" />
   <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
-  <meta name="description" content="" />
+  <meta name="description" content="Simulating the deformation of red blood cells and how they would look under DIC microscopy." />
   <link rel="canonical" href="https://lucasamoudruz.com/blog/red-blood-cells.html" />
   <meta property="og:site_name" content="Lucas Amoudruz" />
   <meta property="og:type" content="article" />
-  <meta property="og:title" content="Red Blood Cells Dynamics and Microscopy" />
-  <meta property="og:description" content="" />
+  <meta property="og:title" content="Red Blood Cell Dynamics and Microscopy" />
+  <meta property="og:description" content="Simulating the deformation of red blood cells and how they would look under DIC microscopy." />
   <meta property="og:url" content="https://lucasamoudruz.com/blog/red-blood-cells.html" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Red Blood Cells Dynamics and Microscopy" />
-  <meta name="twitter:description" content="" />
+  <meta name="twitter:title" content="Red Blood Cell Dynamics and Microscopy" />
+  <meta name="twitter:description" content="Simulating the deformation of red blood cells and how they would look under DIC microscopy." />
   <meta property="og:image" content="https://lucasamoudruz.com/images/blog/red-blood-cells/fischer_comp_echinocyte.png" />
   <meta name="twitter:image" content="https://lucasamoudruz.com/images/blog/red-blood-cells/fischer_comp_echinocyte.png" />
   <link rel="stylesheet" href="../css/main.css" />
@@ -69,14 +69,14 @@
 
 <main>
 <nav class="toc" aria-label="Table of contents">
-  <a class="toc-h2" href="#from-membrane-energies-to-the-sde-sequence">From membrane energies to the SDE sequence</a>
+  <a class="toc-h2" href="#from-membrane-energies-to-the-stomatocyte-discocyte-echinocyte-sequence">From membrane energies to the stomatocyte-discocyte-echinocyte sequence</a>
   <a class="toc-h2" href="#microscopy-model">Microscopy model</a>
   <a class="toc-h2" href="#red-blood-cell-in-a-shear-flow">Red blood cell in a shear flow</a>
   <a class="toc-h2" href="#references">References</a>
 </nav>
 <article class="markdown-body blog-body">
-  <h1 id="red-blood-cells-dynamics-and-microscopy">Red Blood Cells Dynamics and Microscopy</h1>
-<p>August 03, 2026</p>
+  <h1 id="red-blood-cell-dynamics-and-microscopy">Red Blood Cell Dynamics and Microscopy</h1>
+<p>August 11, 2026</p>
 <p>A few months after I started my PhD, I was part of a team trying to model how red blood cells (RBCs) flow through a microfluidic device.
 These devices are prime candidates for detecting circulating tumor cells, extremely rare cells that signal cancer metastasis, terribly difficult to catch among the trillions of red blood cells around them.
 To optimize these devices, we first needed a numerical model that can reproduce the correct physics.</p>
@@ -85,21 +85,21 @@ The trajectories were different, meaning the simulations were wrong.
 In the simulations, the fluid was modeled with a particle method called dissipative particle dynamics (DPD), and we had a coarse-grained model for the membrane dynamics.
 At this point, we were not sure whether the mismatch came from the fluid or from the membrane surface model.
 To rule out the fluid part, I was tasked with writing a boundary-integral method (BIM) code, a trusted method for solving Stokes flows, to compare with the DPD method.
-I never got to finish properly since we discovered that increasing the DPD method resolution fixed that part.</p>
+I never got to finish it properly since we discovered that increasing the DPD resolution fixed that part.</p>
 <p>Recently I made simulations of <a href="parti.html">sedimenting particles in a viscous flow</a>, where a cloud of small particles transformed into a torus before breaking up.
 This relies on the same principles for solving the Stokes equations, and it made me want to finally implement the boundary-integral method for a red blood cell.
 I decided to extend my solver to handle the complex membrane dynamics of RBCs, based on my previous research, and combine them with the fluid solver I implemented.</p>
 <p>In particular, I have seen several experimental videos of these cells, none of them looking like the visualizations of my "perfect" cells produced numerically.
 Can we produce similar pictures, with the microscopic artifacts?</p>
 <p>Let's first make a few simulations to obtain RBC shapes observed in experiments.</p>
-<h2 id="from-membrane-energies-to-the-sde-sequence">From membrane energies to the SDE sequence</h2>
-<p>Red blood cells are roughly two things: a membrane, enclosing a cytosol, containing the hemoglobin necessary to transport oxygen efficiently.
+<h2 id="from-membrane-energies-to-the-stomatocyte-discocyte-echinocyte-sequence">From membrane energies to the stomatocyte-discocyte-echinocyte sequence</h2>
+<p>Red blood cells are roughly two things: a membrane, enclosing the cytosol, which carries the hemoglobin necessary to transport oxygen efficiently.
 The cytosol can be modeled as a viscous fluid about 5 times more viscous than the plasma.
 The membrane is more complicated: it is composed of a cytoskeleton and a lipid bilayer.
 The former is mainly responsible for shear elasticity, while the latter contributes to bending resistance, area conservation, membrane viscosity, and area-difference elasticity, depending on the surrounding chemical conditions.
 All these terms can be modeled mathematically on a single surface, and discretized onto a triangle mesh.
-I spare all the math and energy functionals, but it's described in detail in my previous research <sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup> <sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup>, and has been discretized initially in some of my colleague's work <sup id="fnref:3"><a class="footnote-ref" href="#fn:3">3</a></sup> and implemented in Mirheo <sup id="fnref:4"><a class="footnote-ref" href="#fn:4">4</a></sup>.
-I show a few contributions below. </p>
+I'll spare you all the math and energy functionals, but it's described in detail in my previous research <sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup> <sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup>, and has been discretized initially in some of my colleague's work <sup id="fnref:3"><a class="footnote-ref" href="#fn:3">3</a></sup> and implemented in Mirheo <sup id="fnref:4"><a class="footnote-ref" href="#fn:4">4</a></sup>.
+I show a few of the force terms below. </p>
 <figure class="image-wrap image-center" style="width: 70%;">
 <div class="mesh-anim mesh-anim-static" data-src="../images/blog/red-blood-cells/discocyte_forces.bin">
   <canvas class="mesh-anim-canvas"></canvas>
@@ -112,8 +112,8 @@ I show a few contributions below. </p>
 <p>The energies are relatively simple to implement, and have analytical solutions on spheres.
 Forces are derivatives of these energies with respect to positions, 
 much more involved, but validated against finite differences of the energy.
-I also created functions to compute the Hessian of the energies, allowing to compute equilibrium shapes (minimal energy) faster thanks to Newton's method.
-This was of course all facilitated by LLMs (I mainly used <code>Opus 5.8</code> from Claude Code), although I gave tight directives so that the design remained under control, performance stayed reasonable, and I adopted a test-driven development approach.</p>
+I also created functions to compute the Hessian of the energies, which allows computing equilibrium shapes (minimal energy) faster with Newton's method.
+This was of course all facilitated by LLMs (I mainly used <code>Opus 4.8</code> from Claude Code), although I gave tight directives so that the design remained under control, performance stayed reasonable, and I adopted a test-driven development approach.</p>
 <p>After a bit of back and forth with my agent, tweaking, and parameter tuning, I could reproduce the famous SDE sequence (stomatocyte-discocyte-echinocyte), a sequence of shapes that RBCs take due to a change in the chemical environment, causing an imbalance between the two layers of the lipid bilayer:</p>
 <div class="image-row mesh-row">
 <figure class="image-wrap" style="width: 32%;">
@@ -197,7 +197,7 @@ To account for this, we need to solve the Helmholtz equation through the sample:
 </script>
 which we solve using the <a href="https://en.wikipedia.org/wiki/Angular_spectrum_method">angular spectrum method</a> and FFT.</p>
 <p>Refraction (the <script type="math/tex">e^{iknz}</script> term) does not commute with the diffraction operation.
-We solve this thanks to a second-order Strang splitting scheme over eight slabs (the thin-phase-object approximation would give a 17% error).</p>
+We handle this with a second-order Strang splitting scheme over eight slabs (the thin-phase-object approximation would give a 17% error).</p>
 <p>Finally, the light hitting the sample isn't an ideal plane wave.
 Instead, a real condenser produces a cone of plane waves coming from a spread of angles and from uncorrelated parts of the lamp.
 Thanks to this decorrelation, we can add their contributions only at the end by computing the sum of their intensities.
@@ -241,14 +241,14 @@ An example is simulated below:</p>
   </div>
   <div class="mesh-anim-status">Loading…</div>
 </div>
-<figcaption class="image-caption">A tank treading RBC. <span style="white-space: nowrap;"><script type="math/tex">\mathrm{Ca}=0.5</script>,</span> <span style="white-space: nowrap;"><script type="math/tex">\mathrm{Bq}=8</script>,</span> <span style="white-space: nowrap;"><script type="math/tex">\lambda=0.4</script>.</span></figcaption>
+<figcaption class="image-caption">A tank-treading RBC. <span style="white-space: nowrap;"><script type="math/tex">\mathrm{Ca}=0.5</script>,</span> <span style="white-space: nowrap;"><script type="math/tex">\mathrm{Bq}=8</script>,</span> <span style="white-space: nowrap;"><script type="math/tex">\lambda=0.4</script>.</span></figcaption>
 </figure>
 
-<p>The model used here includes, in addition to the forces we have mentioned above, a Boussinesq-Scriven viscosity model, discretized on the triangle mesh and solved implicitly to accommodate the boundary integral method (BIM) Stokes solver.
+<p>The model used here includes, in addition to the forces we have mentioned above, a Boussinesq-Scriven viscosity model, discretized on the triangle mesh and solved implicitly to accommodate the BIM Stokes solver.
 Furthermore, we model the viscosity contrast between the cytosol and the solvent, appearing as a stresslet term in the BIM solver.
-Again, I spare the math here, but this results in a linear system of equations that we solve with GMRES, where the volume conservation is imposed as a constraint within the solve. 
+Again, I spare you the math here, but this results in a linear system of equations that we solve with GMRES, where the volume conservation is imposed as a constraint within the solve. 
 The system is projected onto surface velocities that keep the enclosed volume stationary.</p>
-<p>We now have the dimensionless quantities: the capillary number <script type="math/tex">\mathrm{Ca} = \eta_o \dot\gamma a / \mu</script>, the Boussinesq number <script type="math/tex">\mathrm{Bq} = \eta_m / (\eta_o a)</script>, and the viscosity contrast <script type="math/tex">\lambda = \eta_i / \eta_o</script>, where <script type="math/tex">\eta_m</script>, <script type="math/tex">\eta_i</script> and <script type="math/tex">\eta_o</script> are the viscosity of the membrane, inner fluid and outer fluids, respectively, <script type="math/tex">a</script> is the equivalent radius of the cell and <script type="math/tex">\mu</script> is the shear modulus of the cytoskeleton.
+<p>We now have the dimensionless quantities: the capillary number <script type="math/tex">\mathrm{Ca} = \eta_o \dot\gamma a / \mu</script>, the Boussinesq number <script type="math/tex">\mathrm{Bq} = \eta_m / (\eta_o a)</script>, and the viscosity contrast <script type="math/tex">\lambda = \eta_i / \eta_o</script>, where <script type="math/tex">\eta_m</script>, <script type="math/tex">\eta_i</script> and <script type="math/tex">\eta_o</script> are the viscosity of the membrane, inner fluid and outer fluid, respectively, <script type="math/tex">a</script> is the equivalent radius of the cell and <script type="math/tex">\mu</script> is the shear modulus of the cytoskeleton.
 I have calibrated the intrinsic parameters of RBC membranes during my PhD, and validated the model in shear flows <sup id="fnref2:2"><a class="footnote-ref" href="#fn:2">2</a></sup>.</p>
 <p>We now have all the ingredients: the RBC dynamics and a microscopy model.
 Combining the two gives the following simulated view:</p>
@@ -290,6 +290,11 @@ To be continued.</p>
 </ol>
 </div>
 </article>
+
+<nav class="post-nav" aria-label="Post navigation">
+  <span class="post-nav-link post-nav-empty"></span>
+  <a class="post-nav-link post-nav-next" href="plant.html"><span class="post-nav-dir">Older →</span><span class="post-nav-title">Plant growth</span></a>
+</nav>
 
 </main>
 
