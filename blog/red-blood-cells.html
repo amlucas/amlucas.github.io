@@ -79,7 +79,7 @@
 <p>August 11, 2026</p>
 <p>A few months after I started my PhD, I was part of a team trying to model how red blood cells (RBCs) flow through a microfluidic device.
 These devices are prime candidates for detecting circulating tumor cells, extremely rare cells that signal cancer metastasis, terribly difficult to catch among the trillions of red blood cells around them.
-To optimize these devices, we first needed a numerical model that can reproduce the correct physics.</p>
+To optimize these devices, we first needed a numerical model that could reproduce the correct physics.</p>
 <p>One day, we were comparing two videos, one from a real experiment, and one from our simulations.
 The trajectories were different, meaning the simulations were wrong.
 In the simulations, the fluid was modeled with a particle method called dissipative particle dynamics (DPD), and we had a coarse-grained model for the membrane dynamics.
@@ -148,7 +148,7 @@ This was of course all facilitated by LLMs (I mainly used <code>Opus 4.8</code> 
     <source src="../images/blog/red-blood-cells/fischer_2022_albumin.mp4" type="video/mp4">
     Your browser does not support the video tag.
   </video>
-
+  <figcaption class="image-caption">Video from Fischer (2022) [^5]</figcaption>
 </figure>
 
 <p>This is a microscopic view, very different from the crisp idealized surfaces I showed before.
@@ -189,7 +189,7 @@ The phase shift is thus proportional to the object thickness, carrying image con
 On top of that, light gets absorbed as it goes through the medium.
 In that case the amplitude decreases exponentially with distance, at a rate <script type="math/tex">\mu</script> depending on the medium.
 This rate can be included as the imaginary part of the refractive index <script type="math/tex">n</script>.
-Note that absorption alone would not give us as sharp a view as the DIC microscopy - nevertheless it is easy to model and still contributes to the optics.</p>
+Note that absorption alone would not give us as sharp a view as DIC microscopy - nevertheless it is easy to model and still contributes to the optics.</p>
 <p>In reality, light follows the wave equation and doesn't go straight, due to <em>diffraction</em>.
 To account for this, we need to solve the Helmholtz equation through the sample:
 <script type="math/tex; mode=display">
@@ -257,7 +257,7 @@ Combining the two gives the following simulated view:</p>
     <source src="../images/blog/red-blood-cells/rbc_shear_dic_side.mp4" type="video/mp4">
     Your browser does not support the video tag.
   </video>
-
+  <figcaption class="image-caption">Simulated DIC microscopy.</figcaption>
 </figure>
 
 <p>We can see the deformation of the rim and the "breathing" pattern of the cell through the DIC microscopy model.</p>
