@@ -228,8 +228,8 @@ This is encouraging: we have a model that reproduces experimental data!</p>
 <p>We still haven't seen any hydrodynamics though.
 Let's study an RBC in a shear flow.</p>
 <h2 id="red-blood-cell-in-a-shear-flow">Red blood cell in a shear flow</h2>
-<p>In a shear flow, red blood cells exhibit an impressive range of dynamics.
-One of the most famous type is the so-called <em>tank-treading</em>, where the membranes rotates around a steady shape, like treads on a tank.
+<p>In a shear flow <script type="math/tex">\mathbf{u}_\infty = \dot{\gamma} z \mathbf{e}_x</script>, red blood cells exhibit an impressive range of dynamics.
+One of the most famous types is the so-called <em>tank-treading</em>, where the membrane rotates around a steady shape, like treads on a tank.
 An example is simulated below:</p>
 <figure class="image-wrap image-center" style="width: 60%;">
 <div class="mesh-anim" data-src="../images/blog/red-blood-cells/rbc_shear.bin">
@@ -244,9 +244,27 @@ An example is simulated below:</p>
 <figcaption class="image-caption">A tank treading RBC. <span style="white-space: nowrap;"><script type="math/tex">\mathrm{Ca}=0.5</script>,</span> <span style="white-space: nowrap;"><script type="math/tex">\mathrm{Bq}=8</script>,</span> <span style="white-space: nowrap;"><script type="math/tex">\lambda=0.4</script>.</span></figcaption>
 </figure>
 
-<p>The model used here includes, in addition to the forces we have mentioned above, a Boussinesqu-Scriven viscosity model, discretized on the triangle mesh and solved implicitly to accomodate the boundary integral method (BIM) Stokes solver.
+<p>The model used here includes, in addition to the forces we have mentioned above, a Boussinesq-Scriven viscosity model, discretized on the triangle mesh and solved implicitly to accommodate the boundary integral method (BIM) Stokes solver.
 Furthermore, we model the viscosity contrast between the cytosol and the solvent, appearing as a stresslet term in the BIM solver.
-Again, I spare the math here, but this results in a linear system of equation that we solve with conjugate gradient.</p>
+Again, I spare the math here, but this results in a linear system of equations that we solve with GMRES, where the volume conservation is imposed as a constraint within the solve. 
+The system is projected onto surface velocities that keep the enclosed volume stationary.</p>
+<p>We now have the dimensionless quantities: the capillary number <script type="math/tex">\mathrm{Ca} = \eta_o \dot\gamma a / \mu</script>, the Boussinesq number <script type="math/tex">\mathrm{Bq} = \eta_m / (\eta_o a)</script>, and the viscosity contrast <script type="math/tex">\lambda = \eta_i / \eta_o</script>, where <script type="math/tex">\eta_m</script>, <script type="math/tex">\eta_i</script> and <script type="math/tex">\eta_o</script> are the viscosity of the membrane, inner fluid and outer fluids, respectively, <script type="math/tex">a</script> is the equivalent radius of the cell and <script type="math/tex">\mu</script> is the shear modulus of the cytoskeleton.
+I have calibrated the intrinsic parameters of RBC membranes during my PhD, and validated the model in shear flows <sup id="fnref2:2"><a class="footnote-ref" href="#fn:2">2</a></sup>.</p>
+<p>We now have all the ingredients: the RBC dynamics and a microscopy model.
+Combining the two gives the following simulated view:</p>
+<figure class="video-wrap" style="width: 50%;">
+  <video controls autoplay loop muted playsinline>
+    <source src="../images/blog/red-blood-cells/rbc_shear_dic_side.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+
+</figure>
+
+<p>We can see the deformation of the rim and the "breathing" pattern of the cell through the DIC microscopy model.</p>
+<p>I am probably still missing some physics here, but this is a good first step towards linking microscopy images to simulations.
+It would be very fun to take this further and try to find an inverse map from the simulated DIC to full RBC shapes, so we can reconstruct RBCs from experimental videos.
+A good problem, I believe, for machine learning.
+To be continued.</p>
 <h2 id="references">References</h2>
 <div class="footnote">
 <hr />
@@ -255,7 +273,7 @@ Again, I spare the math here, but this results in a linear system of equation th
 <p>Amoudruz, L., 2022. Simulations and control of artificial microswimmers in blood. PhD thesis, ETH Zurich. <a href="https://doi.org/10.3929/ethz-b-000550202">DOI</a>&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
 </li>
 <li id="fn:2">
-<p>Amoudruz, L., Economides, A., Arampatzis, G. and Koumoutsakos, P., 2023. The stress-free state of human erythrocytes: Data-driven inference of a transferable RBC model. Biophysical Journal, 122(8), pp.1517-1525. <a href="https://doi.org/10.1016/j.bpj.2023.03.019">DOI</a> · <a href="../data/publications/amoudruz2023a.pdf">PDF</a>&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
+<p>Amoudruz, L., Economides, A., Arampatzis, G. and Koumoutsakos, P., 2023. The stress-free state of human erythrocytes: Data-driven inference of a transferable RBC model. Biophysical Journal, 122(8), pp.1517-1525. <a href="https://doi.org/10.1016/j.bpj.2023.03.019">DOI</a> · <a href="../data/publications/amoudruz2023a.pdf">PDF</a>&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a><a class="footnote-backref" href="#fnref2:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
 </li>
 <li id="fn:3">
 <p>Bian, X., Litvinov, S. and Koumoutsakos, P., 2020. Bending models of lipid bilayer membranes: Spontaneous curvature and area-difference elasticity. Computer Methods in Applied Mechanics and Engineering, 359, p.112758. <a href="https://doi.org/10.1016/j.cma.2019.112758">DOI</a>&#160;<a class="footnote-backref" href="#fnref:3" title="Jump back to footnote 3 in the text">&#8617;</a></p>
