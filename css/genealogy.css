@@ -14,6 +14,13 @@
   height: auto;
 }
 
+/* On narrow screens the lineage graph is laid out at its natural width and
+   pans horizontally in here, so sibling fans never have to wrap. The card
+   stays a child of .genealogy itself: an overflow box would clip it. */
+.genealogy-scroll {
+  overflow-x: auto;
+}
+
 .genealogy-status {
   position: absolute;
   inset: 0;

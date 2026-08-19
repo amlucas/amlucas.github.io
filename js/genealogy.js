@@ -90,6 +90,7 @@
 
   const FONT_NAME = '600 14px Inter, -apple-system, sans-serif';
   const FONT_LABEL = '400 11.5px Inter, -apple-system, sans-serif';
+  const FONT_YEAR = '400 11px ui-monospace, SFMono-Regular, monospace';
 
   // Advisor→student arrowheads. Ids are made unique per render so several
   // genealogies on one page cannot cross-reference each other's markers.
@@ -116,6 +117,20 @@
     if (W < 100) return;
     const narrow = W < 560;
 
+    // On narrow screens the graph is laid out at its natural width and pans
+    // horizontally inside this wrapper; sibling fans then never wrap, so each
+    // generation reads as one aligned line of dots.
+    let scroller = container.querySelector('.genealogy-scroll');
+    if (!scroller) {
+      scroller = document.createElement('div');
+      scroller.className = 'genealogy-scroll';
+      container.appendChild(scroller);
+      scroller.addEventListener('scroll', () => {
+        unpin(container);
+        hideCard(container);
+      });
+    }
+
     // On wide screens the names sit left of the spine, so the spine must sit
     // far enough right for the longest of them (Vega's) not to be clipped.
     const maxNameW = narrow ? 0 : Math.max(...model.layers.map(
@@ -135,15 +150,17 @@
 
     const pos = new Map();    // id -> {x, y} of its node
     let y = 12;
+    let maxRight = 0;         // rightmost drawn x, sets the pannable width
 
     for (const layer of model.layers) {
       const nodeY = y + 10;
       let rowBottom = nodeY + (narrow ? 8 : 22);
+      let prevRight = 0;      // right edge of the previous node's texts
 
       layer.forEach((id, i) => {
         const p = model.byId.get(id);
         const x = narrow
-          ? (i === 0 ? spineX : Math.min(0.55 * W, W - 130))
+          ? (i === 0 ? spineX : prevRight + 30)
           : spineX + i * 170;
         pos.set(id, { x, y: nodeY });
 
@@ -158,17 +175,21 @@
         const name = el('text', { x: tx, y: nodeY + 4, 'text-anchor': anchor,
                                   class: 'gname' }, g);
         name.textContent = p.name;
+        const nameW = textWidth(p.name, FONT_NAME);
+        prevRight = onRight ? tx + nameW : x + 7;
         if (p.year) {
           const yr = el('text', { class: 'gyear', 'text-anchor': anchor }, g);
           if (narrow) {
-            yr.setAttribute('x', tx + textWidth(p.name, FONT_NAME) + 8);
+            yr.setAttribute('x', tx + nameW + 8);
             yr.setAttribute('y', nodeY + 4);
+            prevRight += 8 + textWidth(String(p.year), FONT_YEAR);
           } else {
             yr.setAttribute('x', tx);
             yr.setAttribute('y', nodeY + 20);
           }
           yr.textContent = p.year;
         }
+        maxRight = Math.max(maxRight, prevRight);
         wireCard(container, g, p.id, cardHtml(p), () => pos.get(id));
       });
 
@@ -192,7 +213,7 @@
           const labeled = LABELED.has(sid);
           const label = labeled ? lastName(s.name) : '';
           const w = labeled ? 13 + textWidth(label, FONT_LABEL) + 14 : 16;
-          if (fx + w > W - 6 && fx > fanX0) {
+          if (!narrow && fx + w > W - 6 && fx > fanX0) {
             fx = fanX0; fy += lineH;
             lines.push({ y: fy, xs: [] });
           }
@@ -207,6 +228,9 @@
           }
           pos.set(sid, { x: dx, y: fy });
           wireCard(container, gs, s.id, cardHtml(s), () => pos.get(sid));
+          maxRight = Math.max(maxRight,
+                              labeled ? fx + 13 + textWidth(label, FONT_LABEL)
+                                      : fx + 10);
           fx += w;
         }
         rowBottom = Math.max(rowBottom, fy + 12);
@@ -265,12 +289,16 @@
          gCoadv);
     }
 
-    svg.setAttribute('viewBox', `0 0 ${W} ${y}`);
+    // Content wider than the container (long sibling fans on a phone) keeps
+    // its natural width and pans inside the scroller instead of wrapping.
+    const contentW = Math.max(W, Math.ceil(maxRight) + 8);
+    svg.setAttribute('viewBox', `0 0 ${contentW} ${y}`);
     svg.setAttribute('height', y);
+    if (contentW > W) svg.style.width = contentW + 'px';
     svg.addEventListener('click', (e) => {
       if (e.target === svg) unpin(container);
     });
-    container.appendChild(svg);
+    scroller.appendChild(svg);
   }
 
   // ---- map ----------------------------------------------------------------
@@ -580,8 +608,12 @@
     card.style.display = 'block';
     const W = container.clientWidth;
     const cw = Math.min(320, W - 12);
+    // The node's x is in the graph's own coordinates; a panned scroller
+    // shifts where that lands within the container.
+    const x = at.x - (container.querySelector('.genealogy-scroll')?.scrollLeft
+                      ?? 0);
     card.style.maxWidth = cw + 'px';
-    card.style.left = Math.max(4, Math.min(at.x + 12, W - cw - 4)) + 'px';
+    card.style.left = Math.max(4, Math.min(x + 12, W - cw - 4)) + 'px';
     card.style.top = (at.y + 14) + 'px';
     // Near the bottom edge the card would spill out of the figure; flip it
     // above the node instead (measurable only once displayed).
