@@ -5,7 +5,14 @@
     <link>https://lucasamoudruz.com</link>
     <description>Personal blog covering scientific computing, fluid dynamics, and more</description>
     <language>en-us</language>
-    <lastBuildDate>Tue, 11 Aug 2026 17:55:42 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 19 Aug 2026 16:44:28 +0000</lastBuildDate>
+  <item>
+    <title>My academic genealogy</title>
+    <link>https://lucasamoudruz.com/blog/genealogy.html</link>
+    <guid>https://lucasamoudruz.com/blog/genealogy.html</guid>
+    <pubDate>Wed, 19 Aug 2026 00:00:00 +0000</pubDate>
+    <description>A look at my academic lineage</description>
+  </item>
   <item>
     <title>Red Blood Cell Dynamics and Microscopy</title>
     <link>https://lucasamoudruz.com/blog/red-blood-cells.html</link>

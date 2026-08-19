@@ -1,0 +1,136 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Academic genealogy – Lucas Amoudruz</title>
+  <link rel="icon" href="../favicon.ico" sizes="any" />
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
+  <meta name="description" content="A look at my academic lineage" />
+  <link rel="canonical" href="https://lucasamoudruz.com/blog/genealogy.html" />
+  <meta property="og:site_name" content="Lucas Amoudruz" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Academic genealogy" />
+  <meta property="og:description" content="A look at my academic lineage" />
+  <meta property="og:url" content="https://lucasamoudruz.com/blog/genealogy.html" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Academic genealogy" />
+  <meta name="twitter:description" content="A look at my academic lineage" />
+  <link rel="stylesheet" href="../css/main.css" />
+  <link rel="stylesheet" href="../css/codehilite.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;500;600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="alternate" type="application/rss+xml" href="../feed.xml" title="RSS Feed" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-5XKH0GTGGB"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-5XKH0GTGGB');
+  </script>
+  <link rel="stylesheet" href="../css/genealogy.css" />
+  <script src="../js/genealogy.js" defer></script>
+  <script>
+    MathJax = {
+      options: {
+        renderActions: {
+          find: [10, function (doc) {
+            for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+              const display = node.type.indexOf('display') >= 0;
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.insertBefore(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end   = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            }
+          }, '']
+        }
+      }
+    };
+  </script>
+  <script src="../mathjax/tex-chtml.min.js"></script>
+</head>
+<body>
+
+<nav class="top-nav" aria-label="Main navigation">
+  <a href="../index.html">About</a>
+  <a href="../index.html#publications">Publications</a>
+  <a href="../blog.html" class="active" aria-current="page">Blog</a>
+</nav>
+
+
+<main>
+
+<article class="markdown-body blog-body">
+  <h1 id="academic-genealogy">Academic genealogy</h1>
+<p>August 19, 2026</p>
+<p>My advisor, Petros Koumoutsakos, was looking at his <em>academic genealogy</em> a few years ago.
+Some websites like <a href="https://www.mathgenealogy.org">mathgenealogy.org</a> have already collected the profiles of a large number of scientists and their advisors.
+I thought I would try to produce a visualization of it and, along the way, learn about my academic ancestors.
+Here is what I found:</p>
+<figure class="image-wrap image-center genealogy-wrap" style="width: 100%;">
+<div class="genealogy" data-src="../images/blog/genealogy/genealogy.json">
+  <div class="genealogy-status">Loading…</div>
+</div>
+<figcaption class="image-caption">My academic genealogy. Arrows show advisor-to-student pairs. Hover over the dots for more information.</figcaption>
+</figure>
+
+<p>The furthest ancestor I could find, <a href="https://en.wikipedia.org/wiki/Nikolaus_Poda_von_Neuhaus">Nikolaus Poda von Neuhaus</a>, was a Jesuit priest best known for his study of insects.
+After that, the lineage contains remarkable names.
+The one I immediately noticed was <a href="https://en.wikipedia.org/wiki/Ludwig_Boltzmann">Ludwig Boltzmann</a>, the father of statistical mechanics and associated with the famous constant <script type="math/tex">k_B</script>.
+I was impressed to also see <a href="https://en.wikipedia.org/wiki/George_Uhlenbeck">George Uhlenbeck</a> in my direct lineage.
+He and <a href="https://en.wikipedia.org/wiki/Samuel_Goudsmit">Samuel Goudsmit</a> obtained their PhD the same year under the same advisor, <a href="https://en.wikipedia.org/wiki/Paul_Ehrenfest">Paul Ehrenfest</a>, and are best known for proposing the electron spin.</p>
+<p>I have also included "siblings" in the genealogy.
+Again, many famous scientists appear.</p>
+<p>Any fluid dynamicist would recognize Mach, who studied supersonic flows and shock waves, giving his name to the <a href="https://en.wikipedia.org/wiki/Mach_number">dimensionless ratio of characteristic velocity and speed of sound</a>; Burgers, giving his name to the <a href="https://en.wikipedia.org/wiki/Burgers%27_equation">famous nonlinear advection-diffusion equation</a>; Spalart, who developed the <a href="https://en.wikipedia.org/wiki/Spalart%E2%80%93Allmaras_turbulence_model">Spalart-Allmaras one-equation turbulence model</a>, widely used for aerospace CFD.</p>
+<p>We can also see many big names in physics and chemistry.
+<a href="https://en.wikipedia.org/wiki/Lise_Meitner">Lise Meitner</a>, who gave the first physical explanation of nuclear fission;
+<a href="https://en.wikipedia.org/wiki/Walther_Nernst">Walther Nernst</a>, who formulated the third law of thermodynamics;
+<a href="https://en.wikipedia.org/wiki/Johann_Josef_Loschmidt">Johann Loschmidt</a>, who gave a first realistic estimate of the size of molecules;
+<a href="https://en.wikipedia.org/wiki/Marian_Smoluchowski">Marian Smoluchowski</a>, who derived a kinetic theory of Brownian motion independently of Einstein;
+<a href="https://en.wikipedia.org/wiki/Hans_Kramers">Hendrik Kramers</a>, who made important contributions to quantum mechanics and statistical physics;
+<a href="https://en.wikipedia.org/wiki/Hendrik_Casimir">Hendrik Casimir</a>, who discovered the Casimir effect in quantum mechanics.</p>
+<p>I could keep going a lot longer.
+Now I know what "impostor syndrome" means.</p>
+<p>I was then curious to see the projection of this genealogy onto the world map:</p>
+<figure class="image-wrap image-center genealogy-wrap" style="width: 100%;">
+<div class="genealogy genealogy-map" data-src="../images/blog/genealogy/map.json">
+  <div class="genealogy-status">Loading…</div>
+</div>
+<figcaption class="image-caption">The PhD lineage on the map: solid arcs follow the direct line from Graz to Zürich; dashed arcs are where each advisor's other students studied for their PhD.</figcaption>
+</figure>
+
+<p>From 1760 to 1817, my academic ancestors were Jesuits and mathematicians studying insects and computing logarithm tables for artillery, in Graz and Ljubljana.
+They then stayed in Vienna, where thermal physics became the major focus for a century.
+Ehrenfest then moved to Leiden, where Uhlenbeck obtained his PhD.
+Uhlenbeck then crossed the Atlantic to Michigan; his student there, Konopinski, later participated in the Manhattan Project: the physics became nuclear.
+Later, with Ferziger and Leonard, research turned to fluid mechanics.
+Petros Koumoutsakos, my advisor, chose ETH Zürich and came back to Europe.
+This is where I worked on my PhD.
+He then moved to Harvard, just 6 months before I defended, and I followed him there as a postdoc.
+I'm hoping to keep this lineage going for more generations, and I wish I knew what it will look like in a century.</p>
+<p>I retrieved this data and made the visualizations with the help of Claude Code (Fable 5).
+The mathgenealogy.org website contains almost all of the data shown here.
+For the more recent years, I had to get the list of academic siblings from my advisor's CV and, for his advisor, from the Caltech thesis archive.
+I don't know how many are missing in previous years.</p>
+</article>
+
+<nav class="post-nav" aria-label="Post navigation">
+  <span class="post-nav-link post-nav-empty"></span>
+  <a class="post-nav-link post-nav-next" href="red-blood-cells.html"><span class="post-nav-dir">Older →</span><span class="post-nav-title">Red Blood Cell Dynamics and Microscopy</span></a>
+</nav>
+
+</main>
+
+
+<footer class="site-footer">
+  <p>&copy; 2026 Lucas Amoudruz &nbsp;&nbsp;|&nbsp;&nbsp; <a href="../feed.xml">Subscribe (RSS)</a></p>
+</footer>
+
+</body>
+</html>

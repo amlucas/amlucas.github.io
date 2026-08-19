@@ -1,0 +1,263 @@
+/* Academic-genealogy viewer (js/genealogy.js). Linked, together with the
+   script, only on pages that embed a {{genealogy(...)}} directive. Uses the
+   custom properties from main.css, which loads first on every page. */
+
+.genealogy {
+  position: relative;
+  min-height: 120px;
+  font-family: var(--font-ui);
+}
+
+.genealogy svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.genealogy-status {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+/* --- nodes --- */
+
+.genealogy .gspine circle {
+  fill: white;
+  stroke: var(--color-accent);
+  stroke-width: 2;
+}
+
+.genealogy .groot circle {
+  fill: var(--color-accent);
+}
+
+.genealogy .gspine,
+.genealogy .gsib {
+  cursor: pointer;
+  outline: none;
+}
+
+.genealogy .gspine:hover circle,
+.genealogy .gspine:focus-visible circle {
+  fill: var(--color-accent-wash-strong);
+}
+
+.genealogy .groot:hover circle,
+.genealogy .groot:focus-visible circle {
+  fill: var(--color-accent-hover);
+}
+
+.genealogy .gsib circle {
+  fill: var(--color-border);
+}
+
+.genealogy .gsib:hover circle,
+.genealogy .gsib:focus-visible circle {
+  fill: var(--color-accent);
+}
+
+/* --- text --- */
+
+.genealogy .gname {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 600;
+  fill: var(--color-text);
+}
+
+.genealogy .gyear {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  fill: var(--color-text-muted);
+}
+
+.genealogy .glabel {
+  font-family: var(--font-ui);
+  font-size: 11.5px;
+  fill: var(--color-text-muted);
+}
+
+.genealogy .gsib:hover .glabel {
+  fill: var(--color-accent);
+}
+
+/* --- edges --- */
+
+.genealogy .gedge {
+  fill: none;
+  stroke: var(--color-border);
+  stroke-width: 1.5;
+}
+
+.genealogy .gcoadv {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+  opacity: 0.5;
+}
+
+/* --- map ({{genealogy_map(...)}}) --- */
+
+.genealogy .gmap-land {
+  fill: var(--color-surface);
+  stroke: var(--color-border-muted);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.genealogy .gmap-edge,
+.genealogy .gmap-frame {
+  fill: none;
+  stroke: var(--color-border);
+  vector-effect: non-scaling-stroke;
+}
+
+.genealogy .gmap-edge {
+  stroke: var(--color-border-muted);
+}
+
+.genealogy .gmap-panel {
+  fill: white;
+  stroke: var(--color-border);
+  vector-effect: non-scaling-stroke;
+}
+
+.genealogy .gmap-connect {
+  fill: none;
+  stroke: var(--color-border-muted);
+  stroke-dasharray: 2 3;
+}
+
+.genealogy .gmap-spine {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 1.75;
+  opacity: 0.9;
+}
+
+.genealogy .gmap-sib {
+  fill: none;
+  stroke: var(--color-border);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+}
+
+.genealogy .gmap-place {
+  cursor: pointer;
+  outline: none;
+}
+
+.genealogy .gmap-place circle {
+  fill: white;
+  stroke: var(--color-accent);
+  stroke-width: 2;
+}
+
+.genealogy .gmap-place:hover circle,
+.genealogy .gmap-place:focus-visible circle {
+  fill: var(--color-accent-wash-strong);
+}
+
+.genealogy .gmap-place.groot circle {
+  fill: var(--color-accent);
+}
+
+.genealogy .gmap-sec circle {
+  fill: var(--color-border);
+  stroke: none;
+}
+
+.genealogy .gmap-sec:hover circle,
+.genealogy .gmap-sec:focus-visible circle {
+  fill: var(--color-accent);
+}
+
+.genealogy .gmap-mini {
+  cursor: default;
+}
+
+.genealogy .gmap-mini circle {
+  fill: var(--color-text-muted);
+  stroke: none;
+}
+
+.genealogy .gplace {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 600;
+  fill: var(--color-text);
+}
+
+.genealogy .gmap-cross {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 12.5px;
+  fill: var(--color-text-muted);
+}
+
+.genealogy .gmap-leader {
+  fill: none;
+  stroke: var(--color-border);
+  stroke-width: 1;
+}
+
+.genealogy .glegend-dot {
+  fill: white;
+  stroke: var(--color-accent);
+  stroke-width: 2;
+}
+
+/* --- arrowheads: open chevrons, stroked like the lines they cap --- */
+
+.genealogy .gmark,
+.genealogy .gmark-acc {
+  fill: none;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.genealogy .gmark {
+  stroke: var(--color-border);
+}
+
+.genealogy .gmark-acc {
+  stroke: var(--color-accent);
+}
+
+/* --- detail card --- */
+
+.genealogy-card {
+  display: none;
+  position: absolute;
+  z-index: 10;
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+  padding: 0.55rem 0.75rem;
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: var(--color-text);
+  /* Hover cards must not steal the pointer from the nodes beneath them; a
+     pinned card regains it so its link is clickable. */
+  pointer-events: none;
+}
+
+.genealogy-card.pinned {
+  pointer-events: auto;
+}
+
+.genealogy-card .gcard-meta {
+  color: var(--color-text-muted);
+}
+
+.genealogy-card .gcard-thesis {
+  font-family: var(--font-serif);
+}
