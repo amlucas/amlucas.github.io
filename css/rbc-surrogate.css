@@ -1,0 +1,127 @@
+/* The live tank-treading surrogate (js/rbc-surrogate.js). Loaded next to
+   css/mesh-anim.css, whose container, canvas, control bar and full-screen rules
+   this viewer reuses: only the parts that are specific to running a model --
+   the condition sliders and the readout -- live here. Relies on the custom
+   properties defined in main.css, which every page loads first. */
+
+/* Quantities under the canvas: what the model was asked and what it answered.
+   A fixed min-height keeps the figure from jumping when the first frame lands,
+   and tabular numerals keep the values from shuffling as they change. */
+.rbc-readout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 0.9rem;
+  min-height: 1.5rem;
+  padding: 0.4rem 0.6rem 0.15rem;
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text);
+}
+
+.rbc-quantity {
+  white-space: nowrap;
+}
+
+/* The symbol, not the value: muted so the numbers read first. */
+.rbc-quantity i {
+  font-style: normal;
+  color: var(--color-text-muted);
+}
+
+.rbc-warn {
+  color: var(--color-accent);
+  font-weight: 500;
+}
+
+/* The two flow conditions. One row per condition on a wide figure, stacked on
+   a narrow one, with the name in a fixed column so the tracks line up. */
+.rbc-conditions {
+  padding: 0.5rem 0.7rem 0.6rem;
+  border-top: 1px solid var(--color-border-muted);
+  background: var(--color-surface-2);
+}
+
+/* Each row carries its own two-column grid with the same fixed first column,
+   so the two tracks line up without a subgrid. */
+.rbc-condition {
+  display: grid;
+  grid-template-columns: 1.7rem 1fr;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+}
+
+.rbc-condition-name {
+  font-family: var(--font-ui);
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+/* The band under the track is a sibling of the input rather than a background
+   on it: a native range input paints its own track over anything behind it,
+   and keeping the input native is what preserves accent-color and the
+   platform's own handle. */
+.rbc-slider-wrap {
+  position: relative;
+  display: block;
+  padding-bottom: 0.35rem;
+}
+
+.rbc-slider {
+  display: block;
+  width: 100%;
+  margin: 0;
+  accent-color: var(--color-accent);
+}
+
+/* Where the surrogate was trained: outside it the readout says so. The stops
+   come from the blob's own domain, set on the wrapper by the viewer. */
+.rbc-band {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0.1rem;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(to right,
+    transparent 0 var(--in-start, 0%),
+    var(--color-accent-wash-strong) var(--in-start, 0%) var(--in-end, 100%),
+    transparent var(--in-end, 100%) 100%);
+}
+
+.rbc-note {
+  margin: 0.1rem 0 0;
+  font-family: var(--font-ui);
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+}
+
+/* Outside the trained box the whole figure is flagged, not just the readout:
+   the shape is still a prediction, but not one anything was validated on. */
+.rbc-surrogate.is-extrapolating .rbc-readout {
+  background: var(--color-accent-wash);
+}
+
+.rbc-reset {
+  font: inherit;
+  flex: 0 0 auto;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.85rem;
+  color: var(--color-text);
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.rbc-reset:hover {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+/* Full screen: the canvas takes what the readout and the two panels leave. */
+.mesh-anim.is-fullscreen .rbc-conditions,
+.mesh-anim.is-fullscreen .rbc-readout {
+  flex: 0 0 auto;
+}

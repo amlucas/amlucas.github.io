@@ -1,0 +1,113 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Surrogate Model of a Tank-Treading Red Blood Cell – Lucas Amoudruz</title>
+  <link rel="icon" href="../favicon.ico" sizes="any" />
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
+  <meta name="description" content="" />
+  <link rel="canonical" href="https://lucasamoudruz.com/research/rbc-surrogate.html" />
+  <meta property="og:site_name" content="Lucas Amoudruz" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Surrogate Model of a Tank-Treading Red Blood Cell" />
+  <meta property="og:description" content="" />
+  <meta property="og:url" content="https://lucasamoudruz.com/research/rbc-surrogate.html" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Surrogate Model of a Tank-Treading Red Blood Cell" />
+  <meta name="twitter:description" content="" />
+  <link rel="stylesheet" href="../css/main.css" />
+  <link rel="stylesheet" href="../css/codehilite.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;500;600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-5XKH0GTGGB"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-5XKH0GTGGB');
+  </script>
+  <link rel="stylesheet" href="../css/mesh-anim.css" />
+  <link rel="stylesheet" href="../css/rbc-surrogate.css" />
+  <script src="../js/mesh-view.js" defer></script>
+  <script src="../js/rbc-surrogate.js" defer></script>
+  <script>
+    MathJax = {
+      options: {
+        renderActions: {
+          find: [10, function (doc) {
+            for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+              const display = node.type.indexOf('display') >= 0;
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.insertBefore(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end   = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            }
+          }, '']
+        }
+      }
+    };
+  </script>
+  <script src="../mathjax/tex-chtml.min.js"></script>
+</head>
+<body>
+
+
+
+
+<main>
+
+<article class="markdown-body blog-body">
+  <h1 id="surrogate-model-of-a-tank-treading-red-blood-cell">Surrogate Model of a Tank-Treading Red Blood Cell</h1>
+<figure class="image-wrap image-center" style="width: 100%;">
+<div class="mesh-anim rbc-surrogate" data-src="../images/research/rbc-surrogate/surrogate.bin">
+  <canvas class="mesh-anim-canvas"></canvas>
+  <div class="rbc-readout"></div>
+  <div class="mesh-anim-controls">
+    <button type="button" class="mesh-anim-play" disabled>Pause</button>
+    <input type="range" class="mesh-anim-slider" min="0" max="0" value="0"
+           step="1" disabled aria-label="time in shear times" />
+    <button type="button" class="rbc-reset">Reset</button>
+  </div>
+  <div class="rbc-conditions">
+    <label class="rbc-condition">
+      <span class="rbc-condition-name">Ca</span>
+      <span class="rbc-slider-wrap">
+        <input type="range" class="rbc-slider" data-param="ca"
+               min="0" max="1000" value="500" step="1" aria-label="capillary number" />
+        <span class="rbc-band"></span>
+      </span>
+    </label>
+    <label class="rbc-condition">
+      <span class="rbc-condition-name">&lambda;</span>
+      <span class="rbc-slider-wrap">
+        <input type="range" class="rbc-slider" data-param="lam"
+               min="0" max="1000" value="500" step="1" aria-label="viscosity ratio" />
+        <span class="rbc-band"></span>
+      </span>
+    </label>
+    <p class="rbc-note">Shaded: the range of flow conditions the surrogate was
+    trained on. Outside it the shape is an extrapolation.</p>
+  </div>
+  <div class="mesh-anim-status">Loading…</div>
+</div>
+<figcaption class="image-caption">Surrogate, evaluated live. Slide the capillary number Ca  and the viscosity ratio <script type="math/tex">\lambda</script> to change flow conditions.</figcaption>
+</figure>
+</article>
+
+</main>
+
+
+<footer class="site-footer">
+  <p>&copy; 2026 Lucas Amoudruz</p>
+</footer>
+
+</body>
+</html>
