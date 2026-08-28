@@ -39,6 +39,7 @@
   const SPEED = 5;
 
   const HEADER_BYTES = 128;      // '<4s10I21f', see numpy_surrogate.py
+  const FORMAT_VERSION = 2;      // must match numpy_surrogate.VERSION
 
   // --- float16 --------------------------------------------------------------
 
@@ -137,9 +138,13 @@
     const dv = new DataView(buf);
     const magic = String.fromCharCode(dv.getUint8(0), dv.getUint8(1),
                                       dv.getUint8(2), dv.getUint8(3));
-    if (magic !== 'RBCS') throw new Error(`${url}: bad magic ${magic}`);
+    // No url here: parseModel is handed bytes, wherever they came from.
+    if (magic !== 'RBCS') throw new Error(`surrogate blob: bad magic ${magic}`);
     const version = dv.getUint32(4, true);
-    if (version !== 1) throw new Error(`${url}: version ${version}`);
+    if (version !== FORMAT_VERSION) {
+      throw new Error(`surrogate blob: format version ${version}, this viewer `
+                      + `reads ${FORMAT_VERSION}`);
+    }
 
     const nVerts = dv.getUint32(8, true);
     const nFaces = dv.getUint32(12, true);
@@ -186,6 +191,25 @@
       off += 12 * nVerts;
     }
 
+    // Where the model works, and where its training cases are: the picture
+    // the 2D control draws under the handle.
+    const rnx = dv.getUint32(off, true);
+    const rny = dv.getUint32(off + 4, true);
+    const rlo = dv.getFloat32(off + 8, true);
+    const rhi = dv.getFloat32(off + 12, true);
+    off += 16;
+    let region = null;
+    if (rnx) {
+      region = { nx: rnx, ny: rny, lo: rlo, hi: rhi,
+                 drift: new Uint8Array(buf, off, rnx * rny) };
+      off += rnx * rny;
+      off += off % 4 ? 4 - (off % 4) : 0;
+    }
+    const nCases = dv.getUint32(off, true);
+    off += 4;
+    const cases = new Float32Array(buf, off, 2 * nCases);
+    off += 8 * nCases;
+
     const nPairs = z / 2;
     const logCa = !!(flags & 1);
     const condDecoder = !!(flags & 2);
@@ -202,7 +226,8 @@
 
     const model = {
       nVerts, nFaces, faces, z, nPairs, pair, dt, sigma, a0, v0, mu, zEq,
-      domain, span, phys, driftMax, logCa, condDecoder, golden, decoder, head,
+      domain, span, phys, driftMax, region, cases, logCa, condDecoder,
+      golden, decoder, head,
       params: { omega, decay, rStar },
 
       // (Ca, lambda) -> standardized conditions. Whether Ca enters as its
@@ -346,31 +371,217 @@
     return r;
   }
 
-  // --- sliders --------------------------------------------------------------
+  // --- the condition pad ----------------------------------------------------
 
-  // Both conditions were sampled logarithmically, so the slider is
-  // logarithmic too; 1000 steps is finer than the model's own resolution.
-  const STEPS = 1000;
-  const fromSlider = (v, lo, hi) => lo * Math.pow(hi / lo, v / STEPS);
-  const toSlider = (x, lo, hi) => Math.round(
-    STEPS * Math.log(x / lo) / Math.log(hi / lo));
+  // Both conditions were sampled logarithmically and both span more than a
+  // decade, so the pad is log-log in (Ca, lambda).
+  const LOG = {
+    to: (v, lo, hi) => Math.log(v / lo) / Math.log(hi / lo),
+    from: (f, lo, hi) => lo * Math.pow(hi / lo, f),
+  };
 
-  // Shade the part of the track the model was actually trained on. The reader
-  // can leave it -- the readout says so -- but should be able to see where the
-  // edge is without moving the handle. The stops go on the wrapper, because the
-  // band that reads them is the input's sibling and custom properties only
-  // travel downwards.
-  function trackShading(el, lo, hi, inLo, inHi) {
-    // Clamped, because the training range can reach past the slider: the
-    // sliders stop where the model stops producing physical shapes, which on
-    // one axis is inside the data's own spread.
-    const at = (x) => Math.min(100, Math.max(0,
-      100 * Math.log(x / lo) / Math.log(hi / lo)));
-    const a = at(inLo);
-    const b = at(inHi);
-    const target = el.parentElement || el;
-    target.style.setProperty('--in-start', `${a.toFixed(2)}%`);
-    target.style.setProperty('--in-end', `${b.toFixed(2)}%`);
+  // Nice round values inside a range, for the axis ticks.
+  function ticks(lo, hi) {
+    const out = [];
+    for (const m of [1, 2, 5]) {
+      for (let e = -3; e <= 2; e++) {
+        const v = m * Math.pow(10, e);
+        if (v > lo * 1.08 && v < hi / 1.08) out.push(v);
+      }
+    }
+    return out.sort((a, b) => a - b);
+  }
+
+  const tickLabel = (v) => (v >= 1 ? String(v) : String(v).replace(/^0/, ''));
+
+  // The drift map as a tiny image, one pixel per grid point, later scaled up
+  // with the browser's own smoothing: the field is smooth, and drawing a
+  // contour would claim more precision than a 41x41 scan has.
+  function regionImage(model) {
+    const r = model.region;
+    if (!r) return null;
+    const c = document.createElement('canvas');
+    c.width = r.nx;
+    c.height = r.ny;
+    const ctx = c.getContext('2d');
+    const img = ctx.createImageData(r.nx, r.ny);
+    const scale = Math.log(r.hi / r.lo);
+    for (let iy = 0; iy < r.ny; iy++) {
+      for (let ix = 0; ix < r.nx; ix++) {
+        // The row order is bottom-up in lambda; canvas rows run top-down.
+        const q = r.drift[(r.ny - 1 - iy) * r.nx + ix];
+        const drift = r.lo * Math.exp((q / 255) * scale);
+        // Two steps rather than a ramp, so the boundary the exporter measured
+        // stays visible instead of dissolving into a gradient.
+        const alpha = drift <= model.driftMax ? 0.30
+          : (drift <= 3 * model.driftMax ? 0.12 : 0.0);
+        const at = 4 * (iy * r.nx + ix);
+        img.data[at] = 43;
+        img.data[at + 1] = 108;
+        img.data[at + 2] = 176;
+        img.data[at + 3] = Math.round(255 * alpha);
+      }
+    }
+    ctx.putImageData(img, 0, 0);
+    return c;
+  }
+
+  // opts: { canvas, model, get: () => [ca, lam], set: (ca, lam) => void }
+  function conditionPad(opts) {
+    const { canvas, model } = opts;
+    const ctx = canvas.getContext('2d');
+    const image = regionImage(model);
+    const css = getComputedStyle(document.documentElement);
+    const colour = (name, fallback) =>
+      (css.getPropertyValue(name).trim() || fallback);
+    const ACCENT = colour('--color-accent', '#2b6cb0');
+    const MUTED = colour('--color-text-muted', '#59636e');
+    const BORDER = colour('--color-border', '#d1d9e0');
+    const { caLo, caHi, lamLo, lamHi } = model.span;
+    // Room for the axis labels, in CSS pixels.
+    const PAD = { l: 34, r: 10, t: 8, b: 20 };
+
+    function box() {
+      const w = canvas.clientWidth;
+      const h = canvas.clientHeight;
+      return { x: PAD.l, y: PAD.t,
+               w: Math.max(1, w - PAD.l - PAD.r),
+               h: Math.max(1, h - PAD.t - PAD.b) };
+    }
+
+    function toPixels(ca, lam) {
+      const b = box();
+      return [b.x + b.w * LOG.to(ca, caLo, caHi),
+              b.y + b.h * (1 - LOG.to(lam, lamLo, lamHi))];
+    }
+
+    function fromPixels(px, py) {
+      const b = box();
+      const fx = Math.min(1, Math.max(0, (px - b.x) / b.w));
+      const fy = Math.min(1, Math.max(0, 1 - (py - b.y) / b.h));
+      return [LOG.from(fx, caLo, caHi), LOG.from(fy, lamLo, lamHi)];
+    }
+
+    function draw() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const w = Math.round(canvas.clientWidth * dpr);
+      const h = Math.round(canvas.clientHeight * dpr);
+      if (canvas.width !== w || canvas.height !== h) {
+        canvas.width = w;
+        canvas.height = h;
+      }
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+      const b = box();
+
+      if (image) {
+        ctx.imageSmoothingEnabled = true;
+        // Half a grid cell of bleed on each side: the stored values sit at
+        // cell centres, and drawing them corner-to-corner would shift the
+        // boundary inward by half a cell.
+        const dx = b.w / (model.region.nx - 1) / 2;
+        const dy = b.h / (model.region.ny - 1) / 2;
+        ctx.drawImage(image, b.x - dx, b.y - dy, b.w + 2 * dx, b.h + 2 * dy);
+      }
+
+      // The training cases themselves, which is what the region approximates.
+      ctx.fillStyle = ACCENT;
+      ctx.globalAlpha = 0.5;
+      for (let i = 0; i < model.cases.length; i += 2) {
+        const [px, py] = toPixels(model.cases[i], model.cases[i + 1]);
+        if (px < b.x - 2 || px > b.x + b.w + 2) continue;
+        ctx.beginPath();
+        ctx.arc(px, py, 1.4, 0, 2 * Math.PI);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+
+      ctx.strokeStyle = BORDER;
+      ctx.lineWidth = 1;
+      ctx.strokeRect(b.x + 0.5, b.y + 0.5, b.w - 1, b.h - 1);
+
+      ctx.fillStyle = MUTED;
+      ctx.font = '10px ' + (colour('--font-ui', 'sans-serif').split(',')[0]);
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      for (const v of ticks(caLo, caHi)) {
+        const [px] = toPixels(v, lamLo);
+        ctx.fillText(tickLabel(v), px, b.y + b.h + 4);
+      }
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      for (const v of ticks(lamLo, lamHi)) {
+        const [, py] = toPixels(caLo, v);
+        ctx.fillText(tickLabel(v), b.x - 5, py);
+      }
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+      ctx.fillText('Ca', b.x + b.w / 2, canvas.clientHeight);
+      ctx.save();
+      ctx.translate(9, b.y + b.h / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.textBaseline = 'top';
+      ctx.fillText('\u03bb', 0, 0);
+      ctx.restore();
+
+      // The handle, with hairlines to the axes so the values can be read off.
+      const [ca, lam] = opts.get();
+      const [hx, hy] = toPixels(ca, lam);
+      ctx.strokeStyle = ACCENT;
+      ctx.globalAlpha = 0.35;
+      ctx.beginPath();
+      ctx.moveTo(b.x, hy);
+      ctx.lineTo(hx, hy);
+      ctx.moveTo(hx, b.y + b.h);
+      ctx.lineTo(hx, hy);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+      ctx.beginPath();
+      ctx.arc(hx, hy, 5.5, 0, 2 * Math.PI);
+      ctx.fillStyle = '#fff';
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    const put = (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const [ca, lam] = fromPixels(e.clientX - rect.left, e.clientY - rect.top);
+      opts.set(ca, lam);
+    };
+
+    canvas.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      canvas.focus();
+      try { canvas.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+      put(e);
+    });
+    canvas.addEventListener('pointermove', (e) => {
+      if (canvas.hasPointerCapture && canvas.hasPointerCapture(e.pointerId)) {
+        put(e);
+      }
+    });
+
+    // Keyboard, because a canvas the mouse drives is otherwise unreachable:
+    // one step is a sixtieth of the range in log space, ten with shift.
+    canvas.addEventListener('keydown', (e) => {
+      const step = (e.shiftKey ? 10 : 1) / 60;
+      const dirs = { ArrowLeft: [-step, 0], ArrowRight: [step, 0],
+                     ArrowDown: [0, -step], ArrowUp: [0, step] };
+      const d = dirs[e.key];
+      if (!d) return;
+      e.preventDefault();
+      const [ca, lam] = opts.get();
+      opts.set(
+        LOG.from(Math.min(1, Math.max(0, LOG.to(ca, caLo, caHi) + d[0])),
+                 caLo, caHi),
+        LOG.from(Math.min(1, Math.max(0, LOG.to(lam, lamLo, lamHi) + d[1])),
+                 lamLo, lamHi));
+    });
+
+    if ('ResizeObserver' in window) new ResizeObserver(draw).observe(canvas);
+    else window.addEventListener('resize', draw);
+    return { draw };
   }
 
   // --- viewer ---------------------------------------------------------------
@@ -381,8 +592,7 @@
     const play = root.querySelector('.mesh-anim-play');
     const timeSlider = root.querySelector('.mesh-anim-slider');
     const reset = root.querySelector('.rbc-reset');
-    const caSlider = root.querySelector('.rbc-slider[data-param="ca"]');
-    const lamSlider = root.querySelector('.rbc-slider[data-param="lam"]');
+    const padCanvas = root.querySelector('.rbc-pad');
     const readout = root.querySelector('.rbc-readout');
     const say = (msg) => { if (status) status.textContent = msg; };
 
@@ -416,15 +626,6 @@
         onVisibility: (visible) => { if (!visible) last = 0; },
       });
 
-      caSlider.max = String(STEPS);
-      lamSlider.max = String(STEPS);
-      caSlider.value = String(toSlider(ca, model.span.caLo, model.span.caHi));
-      lamSlider.value = String(toSlider(lam, model.span.lamLo,
-                                        model.span.lamHi));
-      trackShading(caSlider, model.span.caLo, model.span.caHi,
-                   model.domain.caLo, model.domain.caHi);
-      trackShading(lamSlider, model.span.lamLo, model.span.lamHi,
-                   model.domain.lamLo, model.domain.lamHi);
       timeSlider.max = String(Math.round(T_MAX / model.dt));
       timeSlider.disabled = false;
       play.disabled = false;
@@ -481,16 +682,22 @@
         stale = true;
       }
 
-      caSlider.addEventListener('input', () => {
-        ca = fromSlider(Number(caSlider.value), model.span.caLo,
-                        model.span.caHi);
-        handoff();
+      // One handle in the (Ca, lambda) plane rather than two tracks: the set
+      // of conditions the model reproduces is not a rectangle, so a pair of
+      // sliders can only shade a box around it and hope. The pad draws the
+      // measured region and the training cases underneath the handle.
+      const pad = conditionPad({
+        canvas: padCanvas, model,
+        get: () => [ca, lam],
+        set: (nextCa, nextLam) => {
+          ca = nextCa;
+          lam = nextLam;
+          handoff();
+          pad.draw();
+        },
       });
-      lamSlider.addEventListener('input', () => {
-        lam = fromSlider(Number(lamSlider.value), model.span.lamLo,
-                         model.span.lamHi);
-        handoff();
-      });
+      pad.draw();
+
       timeSlider.addEventListener('input', () => {
         t = Number(timeSlider.value) * model.dt;
         playing = false;

@@ -42,59 +42,25 @@
   background: var(--color-surface-2);
 }
 
-/* Each row carries its own two-column grid with the same fixed first column,
-   so the two tracks line up without a subgrid. */
-.rbc-condition {
-  display: grid;
-  grid-template-columns: 1.7rem 1fr;
-  align-items: center;
-  gap: 0.6rem;
-  cursor: pointer;
-}
-
-.rbc-condition-name {
-  font-family: var(--font-ui);
-  font-size: 0.85rem;
-  color: var(--color-text-muted);
-}
-
-/* The band under the track is a sibling of the input rather than a background
-   on it: a native range input paints its own track over anything behind it,
-   and keeping the input native is what preserves accent-color and the
-   platform's own handle. */
-.rbc-slider-wrap {
-  position: relative;
-  display: block;
-  padding-bottom: 0.35rem;
-}
-
-.rbc-slider {
+/* The (Ca, lambda) plane, drawn by the viewer: the measured region where the
+   model works, the training cases as dots, and one draggable handle. Focusable
+   because a canvas is otherwise unreachable without a pointer. */
+.rbc-pad {
   display: block;
   width: 100%;
-  margin: 0;
-  accent-color: var(--color-accent);
+  /* Both axes are logarithmic and span about a decade, so the region is
+     roughly square in the coordinates that matter; a full-width pad under a
+     wide figure would squash it. */
+  max-width: 380px;
+  margin: 0 auto;
+  aspect-ratio: 4 / 3;
+  touch-action: none;
+  cursor: crosshair;
 }
 
-/* Where the surrogate was trained: outside it the readout says so. The stops
-   come from the blob's own domain, set on the wrapper by the viewer. */
-.rbc-band {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0.1rem;
-  height: 3px;
-  border-radius: 2px;
-  background: linear-gradient(to right,
-    transparent 0 var(--in-start, 0%),
-    var(--color-accent-wash-strong) var(--in-start, 0%) var(--in-end, 100%),
-    transparent var(--in-end, 100%) 100%);
-}
-
-.rbc-note {
-  margin: 0.1rem 0 0;
-  font-family: var(--font-ui);
-  font-size: 0.72rem;
-  color: var(--color-text-muted);
+.rbc-pad:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 /* Outside the trained box the whole figure is flagged, not just the readout:

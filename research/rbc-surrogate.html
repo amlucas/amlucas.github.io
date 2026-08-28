@@ -77,28 +77,14 @@
     <button type="button" class="rbc-reset">Reset</button>
   </div>
   <div class="rbc-conditions">
-    <label class="rbc-condition">
-      <span class="rbc-condition-name">Ca</span>
-      <span class="rbc-slider-wrap">
-        <input type="range" class="rbc-slider" data-param="ca"
-               min="0" max="1000" value="500" step="1" aria-label="capillary number" />
-        <span class="rbc-band"></span>
-      </span>
-    </label>
-    <label class="rbc-condition">
-      <span class="rbc-condition-name">&lambda;</span>
-      <span class="rbc-slider-wrap">
-        <input type="range" class="rbc-slider" data-param="lam"
-               min="0" max="1000" value="500" step="1" aria-label="viscosity ratio" />
-        <span class="rbc-band"></span>
-      </span>
-    </label>
-    <p class="rbc-note">Shaded: the range of flow conditions the surrogate was
-    trained on. Outside it the shape is an extrapolation.</p>
+    <canvas class="rbc-pad" tabindex="0" role="group"
+            aria-label="flow conditions: capillary number and viscosity ratio;
+                        drag the handle, or use the arrow keys"></canvas>
   </div>
   <div class="mesh-anim-status">Loading…</div>
 </div>
-<figcaption class="image-caption">Surrogate, evaluated live. Slide the capillary number Ca  and the viscosity ratio <script type="math/tex">\lambda</script> to change flow conditions.</figcaption>
+<figcaption class="image-caption">Surrogate, evaluated live. Slide the point to change flow conditions (capillary number Ca and viscosity ratio <span style="white-space: nowrap;"><script type="math/tex">\lambda</script>).</span> 
+Dots are training set, shaded area is where the surrogates reproduces experiments.</figcaption>
 </figure>
 </article>
 
