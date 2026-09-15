@@ -66,6 +66,43 @@
 
 <article class="markdown-body blog-body">
   <h1 id="surrogate-model-of-a-tank-treading-red-blood-cell">Surrogate Model of a Tank-Treading Red Blood Cell</h1>
+<p>In a constant shear flow, tank-treading red blood cells (RBCs) move periodically in time.
+The membrane rolls like a tank tread around a nearly steady shape whose orientation oscillates.
+Both the shape and the orientation depend on the flow conditions: the shear rate <script type="math/tex">\dot{\gamma}</script> and the viscosity of the suspending medium, <script type="math/tex">\eta_\textrm{out}</script>.
+These conditions are conveniently described by two dimensionless numbers, the <em>capillary number</em> and the <em>viscosity contrast</em>:
+<script type="math/tex; mode=display">
+\mathrm{Ca} = \frac{\eta_\textrm{out} \dot{\gamma} a}{\mu}, \quad \quad \lambda = \frac{\eta_\textrm{in}}{\eta_\textrm{out}},
+</script>
+where <script type="math/tex">a</script> is the radius of a sphere having the same area as the membrane, <script type="math/tex">\mu</script> is the shear elasticity of the membrane, and <script type="math/tex">\eta_\textrm{in}</script> is the viscosity of the fluid inside the cell.</p>
+<p>Based on these two observations (the motion of the membrane is periodic, and it depends on Ca and <script type="math/tex">\lambda</script>), we can look for a reduced-order model in which a low-dimensional latent state carries the periodic motion, while the flow conditions
+<script type="math/tex; mode=display">
+c = \left(\log \mathrm{Ca}, \; \log \lambda\right)
+</script>
+only set the parameters of that motion:
+<script type="math/tex; mode=display">
+z = E(X), \quad X = D(z, c),
+</script>
+where <script type="math/tex">X</script> are the positions of the membrane vertices, <script type="math/tex">z \in \mathbb{R}^{2K}</script> is the latent state, and <script type="math/tex">E</script> and <script type="math/tex">D</script> are an encoder and a decoder, respectively.</p>
+<p>The latent state is split into <script type="math/tex">K</script> pairs, each read as a complex amplitude <script type="math/tex">z_k = r_k e^{i \theta_k}</script> and evolved as a Stuart-Landau oscillator, with the amplitude equation linearized about its limit cycle:
+<script type="math/tex; mode=display">
+\dot{r}_k = -\mu_k \left(r_k - r_k^\star\right), \quad \quad \dot{\theta}_k = \omega_k.
+</script>
+The phase therefore turns at a constant rate <script type="math/tex">\omega_k</script>, while the amplitude relaxes at a rate <script type="math/tex">\mu_k</script> onto a limit cycle of radius <script type="math/tex">r_k^\star</script>.
+The flow enters only through these parameters, which a small network <script type="math/tex">H</script> predicts from the conditions:
+<script type="math/tex; mode=display">
+\left(\omega_k, \mu_k, r_k^\star\right)_{k=1}^{K} = H(c),
+</script>
+a softplus being applied to <script type="math/tex">\mu_k</script> and <script type="math/tex">r_k^\star</script> so that the relaxation rate and the limit-cycle radius stay positive.</p>
+<p>Both equations integrate in closed form,
+<script type="math/tex; mode=display">
+r_k(t) = r_k^\star + \left(r_k(0) - r_k^\star\right) e^{-\mu_k t}, \quad \quad \theta_k(t) = \theta_k(0) + \omega_k t,
+</script>
+so the state at any time follows directly from the initial state, without time stepping and without anything accumulating over a long rollout.</p>
+<p>I generated many trajectories <script type="math/tex">X</script>, each lasting 500 shear times, over a wide range of flow conditions.
+These trajectories were then used to train the auto-encoder <script type="math/tex">(E, D)</script> together with the network <script type="math/tex">H</script>, all parameterized as multi-layer perceptrons.
+The model shown below uses <script type="math/tex">K = 4</script> oscillators, that is an eight-dimensional latent state.</p>
+<p>Evaluating the surrogate is then cheap: the latent state at time <script type="math/tex">t</script> costs a handful of exponentials and sines, and the shape is a single decoder pass.
+Simulating an RBC in a given flow is therefore fast enough to run live, as demonstrated by the real-time evaluator below:</p>
 <figure class="image-wrap image-center" style="width: 100%;">
 <div class="mesh-anim rbc-surrogate" data-src="../images/research/rbc-surrogate/surrogate.bin">
   <canvas class="mesh-anim-canvas"></canvas>
@@ -83,8 +120,8 @@
   </div>
   <div class="mesh-anim-status">Loading…</div>
 </div>
-<figcaption class="image-caption">Surrogate, evaluated live. Slide the point to change flow conditions (capillary number Ca and viscosity ratio <span style="white-space: nowrap;"><script type="math/tex">\lambda</script>).</span> 
-Dots are training set, shaded area is where the surrogates reproduces experiments.</figcaption>
+<figcaption class="image-caption">Surrogate, evaluated live. Drag the point to change the flow conditions (capillary number Ca and viscosity ratio <span style="white-space: nowrap;"><script type="math/tex">\lambda</script>).</span> 
+Dots are the training cases; the shaded area is where the surrogate reproduces the simulations.</figcaption>
 </figure>
 </article>
 
