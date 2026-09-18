@@ -36,6 +36,7 @@
   <script src="../js/toc.js" defer></script>
   <script>
     MathJax = {
+      tex: { tags: 'ams' },
       options: {
         renderActions: {
           find: [10, function (doc) {
@@ -707,6 +708,7 @@ This function handles parsing custom image blocks and turns them into proper HTM
 <span class="si">{</span><span class="n">plotly_tag</span><span class="si">}</span>
 <span class="s2">  &lt;script&gt;</span>
 <span class="s2">    MathJax = </span><span class="se">{{</span>
+<span class="s2">      tex: </span><span class="se">{{</span><span class="s2"> tags: &#39;ams&#39; </span><span class="se">}}</span><span class="s2">,</span>
 <span class="s2">      options: </span><span class="se">{{</span>
 <span class="s2">        renderActions: </span><span class="se">{{</span>
 <span class="s2">          find: [10, function (doc) </span><span class="se">{{</span>
