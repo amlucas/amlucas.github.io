@@ -79,7 +79,7 @@
 <article class="markdown-body blog-body">
   <h1 id="a-heated-rod-from-physics-to-gaussian-process-regression">A heated rod: from physics to Gaussian process regression</h1>
 <p>September 18, 2026</p>
-<p>A few years ago, my former colleague <a href="https://pkarnakov.com">Petr</a> developed a method for solving PDE-based inverse problems, which he called optimization of a discrete loss (ODIL)<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup>.
+<p>A few years ago, my colleagues <a href="https://pkarnakov.com">Petr</a> and <a href="https://slitvinov.com">Sergey</a> developed a method for solving PDE-based inverse problems, which they called optimization of a discrete loss (ODIL)<sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup>.
 It can reconstruct fields from sparse data by minimizing residuals of the discretized PDE together with a mean square loss on the data.</p>
 <p>In practice, measurements are noisy.
 This led me to develop a Bayesian extension of the method, named BODIL<sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup>.
@@ -89,7 +89,7 @@ To understand this link in more detail, I decided to apply BODIL to a physical s
 <p>Let's start with a physical system: a thin rod, heated with a source.
 What is the temperature along the rod?</p>
 <figure class="image-wrap image-center" style="width: 75%;">
-  <img width="1400" height="788" loading="lazy" src="../images/blog/heat-gp/rod.jpg" alt="A thin rod heated by a burner, with thermocouples measuring its temperature at a few points.">
+  <img loading="lazy" src="../images/blog/heat-gp/rod.jpg" alt="A thin rod heated by a burner, with thermocouples measuring its temperature at a few points.">
   <figcaption class="image-caption">A thin rod heated by a burner, with thermocouples measuring its temperature at a few points.</figcaption>
 </figure>
 
