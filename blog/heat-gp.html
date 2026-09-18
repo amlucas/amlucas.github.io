@@ -89,7 +89,7 @@ To understand this link in more detail, I decided to apply BODIL to a physical s
 <p>Let's start with a physical system: a thin rod, heated with a source.
 What is the temperature along the rod?</p>
 <figure class="image-wrap image-center" style="width: 75%;">
-  <img loading="lazy" src="../images/blog/heat-gp/rod.jpg" alt="A thin rod heated by a burner, with thermocouples measuring its temperature at a few points.">
+  <img width="1400" height="788" loading="lazy" src="../images/blog/heat-gp/rod.jpg" alt="A thin rod heated by a burner, with thermocouples measuring its temperature at a few points.">
   <figcaption class="image-caption">A thin rod heated by a burner, with thermocouples measuring its temperature at a few points.</figcaption>
 </figure>
 
@@ -126,7 +126,7 @@ This is the approach taken by BODIL: represent the field on a grid, then define 
 <p>Here the solution field, represented on a uniform grid, is the temperature over a rod of unit length, <script type="math/tex">u_i = u(x_i) = u(i \Delta x)</script>, where <script type="math/tex">\Delta x</script> is the grid spacing.
 The likelihood is straightforward: we assume that the measurements are normally distributed around the solution field, giving
 <script type="math/tex; mode=display">
-P(\mathcal{D} \mid u) = \prod\limits_{k=1}^{N_D} \frac{1}{\sqrt{2\pi\sigma^2}} e^{-\frac{(\bar{u}_k - h_k(u))^2}{2\sigma^2}},
+P(\mathcal{D} \mid u) = \prod\limits_{k=1}^{N_D} \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left[-\frac{(\bar{u}_k - h_k(u))^2}{2\sigma^2} \right],
 </script>
 where <script type="math/tex">h_k</script> is the interpolation of <script type="math/tex">u</script> at the measurement location <script type="math/tex">\bar{x}_k</script>.</p>
 <p>The prior contains the physics, encoded as a discretization of the PDE, here a central finite-difference scheme.
