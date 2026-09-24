@@ -34,7 +34,7 @@
 
     gtag('config', 'G-5XKH0GTGGB');
   </script>
-  <script src="../js/toc.js" defer></script>
+
   <script>
     MathJax = {
       tex: { tags: 'ams' },
@@ -63,257 +63,32 @@
 
 
 <main>
-<nav class="toc" aria-label="Table of contents">
-  <a class="toc-h2" href="#data-and-features">Data and features</a>
-  <a class="toc-h2" href="#evaluation-metrics">Evaluation metrics</a>
-  <a class="toc-h2" href="#models-and-training">Models and training</a>
-  <a class="toc-h3" href="#loss">Loss</a>
-  <a class="toc-h3" href="#early-stopping">Early stopping</a>
-  <a class="toc-h2" href="#tuning-of-the-setup">Tuning of the setup</a>
-  <a class="toc-h3" href="#baseline">Baseline</a>
-  <a class="toc-h3" href="#loss-sweep-event-explorer">Loss sweep [Event explorer]</a>
-  <a class="toc-h2" href="#equal-area-reprojection">Equal-area reprojection</a>
-  <a class="toc-h3" href="#pod-generalization">POD generalization</a>
-  <a class="toc-h2" href="#references">References</a>
-</nav>
+
 <article class="markdown-body blog-body">
   <h1 id="pyrocb">PyroCb</h1>
 <p>Intense wildfires, in combination with atmospheric conditions that favor convection, sometimes produce pyrocumulonimbus (pyroCb) clouds that propel large quantities of smoke, ash, and moisture high into the atmosphere.
 These extreme events can cause severe hazards, such as lightning that can start new fires, intense storms, and long-term climate impacts due to long-lasting smoke injected into the stratosphere.</p>
 <figure class="image-wrap image-center" style="width: 75%;">
-  <img width="2500" height="1250" loading="lazy" src="../images/research/pyrocb/pyrocb_noaa.jpg" alt="PyroCb clouds (Image credit: NOAA NESDIS)">
+  <img loading="lazy" src="../images/research/pyrocb/pyrocb_noaa.jpg" alt="PyroCb clouds (Image credit: NOAA NESDIS)">
   <figcaption class="image-caption">PyroCb clouds (Image credit: NOAA NESDIS)</figcaption>
 </figure>
 
 <p>Because of the intensity and rarity of these events, it is difficult to predict when they occur.
 Here we take a machine learning approach to predict the occurrence of these events from wildfire and weather data over North America.</p>
 <h2 id="data-and-features">Data and features</h2>
-<p>The input features are formed from several datasets covering North America between 2017 and 2024:</p>
+<p>The input features are formed from several datasets covering North America between 2017 and 2025:</p>
 <ul>
 <li>RAVE dataset, merging fire products extracted from GOES and VIIRS.</li>
 <li>Engineered features from GFS analysis data on a <script type="math/tex">0.25^\circ</script> grid with <script type="math/tex">3</script> h time intervals.</li>
 <li>Cloud-top temperatures from the GOES cloud and moisture imagery product (channel C13, <script type="math/tex">10.3</script> µm infrared), which measures the brightness temperature at the top of clouds.</li>
 </ul>
 <p>The task becomes a classification problem, where we need to determine whether each fire will give rise to a pyroCb or not.
-Labels are computed from an inventory of observed pyroCbs between 2013 and 2024.</p>
+Labels are computed from an inventory of observed pyroCbs between 2013 and 2025.</p>
 <p>A list of features and their separability and correlations can be visualized on the <a href="https://files.lucasamoudruz.com/class_separability.html">input features explorer</a>.</p>
-<h2 id="evaluation-metrics">Evaluation metrics</h2>
-<p>The model needs to predict where pyroCbs may occur.
-In particular, it is more important to avoid misses than to avoid false alarms.
-Predicting an occurrence spatially and temporally close to a true event should also be rewarded, and we thus adopt a fuzzy metric rather than a pure pixel-wise loss to evaluate the model.
-This motivates the use of the <strong>symmetric dilated Tversky metric</strong>, defined as
-<script type="math/tex; mode=display">
-\mathrm{CSI}_{\alpha,\beta} = \frac{\mathrm{TP} + \epsilon} {\mathrm{TP} + \alpha\,\mathrm{FP} + \beta\,\mathrm{FN} + \epsilon},
-</script> 
-where <script type="math/tex">\epsilon > 0</script> is a small number to avoid dividing by 0 (we used <script type="math/tex">\epsilon=10^{-6}</script>), <script type="math/tex">\alpha</script> and <script type="math/tex">\beta</script> control the preference for penalizing false positives versus false negatives, and
-<script type="math/tex; mode=display">
-\mathrm{TP} = \sum_{n} y_n\, \tilde q_n, \qquad \mathrm{FP} = \sum_{n} q_n\, (1 - \tilde y_n), \qquad \mathrm{FN} = \sum_{n} y_n\, (1 - \tilde q_n).
-</script>
-</p>
-<p>The <script type="math/tex">\tilde \cdot</script> variables are dilated with a max pool over a given spatial and temporal neighborhood: <script type="math/tex">\tilde q_n</script> is the largest prediction within the neighborhood of point <script type="math/tex">n</script>, and <script type="math/tex">\tilde y_n</script> indicates whether an observed event lies within that neighborhood.
-An observed event thus counts as a hit when a prediction fires anywhere nearby and as a miss otherwise, so each event is credited at most once (<script type="math/tex">\mathrm{TP} + \mathrm{FN} = \sum_n y_n</script>); conversely, a prediction is a false alarm only when no event lies within its neighborhood.
-The metric is symmetric in the sense that misses and false alarms are both judged with the same spatial and temporal tolerance.
-This fixes a flaw of the asymmetric variant that scores hits against the dilated labels, <script type="math/tex">\mathrm{TP} = \sum_n q_n \tilde y_n</script>: there, a single event can collect hits proportional to the volume of its dilated halo, so a model can inflate its score by spraying predictions around events.
-Here we choose a box neighborhood centered on the prediction point, of size <script type="math/tex">1.75^\circ \approx 190</script> km in space and <script type="math/tex">15</script> h in time.
-Note that for <script type="math/tex">\alpha = \beta = 1</script> and no dilation, <script type="math/tex">\mathrm{CSI}_{1,1}</script> reduces to the standard critical success index (CSI).</p>
-<p>Similar constructions appear in the neighborhood verification literature in meteorology <sup id="fnref:1"><a class="footnote-ref" href="#fn:1">1</a></sup> <sup id="fnref:2"><a class="footnote-ref" href="#fn:2">2</a></sup>: this metric can be seen as a Tversky-weighted <sup id="fnref:3"><a class="footnote-ref" href="#fn:3">3</a></sup> <sup id="fnref:4"><a class="footnote-ref" href="#fn:4">4</a></sup> single-ratio variant of the neighborhood CSI loss of Lagerquist and Ebert-Uphoff <sup id="fnref:5"><a class="footnote-ref" href="#fn:5">5</a></sup>, with the tolerance applied to both sides of the contingency table, in the same spirit as the relaxed precision and recall used to evaluate road extraction in computer vision <sup id="fnref:6"><a class="footnote-ref" href="#fn:6">6</a></sup>.</p>
-<h2 id="models-and-training">Models and training</h2>
-<h3 id="loss">Loss</h3>
-<p>Models are trained using the combined loss:
-<script type="math/tex; mode=display">
-\mathcal{L} = \lambda\, \mathcal{L}_{\mathrm{CE}} + (1 - \lambda)\, \mathcal{L}_{\mathrm{Tv}},
-</script>
-where <script type="math/tex">\lambda \in [0, 1]</script>.
-For each sample <script type="math/tex">n = 1, \dots, N</script>, we denote by <script type="math/tex">y_n \in \{0, 1\}</script> the ground-truth label and by <script type="math/tex">q_n = \sigma(p_n)</script> the predicted probability, where <script type="math/tex">p_n</script> is the model logit and <script type="math/tex">\sigma</script> the sigmoid function.
-<script type="math/tex">\mathcal{L}_{\mathrm{CE}}</script> is the binary weighted cross-entropy loss:
-<script type="math/tex; mode=display">
-\mathcal{L}_{\mathrm{CE}} = -\frac{1}{N}\sum_{n=1}^{N}
-      \left[ w\, y_n \log q_n
-              + (1 - y_n)\log\!\left(1 - q_n\right) \right],
-</script>
-where <script type="math/tex">w</script> upweights the rare positive class, and <script type="math/tex">\mathcal{L}_{\mathrm{Tv}}</script> is the <strong>symmetric dilated</strong> Tversky loss,
-<script type="math/tex; mode=display">
-\mathcal{L}_{\mathrm{Tv}} = 1 - \mathrm{CSI}_{\alpha,\beta}.
-</script>
-</p>
-<h3 id="early-stopping">Early stopping</h3>
-<p>We keep track of an EMA model (whose weights are an exponential moving average of the trained model's weights) during training, and use this model for future predictions.</p>
-<p>The symmetric dilated Tversky metric <script type="math/tex">\mathrm{CSI}_{0.3,0.7}</script> is computed on the validation set (year 2021) at every epoch with the EMA model.
-We record the best model in that metric, typically after about 200 epochs of training.</p>
-<h2 id="tuning-of-the-setup">Tuning of the setup</h2>
-<p>The number of pyroCbs varies a lot throughout the years. 
-Generalization to a new year (in this work: 2024) should be robust to these variations.
-The following tuning stages thus operate over a leave-one-out cross validation per year.
-Models with the highest robustness over the training years (2017-2023) will be selected and tested on the test year.</p>
-<p>The procedure is as follow:</p>
-<ol>
-<li>train the model on each fold, on 4 seeds; record early stopping epochs.</li>
-<li>foreach fold, calibrate the threshold to get a given target POD (0.6). Measure the POD on the left-out year with this operational thresholed. </li>
-<li>train a model on all train years with the mean number of epochs obtained in (1).</li>
-<li>test on year 2024 with ensemble prediction over seeds with the mean operational threshold obtained in (2). </li>
-</ol>
-<p>The model with the best POD (closest to target in step 2) is selected.</p>
-<h3 id="baseline">Baseline</h3>
-<p>The baseline case uses pixel-wise metrics, and all available input features.
-This reduces to <script type="math/tex">\lambda=1</script> (pure binary cross-entropy loss), and the early stopping metric is set to the average precision (AP).</p>
-<table>
-<thead>
-<tr>
-<th>model</th>
-<th>deployed POD (mean <script type="math/tex">\pm</script> std)</th>
-<th>range</th>
-<th>abs. error</th>
-<th>mean FP</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>bce_ap_seedavg</td>
-<td>0.639 <script type="math/tex">\pm</script> 0.108</td>
-<td>[0.423, 0.771]</td>
-<td>0.090</td>
-<td>207</td>
-</tr>
-</tbody>
-</table>
-<h3 id="loss-sweep-event-explorer">Loss sweep [<a href="https://files.lucasamoudruz.com/event_explorer_2024_lam_0.25_a_0.3_b_0.7.html">Event explorer</a>]</h3>
-<p>Compare the effect of the loss function (different values of <script type="math/tex">\lambda</script>, <script type="math/tex">\alpha</script>, and <script type="math/tex">\beta</script>) on the prediction capabilities of the base model with all input features.
-To maximize <script type="math/tex">\mathrm{CSI}_{0.3,0.7}</script>, it is best to use a training loss with <script type="math/tex">\lambda=0.25</script>, <script type="math/tex">\alpha=0.3</script>, and <script type="math/tex">\beta=0.7</script>:</p>
-<table>
-<thead>
-<tr>
-<th>model</th>
-<th>deployed POD (mean <script type="math/tex">\pm</script> std)</th>
-<th>range</th>
-<th>abs. error</th>
-<th>mean FP</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>lam_0.25_a_0.2_b_0.8_seedavg</td>
-<td>0.581 <script type="math/tex">\pm</script> 0.101</td>
-<td>[0.462, 0.802]</td>
-<td>0.076</td>
-<td>117</td>
-</tr>
-<tr>
-<td>lam_0.25_a_0.3_b_0.7_seedavg</td>
-<td><strong>0.599 <script type="math/tex">\pm</script> 0.077</strong></td>
-<td>[0.538, 0.779]</td>
-<td>0.057</td>
-<td>135</td>
-</tr>
-<tr>
-<td>lam_0.5_a_0.5_b_0.5_seedavg</td>
-<td>0.623 <script type="math/tex">\pm</script> 0.103</td>
-<td>[0.462, 0.767]</td>
-<td>0.089</td>
-<td>153</td>
-</tr>
-<tr>
-<td>ens_mean</td>
-<td>0.590 <script type="math/tex">\pm</script> 0.090</td>
-<td>[0.500, 0.791]</td>
-<td>0.064</td>
-<td>131</td>
-</tr>
-</tbody>
-</table>
-<h2 id="equal-area-reprojection">Equal-area reprojection</h2>
-<p>All results above were obtained on the <script type="math/tex">0.25^\circ</script> latitude–longitude grid, whose east–west cell size shrinks ~3.5<script type="math/tex">\times</script> from the southern to the northern edge of the domain: the physical footprint of a CNN patch — and of the dilation neighborhood — depended on latitude. All products are now consolidated on a shared Lambert conformal conic grid (<script type="math/tex">25</script> km cells, standard parallels <script type="math/tex">35^\circ</script>N/<script type="math/tex">65^\circ</script>N), so patches and the neighborhood tolerance correspond to a fixed physical scale everywhere, and wind features are rotated into grid-relative components. The full pipeline (loss sweep, cross-validation, threshold calibration) was re-run on this grid; the numbers below supersede the tables above.</p>
-<h3 id="pod-generalization">POD generalization</h3>
-<p>Step (2) of the tuning procedure is a deployment simulation: the operational threshold is frozen from all <em>other</em> folds and applied to the left-out year, so the deployed POD measures how well the target operating point transfers to an unseen fire season. One season breaks this for every model: 2017 (only 25 events) sits far below target (deployed POD 0.24–0.48 across all cases) and its fold-optimal threshold is a strong outlier. Since this common failure does not discriminate between models, 2017 is excluded both from the summary below and from the frozen-threshold average — a leak-free choice, as only training years are involved.</p>
-<p>Two further variants remove geographic coordinates from the input features, testing whether the model uses them to memorize year-specific fire geography:</p>
-<table>
-<thead>
-<tr>
-<th>model</th>
-<th>deployed POD (mean <script type="math/tex">\pm</script> std)</th>
-<th>range</th>
-<th>abs. error</th>
-<th>mean FP</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>bce_ap_seedavg</td>
-<td>0.684 <script type="math/tex">\pm</script> 0.093</td>
-<td>[0.538, 0.788]</td>
-<td>0.104</td>
-<td>185</td>
-</tr>
-<tr>
-<td>lam_0.25_a_0.2_b_0.8_seedavg</td>
-<td>0.610 <script type="math/tex">\pm</script> 0.138</td>
-<td>[0.361, 0.788]</td>
-<td>0.111</td>
-<td>101</td>
-</tr>
-<tr>
-<td>lam_0.25_a_0.3_b_0.7_seedavg</td>
-<td>0.619 <script type="math/tex">\pm</script> 0.071</td>
-<td>[0.543, 0.718]</td>
-<td>0.069</td>
-<td>103</td>
-</tr>
-<tr>
-<td>lam_0.5_a_0.5_b_0.5_seedavg</td>
-<td>0.610 <script type="math/tex">\pm</script> 0.046</td>
-<td>[0.559, 0.692]</td>
-<td>0.037</td>
-<td>105</td>
-</tr>
-<tr>
-<td>no_lon_seedavg</td>
-<td>0.612 <script type="math/tex">\pm</script> 0.056</td>
-<td>[0.538, 0.692]</td>
-<td>0.052</td>
-<td>115</td>
-</tr>
-<tr>
-<td><strong>no_lonlat_seedavg</strong></td>
-<td><strong>0.599 <script type="math/tex">\pm</script> 0.049</strong></td>
-<td>[0.528, 0.671]</td>
-<td>0.042</td>
-<td><strong>92</strong></td>
-</tr>
-</tbody>
-</table>
-<p>Removing longitude and latitude gives the most faithful threshold transfer (essentially unbiased, smallest scatter) at the lowest false-alarm cost — the coordinates were indeed encoding fire geography that shifts from year to year. The BCE
-baseline shows the opposite failure mode: its probabilities saturate near 1, so the threshold <em>value</em> is stable but the operating point is not — the deployed POD overshoots systematically at roughly twice the false alarms.</p>
-<p>On the held-out test year 2024 (80 events, thresholds frozen from the folds), <code>no_lonlat</code> reaches POD 0.55 with 89 false alarms and <code>no_lon</code> POD 0.65 with 121; both score a frozen-threshold <script type="math/tex">\mathrm{CSI}_{0.3,0.7}</script> within 2–7% of the 
-(label-leaking) oracle threshold, confirming that the calibrated operating point transfers to an unseen season.</p>
-<figure class="image-wrap image-center" style="width: 100%;">
-  <img width="1950" height="930" loading="lazy" src="../images/research/pyrocb/relaxed_pod_sr_cover_tversky.png" alt="POD vs SR of the different models.">
-  <figcaption class="image-caption">POD vs SR of the different models.</figcaption>
-</figure>
-
-<p>The results of the <code>no_lonlat</code> case can be seen in this [<a href="https://files.lucasamoudruz.com/event_explorer_2024_no_lonlat.html">event explorer</a>].</p>
-<h2 id="references">References</h2>
-<div class="footnote">
-<hr />
-<ol>
-<li id="fn:1">
-<p>Ebert, E.E., 2008. Fuzzy verification of high-resolution gridded forecasts: a review and proposed framework. Meteorological Applications, 15(1), pp.51-64. <a href="https://doi.org/10.1002/met.25">DOI</a>&#160;<a class="footnote-backref" href="#fnref:1" title="Jump back to footnote 1 in the text">&#8617;</a></p>
-</li>
-<li id="fn:2">
-<p>Clark, A.J., Gallus Jr, W.A. and Weisman, M.L., 2010. Neighborhood-based verification of precipitation forecasts from convection-allowing NCAR WRF model simulations and the operational NAM. Weather and Forecasting, 25(5), pp.1495-1509. <a href="https://doi.org/10.1175/2010WAF2222404.1">DOI</a>&#160;<a class="footnote-backref" href="#fnref:2" title="Jump back to footnote 2 in the text">&#8617;</a></p>
-</li>
-<li id="fn:3">
-<p>Tversky, A., 1977. Features of similarity. Psychological Review, 84(4), pp.327-352. <a href="https://doi.org/10.1037/0033-295X.84.4.327">DOI</a>&#160;<a class="footnote-backref" href="#fnref:3" title="Jump back to footnote 3 in the text">&#8617;</a></p>
-</li>
-<li id="fn:4">
-<p>Salehi, S.S.M., Erdogmus, D. and Gholipour, A., 2017. Tversky loss function for image segmentation using 3D fully convolutional deep networks. In Machine Learning in Medical Imaging (MLMI 2017), pp.379-387. <a href="https://doi.org/10.1007/978-3-319-67389-9_44">DOI</a>&#160;<a class="footnote-backref" href="#fnref:4" title="Jump back to footnote 4 in the text">&#8617;</a></p>
-</li>
-<li id="fn:5">
-<p>Lagerquist, R. and Ebert-Uphoff, I., 2022. Can we integrate spatial verification methods into neural network loss functions for atmospheric science? Artificial Intelligence for the Earth Systems, 1(4), e220021. <a href="https://doi.org/10.1175/AIES-D-22-0021.1">DOI</a>&#160;<a class="footnote-backref" href="#fnref:5" title="Jump back to footnote 5 in the text">&#8617;</a></p>
-</li>
-<li id="fn:6">
-<p>Wiedemann, C., Heipke, C., Mayer, H. and Jamet, O., 1998. Empirical evaluation of automatically extracted road axes. In Empirical Evaluation Techniques in Computer Vision, pp.172-187.&#160;<a class="footnote-backref" href="#fnref:6" title="Jump back to footnote 6 in the text">&#8617;</a></p>
-</li>
-</ol>
-</div>
+<h2 id="trained-model">Trained model</h2>
+<p>See the [<a href="https://files.lucasamoudruz.com/event_explorer_2025_shipped.html">event explorer</a>] for year 2025.</p>
+<h2 id="labeling-tools">Labeling tools</h2>
+<p>Labeling tools for years [<a href="https://files.lucasamoudruz.com/event_explorer_2025_shipped_labeling.html">2025</a>] and for [<a href="https://files.lucasamoudruz.com/event_explorer_2017_shipped_labeling.html">2017</a>]</p>
 </article>
 
 </main>
