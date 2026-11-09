@@ -1,0 +1,93 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Viewing turbulence – Lucas Amoudruz</title>
+  <link rel="icon" href="../favicon.ico" sizes="any" />
+  <link rel="apple-touch-icon" href="../apple-touch-icon.png" />
+  <meta name="description" content="" />
+  <link rel="canonical" href="https://lucasamoudruz.com/blog/viewing-turbulence.html" />
+  <meta property="og:site_name" content="Lucas Amoudruz" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Viewing turbulence" />
+  <meta property="og:description" content="" />
+  <meta property="og:url" content="https://lucasamoudruz.com/blog/viewing-turbulence.html" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Viewing turbulence" />
+  <meta name="twitter:description" content="" />
+  <link rel="stylesheet" href="../css/main.css" />
+  <link rel="stylesheet" href="../css/codehilite.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:wght@400;500;600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="alternate" type="application/rss+xml" href="../feed.xml" title="RSS Feed" />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-5XKH0GTGGB"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-5XKH0GTGGB');
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.6.15/hls.light.min.js" defer></script>
+  <script src="../js/video-hls.js" defer></script>
+  <script>
+    MathJax = {
+      tex: { tags: 'ams' },
+      options: {
+        renderActions: {
+          find: [10, function (doc) {
+            for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+              const display = node.type.indexOf('display') >= 0;
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.insertBefore(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end   = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            }
+          }, '']
+        }
+      }
+    };
+  </script>
+  <script src="../mathjax/tex-chtml.min.js"></script>
+</head>
+<body>
+
+<nav class="top-nav" aria-label="Main navigation">
+  <a href="../index.html">About</a>
+  <a href="../index.html#publications">Publications</a>
+  <a href="../blog.html" class="active" aria-current="page">Blog</a>
+</nav>
+
+
+<main>
+
+<article class="markdown-body blog-body">
+  <h1 id="viewing-turbulence">Viewing turbulence</h1>
+<figure class="video-wrap video-hls" style="width: 100%;">
+  <video controls muted loop playsinline preload="none" width="1920" height="1080"
+         poster="https://media.lucasamoudruz.com/videos/viewing-turbulence/channel_retau1000/poster.jpg" data-src="https://media.lucasamoudruz.com/videos/viewing-turbulence/channel_retau1000/master.m3u8" aria-label="Turbulent channel flow at Re_tau = 1000: Q-criterion isosurfaces coloured by streamwise vorticity. Use the menu in the corner to force 4K."></video>
+  <figcaption class="image-caption">Turbulent channel flow at <span style="white-space: nowrap;"><script type="math/tex">Re_\tau = 1000</script>:</span> Q-criterion isosurfaces coloured by streamwise vorticity. Use the menu in the corner to force 4K.</figcaption>
+</figure>
+
+<figure class="video-wrap video-hls" style="width: 100%;">
+  <video controls muted loop playsinline preload="none" width="1920" height="1080"
+         poster="https://media.lucasamoudruz.com/videos/viewing-turbulence/periodic_hill_re5600/poster.jpg" data-src="https://media.lucasamoudruz.com/videos/viewing-turbulence/periodic_hill_re5600/master.m3u8" aria-label="Flow over periodic hills at Re_h = 5600: Q-criterion isosurfaces coloured by streamwise velocity, so that the recirculating fluid behind each hill stands out."></video>
+  <figcaption class="image-caption">Flow over periodic hills at <span style="white-space: nowrap;"><script type="math/tex">Re_h = 5600</script>:</span> Q-criterion isosurfaces coloured by streamwise velocity, so that the recirculating fluid behind each hill stands out.</figcaption>
+</figure>
+</article>
+
+</main>
+
+
+<footer class="site-footer">
+  <p>&copy; 2026 Lucas Amoudruz &nbsp;&nbsp;|&nbsp;&nbsp; <a href="../feed.xml">Subscribe (RSS)</a></p>
+</footer>
+
+</body>
+</html>

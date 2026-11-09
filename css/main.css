@@ -351,6 +351,36 @@ figure {
   border-radius: 8px;
 }
 
+/* {{video_hls(...)}}: streamed from R2; js/video-hls.js adds the quality menu. */
+.video-hls {
+  position: relative;
+}
+
+.video-hls video {
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+
+.video-hls-quality {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  font: 0.75rem var(--font-ui);
+  color: #fff;
+  background: rgba(0, 0, 0, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 4px;
+  padding: 0.15rem 0.3rem;
+  cursor: pointer;
+  opacity: 0.75;
+  transition: opacity 0.15s;
+}
+
+.video-hls:hover .video-hls-quality,
+.video-hls-quality:focus {
+  opacity: 1;
+}
+
 .video-row {
   display: flex;
   gap: 2%;
